@@ -6,8 +6,10 @@ export const ideas = pgTable("ideas", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
+  useCase: text("use_case"),
   category: text("category"),
   tools: text("tools"),
+  linkUrl: text("link_url"),
   votes: integer("votes").notNull().default(0),
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
 });
@@ -30,12 +32,16 @@ export const votes = pgTable("votes", {
   sessionId: text("session_id").notNull(),
   ideaId: integer("idea_id").notNull(),
   voteType: text("vote_type").notNull(), // 'up' or 'down'
+  ipAddress: text("ip_address").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const insertIdeaSchema = createInsertSchema(ideas).omit({
   id: true,
   votes: true,
   submittedAt: true,
+  title: true,
+  description: true,
 });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({

@@ -35,6 +35,7 @@ export interface IStorage {
   // Votes
   createVote(vote: InsertVote): Promise<Vote>;
   getUserVoteForIdea(sessionId: string, ideaId: number): Promise<Vote | undefined>;
+  getVoteByIpAndIdea(ipAddress: string, ideaId: number): Promise<Vote | undefined>;
   deleteVote(sessionId: string, ideaId: number): Promise<void>;
 }
 

@@ -180,6 +180,29 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
               />
             </div>
 
+            <FormField
+              control={form.control}
+              name="linkUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-slate-700">
+                    Link (Optional)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://your-website.com or social media link"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      {...field}
+                    />
+                  </FormControl>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Your link will only be shown if your idea gets 10+ upvotes
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button
               type="submit"
               disabled={submitMutation.isPending || !sessionId}
