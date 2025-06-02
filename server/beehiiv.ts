@@ -44,12 +44,18 @@ export class BeehiivService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('Beehiiv API Error Details:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData: errorData,
+          url: `https://api.beehiiv.com/v2/publications/${this.publicationId}/subscriptions`
+        });
         
         if (response.status === 400 && errorData.message?.includes('already subscribed')) {
           return { success: false, message: 'Email already subscribed' };
         }
         
-        throw new Error(errorData.message || `Beehiiv API error: ${response.status}`);
+        throw new Error(errorData.message || `Beehiiv API error: ${response.status} - ${JSON.stringify(errorData)}`);
       }
 
       const data = await response.json();
