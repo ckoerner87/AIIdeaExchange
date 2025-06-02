@@ -56,6 +56,18 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       toast({
         title: "Idea submitted successfully!",
         description: "Your AI use case has been added to the community.",
+        action: (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              form.reset();
+              // Keep form visible for another submission
+            }}
+          >
+            Submit Another
+          </Button>
+        ),
       });
       form.reset();
       onSubmitted();

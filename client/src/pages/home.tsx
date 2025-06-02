@@ -144,6 +144,12 @@ export default function Home() {
                 <p className="text-slate-600">Discover how others are using AI creatively</p>
               </div>
               <div className="flex items-center space-x-4">
+                <Button
+                  onClick={() => setHasSubmitted(false)}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Submit Another Idea
+                </Button>
                 <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
