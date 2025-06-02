@@ -5,6 +5,7 @@ import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, in
 import { nanoid } from "nanoid";
 import { ContentFilter } from "./content-filter";
 import { googleSheetsService } from "./google-sheets";
+import { gradeIdea } from "./ai-grader";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get or create user session
@@ -58,7 +59,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Sorry, but that isn't helpful enough" });
       }
 
-      const idea = await storage.createIdea(result.data);
+      // Grade the idea with AI
+      const aiGrade = await gradeIdea({
+        title: result.data.title,
+        description: result.data.description,
+        category: result.data.category || "",
+        tools: result.data.tools || ""
+      });
+
+      const ideaWithGrade = {
+        ...result.data,
+        aiGrade: aiGrade.toString()
+      };
+
+      const idea = await storage.createIdea(ideaWithGrade);
       await storage.updateUserSessionSubmitted(sessionId);
       
       res.json(idea);
@@ -81,7 +95,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const sortBy = req.query.sort as 'votes' | 'recent' || 'votes';
-      const ideas = await storage.getIdeas(sortBy);
+      const category = req.query.category as string;
+      const ideas = await storage.getIdeas(sortBy, category);
       
       res.json(ideas);
     } catch (error) {
@@ -200,6 +215,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to get stats" });
+    }
+  });
+
+  // Admin endpoint to delete ideas
+  app.delete("/api/admin/ideas/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid idea ID" });
+      }
+
+      await storage.deleteIdea(id);
+      res.json({ message: "Idea deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete idea" });
     }
   });
 

@@ -54,7 +54,14 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
             >
               <ChevronUp className="text-slate-400 hover:text-secondary h-5 w-5" />
             </Button>
-            <span className="text-sm font-semibold text-slate-700 px-2">{idea.votes}</span>
+            <div className="px-2 text-center">
+              <span className="text-sm font-semibold text-slate-700 block">{idea.votes}</span>
+              {idea.aiGrade && (
+                <span className="text-xs text-amber-600 font-medium block">
+                  AI: {parseFloat(idea.aiGrade).toFixed(1)}/10
+                </span>
+              )}
+            </div>
             <Button
               variant="ghost"
               size="sm"

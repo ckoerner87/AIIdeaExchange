@@ -14,6 +14,7 @@ export default function Home() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showUnlockMessage, setShowUnlockMessage] = useState(false);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   // Get or create session
   const { data: sessionData } = useQuery({
@@ -36,9 +37,10 @@ export default function Home() {
 
   // Get ideas (only if user has submitted)
   const { data: ideas, isLoading: ideasLoading } = useQuery({
-    queryKey: ['/api/ideas', sortBy],
+    queryKey: ['/api/ideas', sortBy, selectedCategory],
     queryFn: async () => {
-      const res = await fetch(`/api/ideas?sort=${sortBy}`, {
+      const categoryParam = selectedCategory ? `&category=${selectedCategory}` : '';
+      const res = await fetch(`/api/ideas?sort=${sortBy}${categoryParam}`, {
         headers: {
           'x-session-id': sessionId,
         },
