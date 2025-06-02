@@ -11,12 +11,17 @@ interface IdeaCardProps {
 }
 
 const categoryColors: Record<string, string> = {
-  productivity: "bg-blue-100 text-blue-800",
-  creative: "bg-green-100 text-green-800",
-  business: "bg-purple-100 text-purple-800",
-  education: "bg-orange-100 text-orange-800",
-  personal: "bg-pink-100 text-pink-800",
-  other: "bg-gray-100 text-gray-800",
+  "content-creation": "bg-purple-100 text-purple-800",
+  "marketing-ads": "bg-pink-100 text-pink-800",
+  "sales-outreach": "bg-green-100 text-green-800",
+  "automation-ai-agents": "bg-blue-100 text-blue-800",
+  "data-analysis-reporting": "bg-indigo-100 text-indigo-800",
+  "productivity-time-saving": "bg-cyan-100 text-cyan-800",
+  "customer-support": "bg-amber-100 text-amber-800",
+  "ecommerce-dropshipping": "bg-emerald-100 text-emerald-800",
+  "personal-lifestyle": "bg-rose-100 text-rose-800",
+  "real-estate": "bg-orange-100 text-orange-800",
+  "other": "bg-gray-100 text-gray-800",
 };
 
 const formatTimeAgo = (date: Date) => {

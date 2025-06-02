@@ -141,11 +141,16 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="productivity">Productivity</SelectItem>
-                        <SelectItem value="creative">Creative</SelectItem>
-                        <SelectItem value="business">Business</SelectItem>
-                        <SelectItem value="education">Education</SelectItem>
-                        <SelectItem value="personal">Personal</SelectItem>
+                        <SelectItem value="content-creation">Content Creation</SelectItem>
+                        <SelectItem value="marketing-ads">Marketing & Ads</SelectItem>
+                        <SelectItem value="sales-outreach">Sales & Outreach</SelectItem>
+                        <SelectItem value="automation-ai-agents">Automation & AI Agents</SelectItem>
+                        <SelectItem value="data-analysis-reporting">Data Analysis & Reporting</SelectItem>
+                        <SelectItem value="productivity-time-saving">Productivity & Time-Saving</SelectItem>
+                        <SelectItem value="customer-support">Customer Support</SelectItem>
+                        <SelectItem value="ecommerce-dropshipping">E-commerce & Dropshipping</SelectItem>
+                        <SelectItem value="personal-lifestyle">Personal Life & Lifestyle Hacks</SelectItem>
+                        <SelectItem value="real-estate">Real Estate</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
@@ -160,13 +165,34 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-slate-700">AI Tools Used</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g., ChatGPT, Midjourney, Claude"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                        {...field}
-                      />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                          <SelectValue placeholder="Select AI tools" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="chatgpt">ChatGPT</SelectItem>
+                        <SelectItem value="claude">Claude</SelectItem>
+                        <SelectItem value="gemini">Gemini</SelectItem>
+                        <SelectItem value="copilot">Microsoft Copilot</SelectItem>
+                        <SelectItem value="midjourney">Midjourney</SelectItem>
+                        <SelectItem value="dall-e">DALL-E</SelectItem>
+                        <SelectItem value="stable-diffusion">Stable Diffusion</SelectItem>
+                        <SelectItem value="canva-ai">Canva AI</SelectItem>
+                        <SelectItem value="grammarly">Grammarly</SelectItem>
+                        <SelectItem value="jasper">Jasper</SelectItem>
+                        <SelectItem value="copy-ai">Copy.ai</SelectItem>
+                        <SelectItem value="notion-ai">Notion AI</SelectItem>
+                        <SelectItem value="loom-ai">Loom AI</SelectItem>
+                        <SelectItem value="zapier">Zapier</SelectItem>
+                        <SelectItem value="perplexity">Perplexity</SelectItem>
+                        <SelectItem value="runway">Runway</SelectItem>
+                        <SelectItem value="adobe-ai">Adobe AI</SelectItem>
+                        <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
