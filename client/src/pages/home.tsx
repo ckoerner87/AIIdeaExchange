@@ -164,6 +164,108 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Category Filter */}
+            <div className="mb-6">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={selectedCategory === '' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('')}
+                  className="rounded-full"
+                >
+                  All Categories
+                </Button>
+                <Button
+                  variant={selectedCategory === 'content-creation' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('content-creation')}
+                  className="rounded-full"
+                >
+                  Content Creation
+                </Button>
+                <Button
+                  variant={selectedCategory === 'marketing-ads' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('marketing-ads')}
+                  className="rounded-full"
+                >
+                  Marketing & Ads
+                </Button>
+                <Button
+                  variant={selectedCategory === 'sales-outreach' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('sales-outreach')}
+                  className="rounded-full"
+                >
+                  Sales & Outreach
+                </Button>
+                <Button
+                  variant={selectedCategory === 'automation-ai-agents' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('automation-ai-agents')}
+                  className="rounded-full"
+                >
+                  Automation & AI Agents
+                </Button>
+                <Button
+                  variant={selectedCategory === 'data-analysis-reporting' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('data-analysis-reporting')}
+                  className="rounded-full"
+                >
+                  Data Analysis & Reporting
+                </Button>
+                <Button
+                  variant={selectedCategory === 'productivity-time-saving' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('productivity-time-saving')}
+                  className="rounded-full"
+                >
+                  Productivity & Time-Saving
+                </Button>
+                <Button
+                  variant={selectedCategory === 'customer-support' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('customer-support')}
+                  className="rounded-full"
+                >
+                  Customer Support
+                </Button>
+                <Button
+                  variant={selectedCategory === 'ecommerce-dropshipping' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('ecommerce-dropshipping')}
+                  className="rounded-full"
+                >
+                  E-commerce & Dropshipping
+                </Button>
+                <Button
+                  variant={selectedCategory === 'personal-lifestyle' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('personal-lifestyle')}
+                  className="rounded-full"
+                >
+                  Personal Life & Lifestyle
+                </Button>
+                <Button
+                  variant={selectedCategory === 'real-estate' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('real-estate')}
+                  className="rounded-full"
+                >
+                  Real Estate
+                </Button>
+                <Button
+                  variant={selectedCategory === 'other' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory('other')}
+                  className="rounded-full"
+                >
+                  Other
+                </Button>
+              </div>
+            </div>
+
             {ideasLoading ? (
               <div className="space-y-6">
                 {[1, 2, 3].map((i) => (
