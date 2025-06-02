@@ -89,31 +89,11 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="title"
+              name="useCase"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-slate-700">
-                    What's your AI use case? <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g., Using ChatGPT to write better email responses"
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-slate-700">
-                    Tell us more about it <span className="text-red-500">*</span>
+                    What's Your AI Use Case? <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Textarea

@@ -57,18 +57,8 @@ export class ContentFilter {
     return { isValid: true };
   }
 
-  static validateIdea(title: string, description: string, useCase: string): { isValid: boolean; reason?: string } {
-    // Validate each field
-    const titleCheck = this.isValidAIUseCase(title);
-    if (!titleCheck.isValid) {
-      return { isValid: false, reason: titleCheck.reason };
-    }
-
-    const descriptionCheck = this.isValidAIUseCase(description);
-    if (!descriptionCheck.isValid) {
-      return { isValid: false, reason: descriptionCheck.reason };
-    }
-
+  static validateIdea(useCase: string): { isValid: boolean; reason?: string } {
+    // Validate the use case field
     const useCaseCheck = this.isValidAIUseCase(useCase);
     if (!useCaseCheck.isValid) {
       return { isValid: false, reason: useCaseCheck.reason };

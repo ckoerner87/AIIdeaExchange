@@ -51,8 +51,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Validate content with content filter
       const contentValidation = ContentFilter.validateIdea(
-        result.data.title,
-        result.data.description,
         result.data.useCase
       );
       
