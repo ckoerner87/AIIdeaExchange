@@ -56,11 +56,6 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
             </Button>
             <div className="px-2 text-center">
               <span className="text-sm font-semibold text-slate-700 block">{idea.votes}</span>
-              {idea.aiGrade && (
-                <span className="text-xs text-amber-600 font-medium block">
-                  AI: {parseFloat(idea.aiGrade).toFixed(1)}/10
-                </span>
-              )}
             </div>
             <Button
               variant="ghost"

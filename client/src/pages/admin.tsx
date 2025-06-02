@@ -103,11 +103,7 @@ export default function Admin() {
                           {idea.category}
                         </span>
                       )}
-                      {idea.aiGrade && (
-                        <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">
-                          AI Grade: {parseFloat(idea.aiGrade).toFixed(1)}/10
-                        </span>
-                      )}
+
                     </div>
                     
                     {idea.description && (
