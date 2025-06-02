@@ -188,15 +188,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ message: "Email already subscribed" });
       }
 
-      const subscription = await storage.createSubscription(result.data);
-      
-      // Add email to Google Sheets
+      // Add subscriber to Beehiiv
       try {
-        await googleSheetsService.addEmailToSheet(result.data.email);
-      } catch (sheetsError) {
-        console.error('Failed to add email to Google Sheets:', sheetsError);
-        // Continue with response even if Google Sheets fails
+        const beehiivResult = await beehiivService.addSubscriber(result.data.email);
+        if (!beehiivResult.success) {
+          if (beehiivResult.message === 'Email already subscribed') {
+            return res.status(409).json({ message: "Email already subscribed" });
+          }
+          throw new Error(beehiivResult.message);
+        }
+      } catch (beehiivError: any) {
+        console.error('Failed to add subscriber to Beehiiv:', beehiivError);
+        return res.status(500).json({ message: "Failed to subscribe to newsletter" });
       }
+
+      const subscription = await storage.createSubscription(result.data);
       
       res.json({ message: "Successfully subscribed", subscription });
     } catch (error) {

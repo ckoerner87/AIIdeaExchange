@@ -31,7 +31,14 @@ export class BeehiivService {
           send_welcome_email: true,
           utm_source: 'howdoyouuseai',
           utm_medium: 'website',
-          utm_campaign: 'ai_ideas_platform'
+          utm_campaign: 'ai_ideas_platform',
+          custom_fields: [
+            {
+              name: 'source',
+              value: 'howdoyouuseai'
+            }
+          ],
+          tags: ['howdoyouuseai', 'ai-platform', 'community']
         }),
       });
 
