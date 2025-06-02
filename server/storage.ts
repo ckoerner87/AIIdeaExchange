@@ -118,6 +118,13 @@ export class DatabaseStorage implements IStorage {
     return vote || undefined;
   }
 
+  async getVoteByIpAndIdea(ipAddress: string, ideaId: number): Promise<Vote | undefined> {
+    const [vote] = await db.select().from(votes).where(
+      and(eq(votes.ipAddress, ipAddress), eq(votes.ideaId, ideaId))
+    );
+    return vote || undefined;
+  }
+
   async deleteVote(sessionId: string, ideaId: number): Promise<void> {
     await db.delete(votes).where(
       and(eq(votes.sessionId, sessionId), eq(votes.ideaId, ideaId))

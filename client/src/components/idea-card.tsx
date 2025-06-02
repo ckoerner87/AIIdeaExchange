@@ -1,4 +1,4 @@
-import { ChevronUp, ChevronDown, Flag } from "lucide-react";
+import { ChevronUp, ChevronDown, Flag, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,7 +67,7 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
           </div>
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-3">
-              <h3 className="text-lg font-semibold text-slate-900">{idea.title}</h3>
+              <h3 className="text-lg font-semibold text-slate-900">{idea.useCase || idea.title}</h3>
               {idea.category && (
                 <Badge 
                   className={`text-xs rounded-full ${categoryColors[idea.category] || categoryColors.other}`}
@@ -77,7 +77,22 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
                 </Badge>
               )}
             </div>
-            <p className="text-slate-600 mb-4">{idea.description}</p>
+            {idea.description && <p className="text-slate-600 mb-4">{idea.description}</p>}
+            {idea.useCase && !idea.title && <p className="text-slate-600 mb-4">{idea.useCase}</p>}
+            {/* Show link if idea has 10+ votes */}
+            {idea.votes >= 10 && idea.linkUrl && (
+              <div className="mb-3">
+                <a
+                  href={idea.linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors text-sm"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span>Visit Link</span>
+                </a>
+              </div>
+            )}
             <div className="flex items-center justify-between text-sm text-slate-500">
               <div className="flex items-center space-x-4">
                 {idea.tools && <span>Tools: {idea.tools}</span>}

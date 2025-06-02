@@ -156,21 +156,11 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                         <SelectItem value="chatgpt">ChatGPT</SelectItem>
                         <SelectItem value="claude">Claude</SelectItem>
                         <SelectItem value="gemini">Gemini</SelectItem>
-                        <SelectItem value="copilot">Microsoft Copilot</SelectItem>
-                        <SelectItem value="midjourney">Midjourney</SelectItem>
-                        <SelectItem value="dall-e">DALL-E</SelectItem>
-                        <SelectItem value="stable-diffusion">Stable Diffusion</SelectItem>
-                        <SelectItem value="canva-ai">Canva AI</SelectItem>
-                        <SelectItem value="grammarly">Grammarly</SelectItem>
-                        <SelectItem value="jasper">Jasper</SelectItem>
-                        <SelectItem value="copy-ai">Copy.ai</SelectItem>
-                        <SelectItem value="notion-ai">Notion AI</SelectItem>
-                        <SelectItem value="loom-ai">Loom AI</SelectItem>
-                        <SelectItem value="zapier">Zapier</SelectItem>
+                        <SelectItem value="deepseek">DeepSeek</SelectItem>
+                        <SelectItem value="grok">Grok</SelectItem>
                         <SelectItem value="perplexity">Perplexity</SelectItem>
-                        <SelectItem value="runway">Runway</SelectItem>
-                        <SelectItem value="adobe-ai">Adobe AI</SelectItem>
-                        <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
+                        <SelectItem value="mistral">Mistral</SelectItem>
+                        <SelectItem value="llama">Llama</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>

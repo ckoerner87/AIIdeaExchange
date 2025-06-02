@@ -114,7 +114,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Idea not found" });
       }
 
-      // Check if user already voted
+      // Get client IP address
+      const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
+      
+      // Check if this IP already voted on this idea (one vote per IP)
+      const existingIpVote = await storage.getVoteByIpAndIdea(clientIp as string, ideaId);
+      if (existingIpVote && voteType === 'up') {
+        return res.status(400).json({ message: "You can only upvote once per idea" });
+      }
+      
+      // Check if user already voted with this session
       const existingVote = await storage.getUserVoteForIdea(sessionId, ideaId);
       
       if (existingVote) {
@@ -125,9 +134,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateIdeaVotes(ideaId, newVotes);
           return res.json({ votes: newVotes, userVote: null });
         } else {
-          // Change vote type
+          // Change vote type (only allow if not blocked by IP restriction)
+          if (voteType === 'up' && existingIpVote) {
+            return res.status(400).json({ message: "You can only upvote once per idea" });
+          }
           await storage.deleteVote(sessionId, ideaId);
-          await storage.createVote({ sessionId, ideaId, voteType });
+          await storage.createVote({ sessionId, ideaId, voteType, ipAddress: clientIp as string });
           const voteChange = voteType === 'up' ? 2 : -2; // Change from down to up or vice versa
           const newVotes = idea.votes + voteChange;
           await storage.updateIdeaVotes(ideaId, newVotes);
@@ -135,7 +147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else {
         // New vote
-        await storage.createVote({ sessionId, ideaId, voteType });
+        await storage.createVote({ sessionId, ideaId, voteType, ipAddress: clientIp as string });
         const voteChange = voteType === 'up' ? 1 : -1;
         const newVotes = idea.votes + voteChange;
         await storage.updateIdeaVotes(ideaId, newVotes);
