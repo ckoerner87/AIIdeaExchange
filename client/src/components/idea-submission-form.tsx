@@ -175,7 +175,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
 
             <Button
               type="submit"
-              disabled={submitMutation.isPending}
+              disabled={submitMutation.isPending || !sessionId}
               className="w-full bg-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-200 transition-all transform hover:scale-[1.02]"
             >
               {submitMutation.isPending ? (

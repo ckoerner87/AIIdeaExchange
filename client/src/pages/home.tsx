@@ -131,7 +131,7 @@ export default function Home() {
                 Share how you're using AI in your work or life. Once you contribute, you'll unlock access to see what others are doing with AI and vote on the best ideas.
               </p>
             </div>
-            <IdeaSubmissionForm sessionId={sessionId} onSubmitted={handleIdeaSubmitted} />
+            <IdeaSubmissionForm sessionId={sessionData?.sessionId || sessionId} onSubmitted={handleIdeaSubmitted} />
           </div>
         )}
 
