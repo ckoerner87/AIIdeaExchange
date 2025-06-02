@@ -13,7 +13,7 @@ import {
   type InsertVote
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc, asc, and } from "drizzle-orm";
 
 export interface IStorage {
   // Ideas
@@ -112,15 +112,15 @@ export class DatabaseStorage implements IStorage {
 
   async getUserVoteForIdea(sessionId: string, ideaId: number): Promise<Vote | undefined> {
     const [vote] = await db.select().from(votes).where(
-      eq(votes.sessionId, sessionId)
-    ).where(eq(votes.ideaId, ideaId));
+      and(eq(votes.sessionId, sessionId), eq(votes.ideaId, ideaId))
+    );
     return vote || undefined;
   }
 
   async deleteVote(sessionId: string, ideaId: number): Promise<void> {
     await db.delete(votes).where(
-      eq(votes.sessionId, sessionId)
-    ).where(eq(votes.ideaId, ideaId));
+      and(eq(votes.sessionId, sessionId), eq(votes.ideaId, ideaId))
+    );
   }
 }
 

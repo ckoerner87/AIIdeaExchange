@@ -55,7 +55,18 @@ export default function Home() {
   // Vote mutation
   const voteMutation = useMutation({
     mutationFn: async ({ ideaId, voteType }: { ideaId: number; voteType: 'up' | 'down' }) => {
-      const res = await apiRequest('POST', `/api/ideas/${ideaId}/vote`, { voteType });
+      const res = await fetch(`/api/ideas/${ideaId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': sessionId,
+        },
+        body: JSON.stringify({ voteType }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to vote');
+      }
       return res.json();
     },
     onSuccess: () => {

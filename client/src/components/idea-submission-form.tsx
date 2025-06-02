@@ -34,7 +34,18 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
 
   const submitMutation = useMutation({
     mutationFn: async (data: InsertIdea) => {
-      const res = await apiRequest('POST', '/api/ideas', data);
+      const res = await fetch('/api/ideas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': sessionId,
+        },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to submit idea');
+      }
       return res.json();
     },
     onSuccess: () => {
