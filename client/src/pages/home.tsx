@@ -207,6 +207,7 @@ export default function Home() {
             <div className="flex items-center space-x-6 text-sm text-slate-600">
               <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
+              <a href="mailto:chris@cofounders.com?subject=Feature Request - AI Ideas Exchange" className="hover:text-slate-900 transition-colors">Feature Request</a>
               <a href="#" className="hover:text-slate-900 transition-colors">Contact</a>
             </div>
           </div>
