@@ -12,6 +12,8 @@ import {
   type Vote,
   type InsertVote
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, asc } from "drizzle-orm";
 
 export interface IStorage {
   // Ideas
@@ -36,126 +38,90 @@ export interface IStorage {
   deleteVote(sessionId: string, ideaId: number): Promise<void>;
 }
 
-export class MemStorage implements IStorage {
-  private ideas: Map<number, Idea>;
-  private subscriptions: Map<number, Subscription>;
-  private userSessions: Map<string, UserSession>;
-  private votes: Map<string, Vote>;
-  private currentIdeaId: number;
-  private currentSubscriptionId: number;
-  private currentSessionId: number;
-  private currentVoteId: number;
-
-  constructor() {
-    this.ideas = new Map();
-    this.subscriptions = new Map();
-    this.userSessions = new Map();
-    this.votes = new Map();
-    this.currentIdeaId = 1;
-    this.currentSubscriptionId = 1;
-    this.currentSessionId = 1;
-    this.currentVoteId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   // Ideas
   async createIdea(insertIdea: InsertIdea): Promise<Idea> {
-    const id = this.currentIdeaId++;
-    const idea: Idea = { 
-      ...insertIdea, 
-      id, 
-      votes: 0,
-      submittedAt: new Date()
-    };
-    this.ideas.set(id, idea);
+    const [idea] = await db
+      .insert(ideas)
+      .values(insertIdea)
+      .returning();
     return idea;
   }
 
   async getIdeas(sortBy: 'votes' | 'recent' = 'votes'): Promise<Idea[]> {
-    const allIdeas = Array.from(this.ideas.values());
-    
     if (sortBy === 'votes') {
-      return allIdeas.sort((a, b) => b.votes - a.votes);
+      return await db.select().from(ideas).orderBy(desc(ideas.votes));
     } else {
-      return allIdeas.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+      return await db.select().from(ideas).orderBy(desc(ideas.submittedAt));
     }
   }
 
   async getIdeaById(id: number): Promise<Idea | undefined> {
-    return this.ideas.get(id);
+    const [idea] = await db.select().from(ideas).where(eq(ideas.id, id));
+    return idea || undefined;
   }
 
   async updateIdeaVotes(id: number, votes: number): Promise<void> {
-    const idea = this.ideas.get(id);
-    if (idea) {
-      idea.votes = votes;
-      this.ideas.set(id, idea);
-    }
+    await db.update(ideas).set({ votes }).where(eq(ideas.id, id));
   }
 
   // Subscriptions
   async createSubscription(insertSubscription: InsertSubscription): Promise<Subscription> {
-    const id = this.currentSubscriptionId++;
-    const subscription: Subscription = {
-      ...insertSubscription,
-      id,
-      subscribedAt: new Date()
-    };
-    this.subscriptions.set(id, subscription);
+    const [subscription] = await db
+      .insert(subscriptions)
+      .values(insertSubscription)
+      .returning();
     return subscription;
   }
 
   async getSubscriptionByEmail(email: string): Promise<Subscription | undefined> {
-    return Array.from(this.subscriptions.values()).find(
-      (subscription) => subscription.email === email
-    );
+    const [subscription] = await db.select().from(subscriptions).where(eq(subscriptions.email, email));
+    return subscription || undefined;
   }
 
   async getAllSubscriptions(): Promise<Subscription[]> {
-    return Array.from(this.subscriptions.values());
+    return await db.select().from(subscriptions);
   }
 
   // User Sessions
   async createUserSession(insertSession: InsertUserSession): Promise<UserSession> {
-    const id = this.currentSessionId++;
-    const session: UserSession = {
-      ...insertSession,
-      id,
-      createdAt: new Date()
-    };
-    this.userSessions.set(insertSession.sessionId, session);
+    const [session] = await db
+      .insert(userSessions)
+      .values(insertSession)
+      .returning();
     return session;
   }
 
   async getUserSession(sessionId: string): Promise<UserSession | undefined> {
-    return this.userSessions.get(sessionId);
+    const [session] = await db.select().from(userSessions).where(eq(userSessions.sessionId, sessionId));
+    return session || undefined;
   }
 
   async updateUserSessionSubmitted(sessionId: string): Promise<void> {
-    const session = this.userSessions.get(sessionId);
-    if (session) {
-      session.hasSubmitted = true;
-      this.userSessions.set(sessionId, session);
-    }
+    await db.update(userSessions).set({ hasSubmitted: true }).where(eq(userSessions.sessionId, sessionId));
   }
 
   // Votes
   async createVote(insertVote: InsertVote): Promise<Vote> {
-    const id = this.currentVoteId++;
-    const vote: Vote = { ...insertVote, id };
-    const key = `${insertVote.sessionId}-${insertVote.ideaId}`;
-    this.votes.set(key, vote);
+    const [vote] = await db
+      .insert(votes)
+      .values(insertVote)
+      .returning();
     return vote;
   }
 
   async getUserVoteForIdea(sessionId: string, ideaId: number): Promise<Vote | undefined> {
-    const key = `${sessionId}-${ideaId}`;
-    return this.votes.get(key);
+    const [vote] = await db.select().from(votes).where(
+      eq(votes.sessionId, sessionId)
+    ).where(eq(votes.ideaId, ideaId));
+    return vote || undefined;
   }
 
   async deleteVote(sessionId: string, ideaId: number): Promise<void> {
-    const key = `${sessionId}-${ideaId}`;
-    this.votes.delete(key);
+    await db.delete(votes).where(
+      eq(votes.sessionId, sessionId)
+    ).where(eq(votes.ideaId, ideaId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
