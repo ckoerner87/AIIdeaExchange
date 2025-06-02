@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 import { ContentFilter } from "./content-filter";
 import { googleSheetsService } from "./google-sheets";
 import { gradeIdea } from "./ai-grader";
+import { beehiivService } from "./beehiiv";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get or create user session
