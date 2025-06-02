@@ -10,6 +10,10 @@ export class GoogleSheetsService {
     // https://docs.google.com/spreadsheets/d/1pkysuWrj4G13b0j71cV_S8gRJM0WXB-mT95fQ-7xWpg/edit?usp=sharing
     this.spreadsheetId = '1pkysuWrj4G13b0j71cV_S8gRJM0WXB-mT95fQ-7xWpg';
     
+    console.log('Checking Google Sheets credentials...');
+    console.log('Service Account Email:', process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ? 'Present' : 'Missing');
+    console.log('Private Key:', process.env.GOOGLE_PRIVATE_KEY ? 'Present' : 'Missing');
+    
     if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
       console.log('Google Sheets credentials not configured - emails will not be saved to sheets');
       this.isConfigured = false;
