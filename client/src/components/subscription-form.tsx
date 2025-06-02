@@ -62,9 +62,9 @@ export default function SubscriptionForm({ subscriberCount }: SubscriptionFormPr
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-8 text-center">
       <div className="max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-white mb-4">Never Miss the Best AI Ideas</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Get the 5 most upvoted ideas to your inbox every week</h2>
         <p className="text-slate-300 mb-6">
-          Get a weekly digest of the most upvoted AI use cases delivered to your inbox. Join other innovators discovering creative AI applications.
+          No spam, no ads, no cost.
         </p>
         
         <Form {...form}>
@@ -111,7 +111,7 @@ export default function SubscriptionForm({ subscriberCount }: SubscriptionFormPr
           </form>
         </Form>
         
-        <p className="text-xs text-slate-400 mt-4">No spam, unsubscribe anytime. We respect your privacy.</p>
+        <p className="text-xs text-slate-400 mt-4">Unsubscribe anytime. We respect your privacy.</p>
       </div>
     </div>
   );
