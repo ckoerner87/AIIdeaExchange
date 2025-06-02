@@ -183,7 +183,20 @@ export default function Home() {
 
         {/* Subscription Section */}
         <div id="subscription-section" className="mt-16">
-          <SubscriptionForm subscriberCount={stats?.totalSubscribers || 0} />
+          <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
+        </div>
+
+        {/* Feature Request Section */}
+        <div className="mt-12 text-center">
+          <a 
+            href="mailto:chris@cofounders.com?subject=Feature Request - How Do You Use AI?" 
+            className="inline-block bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-xl font-bold text-xl hover:shadow-lg transition-all transform hover:scale-105"
+          >
+            💡 Got Ideas? Send Feature Requests
+          </a>
+          <p className="text-slate-600 mt-3 text-sm">
+            Help us improve the platform by sharing your suggestions
+          </p>
         </div>
       </main>
 
