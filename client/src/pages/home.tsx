@@ -94,21 +94,14 @@ export default function Home() {
                 <Lightbulb className="text-white text-lg" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-900">AI Ideas Exchange</h1>
+                <h1 className="text-xl font-bold text-slate-900">How Do You Use AI?</h1>
                 <p className="text-sm text-slate-600">Share creative AI use cases</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-slate-600">
-                {stats?.totalIdeas || 0} ideas shared
+                {(stats as any)?.totalIdeas || 0} ideas shared
               </span>
-              <Button 
-                className="bg-accent text-white hover:bg-amber-600"
-                onClick={() => document.getElementById('subscription-section')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                <Bell className="mr-2 h-4 w-4" />
-                Subscribe
-              </Button>
             </div>
           </div>
         </div>
@@ -202,7 +195,7 @@ export default function Home() {
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
                 <Lightbulb className="text-white text-sm" />
               </div>
-              <span className="text-slate-600">AI Ideas Exchange</span>
+              <span className="text-slate-600">How Do You Use AI?</span>
             </div>
             <div className="flex items-center space-x-6 text-sm text-slate-600">
               <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>

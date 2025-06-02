@@ -39,17 +39,25 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
     <Card className="border border-slate-200 hover:shadow-lg transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start space-x-4">
-          <div className="flex flex-col items-center space-y-2">
+          <div className="flex flex-col items-center space-y-1">
             <Button
               variant="ghost"
               size="sm"
-              className="flex flex-col items-center p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
               onClick={() => onVote(idea.id, 'up')}
               disabled={isVoting}
             >
-              <ChevronUp className="text-slate-400 hover:text-secondary h-4 w-4" />
-              <span className="text-sm font-semibold text-slate-700">{idea.votes}</span>
-              <ChevronDown className="text-slate-400 hover:text-red-400 h-4 w-4" />
+              <ChevronUp className="text-slate-400 hover:text-secondary h-5 w-5" />
+            </Button>
+            <span className="text-sm font-semibold text-slate-700 px-2">{idea.votes}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
+              onClick={() => onVote(idea.id, 'down')}
+              disabled={isVoting}
+            >
+              <ChevronDown className="text-slate-400 hover:text-red-400 h-5 w-5" />
             </Button>
           </div>
           <div className="flex-1">
