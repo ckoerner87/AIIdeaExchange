@@ -19,26 +19,21 @@ export class BeehiivService {
     }
 
     try {
+      console.log('Making Beehiiv API request to:', `https://api.beehiiv.com/v2/publications/${this.publicationId}/subscriptions`);
+      console.log('Request body:', JSON.stringify({ email: email }));
+      
+      // Try different API format that might work with your Beehiiv setup
       const response = await fetch(`https://api.beehiiv.com/v2/publications/${this.publicationId}/subscriptions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           email: email,
           reactivate_existing: false,
-          send_welcome_email: true,
-          utm_source: 'howdoyouuseai',
-          utm_medium: 'website',
-          utm_campaign: 'ai_ideas_platform',
-          custom_fields: [
-            {
-              name: 'source',
-              value: 'howdoyouuseai'
-            }
-          ],
-          tags: ['howdoyouuseai', 'ai-platform', 'community']
+          send_welcome_email: false
         }),
       });
 
