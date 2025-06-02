@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema } from "@shared/schema";
 import { nanoid } from "nanoid";
+import { ContentFilter } from "./content-filter";
+import { googleSheetsService } from "./google-sheets";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get or create user session
@@ -45,6 +47,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = insertIdeaSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({ message: "Invalid idea data", errors: result.error.errors });
+      }
+
+      // Validate content with content filter
+      const contentValidation = ContentFilter.validateIdea(
+        result.data.title,
+        result.data.description,
+        result.data.useCase
+      );
+      
+      if (!contentValidation.isValid) {
+        return res.status(400).json({ message: "Sorry, but that isn't helpful enough" });
       }
 
       const idea = await storage.createIdea(result.data);
@@ -150,6 +163,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const subscription = await storage.createSubscription(result.data);
+      
+      // Add email to Google Sheets
+      try {
+        await googleSheetsService.addEmailToSheet(result.data.email);
+      } catch (sheetsError) {
+        console.error('Failed to add email to Google Sheets:', sheetsError);
+        // Continue with response even if Google Sheets fails
+      }
+      
       res.json({ message: "Successfully subscribed", subscription });
     } catch (error) {
       res.status(500).json({ message: "Failed to subscribe" });
