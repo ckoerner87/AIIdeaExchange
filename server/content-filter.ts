@@ -8,8 +8,8 @@ export class ContentFilter {
     // Spam indicators
     'click here', 'buy now', 'limited time', 'act now', 'free money',
     'make money fast', 'work from home', 'get rich', 'no experience',
-    // Irrelevant content
-    'recipe', 'cooking', 'weather', 'sports', 'politics', 'religion'
+    // Irrelevant content (removed recipe since it can be valid AI use case)
+    'weather', 'sports', 'politics', 'religion'
   ];
 
   private static aiKeywords = [
@@ -17,7 +17,9 @@ export class ContentFilter {
     'machine learning', 'ml', 'automation', 'bot', 'assistant', 'prompt',
     'generate', 'analyze', 'summarize', 'translate', 'write', 'create',
     'midjourney', 'dall-e', 'stable diffusion', 'openai', 'anthropic',
-    'gemini', 'copilot', 'jasper', 'notion ai', 'grammarly', 'canva ai'
+    'gemini', 'copilot', 'jasper', 'notion ai', 'grammarly', 'canva ai',
+    'recipe', 'regenerate', 'generates', 'creating', 'writing', 'helps',
+    'tool', 'app', 'software', 'platform', 'service', 'algorithm'
   ];
 
   static isValidAIUseCase(content: string): { isValid: boolean; reason?: string } {
