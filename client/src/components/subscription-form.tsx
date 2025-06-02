@@ -8,7 +8,7 @@ interface SubscriptionFormProps {
 export default function SubscriptionForm({ subscriberCount }: SubscriptionFormProps) {
   const handleSubscribe = () => {
     // Open Beehiiv newsletter signup in new tab
-    window.open('https://your-beehiiv-url.beehiiv.com/subscribe', '_blank');
+    window.open('https://newsletter.chrisjkoerner.com/', '_blank');
   };
 
   return (
