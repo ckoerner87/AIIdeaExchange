@@ -62,7 +62,7 @@ export default function SubscriptionForm({ subscriberCount }: SubscriptionFormPr
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-8 text-center">
       <div className="max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-white mb-4">Get the 5 most upvoted ideas to your inbox every week</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Get The 5 Most Upvoted Ideas To Your Inbox Every Week</h2>
         <p className="text-slate-300 mb-6">
           No spam, no ads, no cost.
         </p>
