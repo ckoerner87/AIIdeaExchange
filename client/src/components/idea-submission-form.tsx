@@ -34,6 +34,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
 
   const submitMutation = useMutation({
     mutationFn: async (data: InsertIdea) => {
+      console.log("Making API request with sessionId:", sessionId);
       const res = await fetch('/api/ideas', {
         method: 'POST',
         headers: {
@@ -42,8 +43,10 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
         },
         body: JSON.stringify(data),
       });
+      console.log("Response status:", res.status);
       if (!res.ok) {
         const error = await res.json();
+        console.log("Error response:", error);
         throw new Error(error.message || 'Failed to submit idea');
       }
       return res.json();
@@ -66,6 +69,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
   });
 
   const onSubmit = (data: InsertIdea) => {
+    console.log("Form submit - sessionId:", sessionId);
     if (!sessionId) {
       toast({
         title: "Error",

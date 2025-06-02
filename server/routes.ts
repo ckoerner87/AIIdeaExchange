@@ -37,8 +37,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit an idea
   app.post("/api/ideas", async (req, res) => {
     try {
+      console.log("Headers received:", req.headers);
       const sessionId = req.headers['x-session-id'] as string;
+      console.log("Session ID extracted:", sessionId);
       if (!sessionId) {
+        console.log("No session ID found in headers");
         return res.status(401).json({ message: "Session ID required" });
       }
 
