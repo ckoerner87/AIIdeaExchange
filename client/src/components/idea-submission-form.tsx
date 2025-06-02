@@ -1,0 +1,183 @@
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertIdeaSchema } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
+import { Rocket } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import type { InsertIdea } from "@shared/schema";
+
+interface IdeaSubmissionFormProps {
+  sessionId: string;
+  onSubmitted: () => void;
+}
+
+export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmissionFormProps) {
+  const { toast } = useToast();
+  
+  const form = useForm<InsertIdea>({
+    resolver: zodResolver(insertIdeaSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      tools: "",
+    },
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: async (data: InsertIdea) => {
+      const res = await apiRequest('POST', '/api/ideas', data);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Idea submitted successfully!",
+        description: "Your AI use case has been added to the community.",
+      });
+      form.reset();
+      onSubmitted();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit idea",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: InsertIdea) => {
+    if (!sessionId) {
+      toast({
+        title: "Error",
+        description: "Session not initialized. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    submitMutation.mutate(data);
+  };
+
+  return (
+    <Card className="shadow-lg border border-slate-200">
+      <CardContent className="p-8">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-slate-700">
+                    What's your AI use case? <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Using ChatGPT to write better email responses"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-slate-700">
+                    Tell us more about it <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={4}
+                      placeholder="Describe how you use AI, what tools you use, and what benefits you've seen..."
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700">Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="productivity">Productivity</SelectItem>
+                        <SelectItem value="creative">Creative</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                        <SelectItem value="education">Education</SelectItem>
+                        <SelectItem value="personal">Personal</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tools"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700">AI Tools Used</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., ChatGPT, Midjourney, Claude"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={submitMutation.isPending}
+              className="w-full bg-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-200 transition-all transform hover:scale-[1.02]"
+            >
+              {submitMutation.isPending ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Rocket className="mr-2 h-5 w-5" />
+                  Share My Idea & Unlock Community
+                </>
+              )}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
