@@ -176,7 +176,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-slate-700">
-                    Link to Your Stuff - Only Visible If Your Idea Gets 10+ Upvotes
+                    Link Your Stuff - Only Visible Once Your Idea Gets 10+ Upvotes
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -185,9 +185,6 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                       {...field}
                     />
                   </FormControl>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Your link will only be shown if your idea gets 10+ upvotes
-                  </p>
                   <FormMessage />
                 </FormItem>
               )}
