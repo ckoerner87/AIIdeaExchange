@@ -5,7 +5,7 @@ import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, in
 import { nanoid } from "nanoid";
 import { ContentFilter } from "./content-filter";
 import { googleSheetsService } from "./google-sheets";
-import { gradeIdea } from "./ai-grader";
+
 import { beehiivService } from "./beehiiv";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -60,20 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Sorry, but that isn't helpful enough" });
       }
 
-      // Grade the idea with AI
-      const aiGrade = await gradeIdea({
-        title: result.data.title,
-        description: result.data.description,
-        category: result.data.category || "",
-        tools: result.data.tools || ""
-      });
-
-      const ideaWithGrade = {
-        ...result.data,
-        aiGrade: aiGrade.toString()
-      };
-
-      const idea = await storage.createIdea(ideaWithGrade);
+      const idea = await storage.createIdea(result.data);
       await storage.updateUserSessionSubmitted(sessionId);
       
       res.json(idea);
