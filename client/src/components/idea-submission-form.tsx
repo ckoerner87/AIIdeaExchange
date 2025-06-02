@@ -171,6 +171,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                         <SelectItem value="deepseek">DeepSeek</SelectItem>
                         <SelectItem value="grok">Grok</SelectItem>
                         <SelectItem value="perplexity">Perplexity</SelectItem>
+                        <SelectItem value="manus">Manus</SelectItem>
                         <SelectItem value="mistral">Mistral</SelectItem>
                         <SelectItem value="llama">Llama</SelectItem>
                         <SelectItem value="other">Other</SelectItem>

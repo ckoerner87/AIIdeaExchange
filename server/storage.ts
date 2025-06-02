@@ -18,9 +18,10 @@ import { eq, desc, asc, and } from "drizzle-orm";
 export interface IStorage {
   // Ideas
   createIdea(idea: InsertIdea): Promise<Idea>;
-  getIdeas(sortBy?: 'votes' | 'recent'): Promise<Idea[]>;
+  getIdeas(sortBy?: 'votes' | 'recent', category?: string): Promise<Idea[]>;
   getIdeaById(id: number): Promise<Idea | undefined>;
   updateIdeaVotes(id: number, votes: number): Promise<void>;
+  deleteIdea(id: number): Promise<void>;
   
   // Subscriptions
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
@@ -49,11 +50,17 @@ export class DatabaseStorage implements IStorage {
     return idea;
   }
 
-  async getIdeas(sortBy: 'votes' | 'recent' = 'votes'): Promise<Idea[]> {
+  async getIdeas(sortBy: 'votes' | 'recent' = 'votes', category?: string): Promise<Idea[]> {
+    let query = db.select().from(ideas);
+    
+    if (category) {
+      query = query.where(eq(ideas.category, category));
+    }
+    
     if (sortBy === 'votes') {
-      return await db.select().from(ideas).orderBy(desc(ideas.votes));
+      return await query.orderBy(desc(ideas.votes));
     } else {
-      return await db.select().from(ideas).orderBy(desc(ideas.submittedAt));
+      return await query.orderBy(desc(ideas.submittedAt));
     }
   }
 
@@ -64,6 +71,10 @@ export class DatabaseStorage implements IStorage {
 
   async updateIdeaVotes(id: number, votes: number): Promise<void> {
     await db.update(ideas).set({ votes }).where(eq(ideas.id, id));
+  }
+
+  async deleteIdea(id: number): Promise<void> {
+    await db.delete(ideas).where(eq(ideas.id, id));
   }
 
   // Subscriptions

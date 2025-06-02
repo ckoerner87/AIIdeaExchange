@@ -11,6 +11,7 @@ export const ideas = pgTable("ideas", {
   tools: text("tools"),
   linkUrl: text("link_url"),
   votes: integer("votes").notNull().default(0),
+  aiGrade: text("ai_grade"), // Store as decimal string like "7.3"
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
 });
 
