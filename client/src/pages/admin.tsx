@@ -13,6 +13,7 @@ export default function Admin() {
   const [password, setPassword] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
+  const [editUrl, setEditUrl] = useState("");
 
   // Get all ideas for admin view
   const { data: ideas, isLoading } = useQuery({
@@ -117,17 +118,19 @@ export default function Admin() {
   const handleEdit = (idea: any) => {
     setEditingId(idea.id);
     setEditText(idea.useCase || "");
+    setEditUrl(idea.linkUrl || "");
   };
 
   const handleSave = () => {
     if (editingId && editText.trim()) {
-      updateMutation.mutate({ id: editingId, useCase: editText });
+      updateMutation.mutate({ id: editingId, useCase: editText, linkUrl: editUrl });
     }
   };
 
   const handleCancel = () => {
     setEditingId(null);
     setEditText("");
+    setEditUrl("");
   };
 
   const handleDelete = (idea: any) => {
@@ -263,12 +266,24 @@ export default function Admin() {
                         </div>
                         {editingId === idea.id ? (
                           <div className="space-y-4">
-                            <Textarea
-                              value={editText}
-                              onChange={(e) => setEditText(e.target.value)}
-                              className="w-full min-h-[100px]"
-                              placeholder="Edit idea text..."
-                            />
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Idea Text</label>
+                              <Textarea
+                                value={editText}
+                                onChange={(e) => setEditText(e.target.value)}
+                                className="w-full min-h-[100px]"
+                                placeholder="Edit idea text..."
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">URL (Optional)</label>
+                              <Input
+                                value={editUrl}
+                                onChange={(e) => setEditUrl(e.target.value)}
+                                className="w-full"
+                                placeholder="https://example.com or leave empty to remove"
+                              />
+                            </div>
                             <div className="flex space-x-2">
                               <Button 
                                 onClick={handleSave} 

@@ -147,6 +147,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
       const isWhitelisted = WHITELISTED_IPS.includes(clientIp as string);
       
+      // Rate limiting for all IPs (including whitelisted for rate limits only)
+      const recentVotes = await storage.getRecentVotesByIp(clientIp as string, 60000); // Last 1 minute
+      if (recentVotes.length >= 5) {
+        return res.status(429).json({ message: "Too many votes. Please wait before voting again." });
+      }
+      
+      const veryRecentVotes = await storage.getRecentVotesByIp(clientIp as string, 10000); // Last 10 seconds
+      if (veryRecentVotes.length >= 2) {
+        return res.status(429).json({ message: "Voting too quickly. Please slow down." });
+      }
+
       // Anti-gaming measures (skip for whitelisted IPs)
       if (!isWhitelisted) {
         // Prevent voting on own submission
@@ -154,22 +165,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: "You cannot vote on your own idea" });
         }
         
-        // Rate limiting: Check if this IP has voted too many times recently
-        const recentVotes = await storage.getRecentVotesByIp(clientIp as string, 60000); // Last 1 minute
-        if (recentVotes.length >= 5) {
-          return res.status(429).json({ message: "Too many votes. Please wait before voting again." });
-        }
-        
-        // Check for rapid voting patterns
-        const veryRecentVotes = await storage.getRecentVotesByIp(clientIp as string, 10000); // Last 10 seconds
-        if (veryRecentVotes.length >= 2) {
-          return res.status(429).json({ message: "Voting too quickly. Please slow down." });
-        }
-        
-        // Check if this IP already voted on this idea (one vote per IP)
+        // Check if this IP already voted on ANY idea (one vote total per IP)
         const existingIpVote = await storage.getVoteByIpAndIdea(clientIp as string, ideaId);
-        if (existingIpVote && voteType === 'up') {
-          return res.status(400).json({ message: "You can only upvote once per idea" });
+        if (existingIpVote) {
+          return res.status(400).json({ message: "You can only vote once per idea from this location" });
         }
       }
       
