@@ -71,9 +71,13 @@ export class DatabaseStorage implements IStorage {
       }
     }
     
-    if (tool) {
-      // Case-insensitive search for tool in the tools field
-      conditions.push(eq(ideas.tools, tool));
+    if (tool && tool !== 'All') {
+      if (tool.toLowerCase() === 'other') {
+        // For "other" tool, include both null and "other" values (case insensitive)
+        conditions.push(or(eq(ideas.tools, 'Other'), eq(ideas.tools, 'other'), isNull(ideas.tools)));
+      } else {
+        conditions.push(eq(ideas.tools, tool));
+      }
     }
     
     if (conditions.length > 0) {
