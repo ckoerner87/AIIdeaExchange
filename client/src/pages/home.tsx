@@ -320,6 +320,22 @@ export default function Home() {
           <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
         </div>
 
+        {/* GIF Section */}
+        <div className="mt-8 text-center">
+          <div className="flex justify-center gap-6 flex-wrap">
+            <img 
+              src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHdpa3piajBreXl0NnBheGV6ZmNoZHl5cnV0NGhsc3F1YWx4N3ZwNCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/fZoKDBwdbILBjhtXZD/giphy.gif"
+              alt="AI Animation Left"
+              className="rounded-lg shadow-md max-w-sm w-full"
+            />
+            <img 
+              src="https://media.giphy.com/media/SbGMR2CbpUxzCxBL9j/giphy.gif?cid=ecf05e47zlpbxusjvpvzr0yjl5cq0c40uyrebycxspdnupa6&ep=v1_gifs_search&rid=giphy.gif&ct=g"
+              alt="AI Animation Right"
+              className="rounded-lg shadow-md max-w-sm w-full"
+            />
+          </div>
+        </div>
+
         {/* Feature Request Section */}
         <div className="mt-12 text-center">
           <a 
