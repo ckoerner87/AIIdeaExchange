@@ -37,49 +37,7 @@ export default function Admin() {
     enabled: isAuthenticated, // Only fetch when authenticated
   });
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === "cjk") {
-      setIsAuthenticated(true);
-    } else {
-      toast({
-        title: "Access Denied",
-        description: "Invalid password",
-        variant: "destructive",
-      });
-      setPassword("");
-    }
-  };
-
-  // Show password form if not authenticated
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
-          <div className="text-center mb-6">
-            <Lock className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Access</h1>
-            <p className="text-slate-600">Enter password to access admin panel</p>
-          </div>
-          <form onSubmit={handlePasswordSubmit}>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
-              className="mb-4"
-              autoFocus
-            />
-            <Button type="submit" className="w-full">
-              Access Admin Panel
-            </Button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // Delete idea mutation
+  // Delete idea mutation - must be called before any conditional returns
   const deleteMutation = useMutation({
     mutationFn: async (ideaId: number) => {
       const res = await fetch(`/api/admin/ideas/${ideaId}`, {
@@ -105,6 +63,20 @@ export default function Admin() {
       });
     },
   });
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === "cjk") {
+      setIsAuthenticated(true);
+    } else {
+      toast({
+        title: "Access Denied",
+        description: "Invalid password",
+        variant: "destructive",
+      });
+      setPassword("");
+    }
+  };
 
   const handleDelete = (idea: any) => {
     if (window.confirm(`Are you sure you want to delete this idea: "${idea.useCase || idea.title}"?`)) {
@@ -141,6 +113,34 @@ export default function Admin() {
       description: `Downloaded ${subscribers.length} email addresses as CSV file.`,
     });
   };
+
+  // Show password form if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+          <div className="text-center mb-6">
+            <Lock className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Access</h1>
+            <p className="text-slate-600">Enter password to access admin panel</p>
+          </div>
+          <form onSubmit={handlePasswordSubmit}>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="mb-4"
+              autoFocus
+            />
+            <Button type="submit" className="w-full">
+              Access Admin Panel
+            </Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen font-inter">
