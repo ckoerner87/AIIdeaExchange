@@ -40,6 +40,39 @@ export default function Admin() {
     enabled: isAuthenticated, // Only fetch when authenticated
   });
 
+  // Update idea mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, useCase }: { id: number; useCase: string }) => {
+      const res = await fetch(`/api/admin/ideas/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ useCase }),
+      });
+      if (!res.ok) {
+        throw new Error('Failed to update idea');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Idea updated",
+        description: "The idea has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
+      setEditingId(null);
+      setEditText("");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update idea",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Delete idea mutation - must be called before any conditional returns
   const deleteMutation = useMutation({
     mutationFn: async (ideaId: number) => {
@@ -79,6 +112,22 @@ export default function Admin() {
       });
       setPassword("");
     }
+  };
+
+  const handleEdit = (idea: any) => {
+    setEditingId(idea.id);
+    setEditText(idea.useCase || "");
+  };
+
+  const handleSave = () => {
+    if (editingId && editText.trim()) {
+      updateMutation.mutate({ id: editingId, useCase: editText });
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setEditText("");
   };
 
   const handleDelete = (idea: any) => {
@@ -212,29 +261,53 @@ export default function Admin() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {idea.useCase || idea.title}
-                      </h3>
-                      {idea.category && (
-                        <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">
-                          {idea.category}
-                        </span>
+                      {editingId === idea.id ? (
+                        <div className="flex-1">
+                          <Textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            className="w-full h-32 text-sm"
+                            placeholder="Edit idea text..."
+                          />
+                          <div className="flex gap-2 mt-2">
+                            <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
+                              <Save className="h-4 w-4 mr-1" />
+                              Save
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={handleCancel}>
+                              <X className="h-4 w-4 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <h3 className="text-lg font-semibold text-slate-900 whitespace-pre-wrap">
+                            {idea.useCase || idea.title}
+                          </h3>
+                          {idea.category && (
+                            <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">
+                              {idea.category}
+                            </span>
+                          )}
+                        </>
                       )}
-
                     </div>
                     
-                    {idea.description && (
+                    {!editingId && idea.description && (
                       <p className="text-slate-600 mb-3">{idea.description}</p>
                     )}
                     
-                    <div className="flex items-center gap-4 text-sm text-slate-500">
-                      <span>Votes: {idea.votes}</span>
-                      {idea.tools && <span>Tools: {idea.tools}</span>}
-                      <span>ID: {idea.id}</span>
-                      <span>Submitted: {new Date(idea.submittedAt).toLocaleDateString()}</span>
-                    </div>
+                    {!editingId && (
+                      <div className="flex items-center gap-4 text-sm text-slate-500">
+                        <span>Votes: {idea.votes}</span>
+                        {idea.tools && <span>Tools: {idea.tools}</span>}
+                        <span>ID: {idea.id}</span>
+                        <span>Submitted: {new Date(idea.submittedAt).toLocaleDateString()}</span>
+                      </div>
+                    )}
                     
-                    {idea.linkUrl && idea.votes >= 10 && (
+                    {!editingId && idea.linkUrl && idea.votes >= 10 && (
                       <div className="mt-3">
                         <a 
                           href={idea.linkUrl} 
@@ -248,16 +321,25 @@ export default function Admin() {
                     )}
                   </div>
                   
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(idea)}
-                    disabled={deleteMutation.isPending}
-                    className="ml-4"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
+                  {editingId !== idea.id && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(idea)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(idea)}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

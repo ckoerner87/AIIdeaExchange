@@ -114,7 +114,7 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
             </div>
             
             <div className="mb-4">
-              <p className="text-slate-800 leading-relaxed">{displayText}</p>
+              <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{displayText}</p>
               {shouldTruncate && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}

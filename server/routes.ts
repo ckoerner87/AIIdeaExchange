@@ -203,7 +203,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Store email in our database
+      console.log('Creating subscription with data:', result.data);
       const subscription = await storage.createSubscription(result.data);
+      console.log('Created subscription:', subscription);
       
       res.json({ message: "Successfully subscribed", subscription });
     } catch (error) {
