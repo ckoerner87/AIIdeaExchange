@@ -33,6 +33,8 @@ export interface IStorage {
   createUserSession(session: InsertUserSession): Promise<UserSession>;
   getUserSession(sessionId: string): Promise<UserSession | undefined>;
   updateUserSessionSubmitted(sessionId: string): Promise<void>;
+  incrementUpvotesGiven(sessionId: string): Promise<void>;
+  getUserIdeasBySession(sessionId: string): Promise<Idea[]>;
   
   // Votes
   createVote(vote: InsertVote): Promise<Vote>;
@@ -144,6 +146,21 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserSessionSubmitted(sessionId: string): Promise<void> {
     await db.update(userSessions).set({ hasSubmitted: true }).where(eq(userSessions.sessionId, sessionId));
+  }
+
+  async incrementUpvotesGiven(sessionId: string): Promise<void> {
+    const session = await this.getUserSession(sessionId);
+    if (session) {
+      const newUpvotesGiven = session.upvotesGiven + 1;
+      await db.update(userSessions)
+        .set({ upvotesGiven: newUpvotesGiven })
+        .where(eq(userSessions.sessionId, sessionId));
+    }
+  }
+
+  async getUserIdeasBySession(sessionId: string): Promise<Idea[]> {
+    const userIdeas = await db.select().from(ideas).where(eq(ideas.sessionId, sessionId));
+    return userIdeas;
   }
 
   // Votes

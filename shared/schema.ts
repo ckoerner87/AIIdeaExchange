@@ -28,6 +28,8 @@ export const userSessions = pgTable("user_sessions", {
   id: serial("id").primaryKey(),
   sessionId: text("session_id").notNull().unique(),
   hasSubmitted: boolean("has_submitted").notNull().default(false),
+  upvotesGiven: integer("upvotes_given").notNull().default(0),
+  rewardUpvotesEarned: integer("reward_upvotes_earned").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

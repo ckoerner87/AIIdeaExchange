@@ -210,6 +210,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const voteChange = voteType === 'up' ? 1 : -1;
         const newVotes = idea.votes + voteChange;
         await storage.updateIdeaVotes(ideaId, newVotes);
+        
+        // Reward system: Give bonus upvotes for upvoting others' ideas
+        if (voteType === 'up' && !isWhitelisted) {
+          await storage.incrementUpvotesGiven(sessionId);
+          
+          // Check if user earned a reward (every 3 upvotes given)
+          const userSession = await storage.getUserSession(sessionId);
+          if (userSession && userSession.upvotesGiven > 0 && userSession.upvotesGiven % 3 === 0) {
+            // Award 1 bonus upvote to one of their ideas
+            const userIdeas = await storage.getUserIdeasBySession(sessionId);
+            if (userIdeas.length > 0) {
+              // Pick the idea with the lowest votes to boost
+              const ideaToBoost = userIdeas.reduce((lowest, current) => 
+                current.votes < lowest.votes ? current : lowest
+              );
+              
+              const boostedVotes = ideaToBoost.votes + 1;
+              await storage.updateIdeaVotes(ideaToBoost.id, boostedVotes);
+            }
+          }
+        }
+        
         return res.json({ votes: newVotes, userVote: voteType });
       }
     } catch (error) {
