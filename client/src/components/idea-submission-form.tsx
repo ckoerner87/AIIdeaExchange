@@ -234,7 +234,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
               ) : (
                 <>
                   <Rocket className="mr-2 h-5 w-5" />
-                  Share My Idea & Unlock Community
+                  Share My Idea & Show Me Everyone Else's!
                 </>
               )}
             </Button>
