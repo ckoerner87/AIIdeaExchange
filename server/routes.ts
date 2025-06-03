@@ -219,9 +219,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ideas = await storage.getIdeas();
       const subscriptions = await storage.getAllSubscriptions();
       
+      // Calculate category counts
+      const categoryCounts: Record<string, number> = {};
+      ideas.forEach((idea: any) => {
+        const category = idea.category || 'Other';
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+      });
+      
       res.json({
         totalIdeas: ideas.length,
-        totalSubscribers: subscriptions.length
+        totalSubscribers: subscriptions.length,
+        categoryCounts
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to get stats" });

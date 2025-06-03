@@ -144,8 +144,7 @@ export default function Home() {
           <div>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900">Community AI Ideas</h2>
-                <p className="text-slate-600">Discover how others are using AI creatively</p>
+                <h2 className="text-2xl font-bold text-slate-900">AI Use Case Ideas</h2>
               </div>
               <div className="flex items-center space-x-4">
                 <Button
@@ -304,25 +303,22 @@ export default function Home() {
           </div>
         )}
 
-        {/* Subscription Section */}
-        <div id="subscription-section" className="mt-16">
-          <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
-        </div>
-
-        {/* Submit Another Idea Button - Between subscription and ideas */}
+        {/* Submit Another Idea Button - Above subscription form */}
         {hasSubmitted && (
-          <div className="mt-12 text-center">
+          <div className="mt-16 text-center">
             <Button
               onClick={() => setHasSubmitted(false)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-xl font-bold text-xl transition-all transform hover:scale-105"
             >
               Submit Another Idea
             </Button>
-            <p className="text-slate-600 mt-3 text-sm">
-              Share another way you use AI and help the community discover more creative applications
-            </p>
           </div>
         )}
+
+        {/* Subscription Section */}
+        <div id="subscription-section" className="mt-12">
+          <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
+        </div>
 
         {/* Feature Request Section */}
         <div className="mt-12 text-center">
