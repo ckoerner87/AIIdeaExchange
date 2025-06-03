@@ -18,6 +18,7 @@ export const ideas = pgTable("ideas", {
 export const subscriptions = pgTable("subscriptions", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
+  source: text("source").notNull().default("homepage"), // "homepage" or "gift_card_popup"
   subscribedAt: timestamp("subscribed_at").notNull().defaultNow(),
 });
 

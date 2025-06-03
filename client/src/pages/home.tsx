@@ -6,6 +6,7 @@ import IdeaSubmissionForm from "@/components/idea-submission-form";
 import IdeaCard from "@/components/idea-card";
 import SubscriptionForm from "@/components/subscription-form";
 import UnlockMessage from "@/components/unlock-message";
+import GiftCardPopup from "@/components/gift-card-popup";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -19,6 +20,7 @@ export default function Home() {
   });
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showUnlockMessage, setShowUnlockMessage] = useState(false);
+  const [showGiftCardPopup, setShowGiftCardPopup] = useState(false);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
@@ -113,9 +115,14 @@ export default function Home() {
   }, []);
 
   const handleIdeaSubmitted = () => {
+    setShowGiftCardPopup(true);
+    queryClient.invalidateQueries({ queryKey: ['/api/session'] });
+  };
+
+  const handleGiftCardPopupClose = () => {
+    setShowGiftCardPopup(false);
     setShowUnlockMessage(true);
     setHasSubmitted(true);
-    queryClient.invalidateQueries({ queryKey: ['/api/session'] });
     setTimeout(() => {
       setShowUnlockMessage(false);
     }, 3000);
@@ -420,6 +427,12 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Gift Card Popup */}
+      <GiftCardPopup
+        isOpen={showGiftCardPopup}
+        onClose={handleGiftCardPopupClose}
+      />
     </div>
   );
 }
