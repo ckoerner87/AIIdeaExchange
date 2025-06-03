@@ -6,7 +6,7 @@ import { nanoid } from "nanoid";
 import { ContentFilter } from "./content-filter";
 import { googleSheetsService } from "./google-sheets";
 
-import { beehiivService } from "./beehiiv";
+
 
 // Whitelisted IPs that can vote multiple times (for testing)
 const WHITELISTED_IPS = [

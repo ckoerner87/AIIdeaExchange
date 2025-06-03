@@ -30,6 +30,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       description: "",
       category: "",
       tools: "",
+      linkUrl: "",
     },
   });
 
