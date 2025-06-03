@@ -51,13 +51,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid idea data", errors: result.error.errors });
       }
 
-      // Validate content with content filter
-      const contentValidation = ContentFilter.validateIdea(
-        result.data.useCase
-      );
-      
-      if (!contentValidation.isValid) {
-        return res.status(400).json({ message: "Sorry, but that isn't helpful enough" });
+      // Basic validation - just check for minimum content
+      if (!result.data.useCase || result.data.useCase.trim().length < 3) {
+        return res.status(400).json({ message: "Please provide a valid use case description" });
       }
 
       const idea = await storage.createIdea(result.data);

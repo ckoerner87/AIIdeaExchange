@@ -32,18 +32,9 @@ export class ContentFilter {
       }
     }
 
-    // Check minimum length (at least 10 characters)
-    if (content.trim().length < 10) {
+    // Check minimum length (at least 5 characters)
+    if (content.trim().length < 5) {
       return { isValid: false, reason: 'Too short to be helpful' };
-    }
-
-    // Check for AI-related keywords
-    const hasAIKeyword = this.aiKeywords.some(keyword => 
-      lowercaseContent.includes(keyword)
-    );
-
-    if (!hasAIKeyword) {
-      return { isValid: false, reason: 'Must be related to AI use cases' };
     }
 
     // Check for spam patterns (excessive capitalization, repeated characters)
