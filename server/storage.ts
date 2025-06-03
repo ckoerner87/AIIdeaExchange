@@ -73,11 +73,11 @@ export class DatabaseStorage implements IStorage {
     
     if (tool) {
       // Case-insensitive search for tool in the tools field
-      conditions.push(and(ideas.tools, eq(ideas.tools, tool)));
+      conditions.push(eq(ideas.tools, tool));
     }
     
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = query.where(and(...conditions)) as any;
     }
     
     if (sortBy === 'votes') {

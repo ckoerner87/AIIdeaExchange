@@ -225,7 +225,11 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                     <Input
                       placeholder="https://your-website.com or social media link"
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                      {...field}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      value={field.value || ""}
+                      ref={field.ref}
                     />
                   </FormControl>
                   <FormMessage />
