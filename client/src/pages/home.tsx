@@ -233,7 +233,30 @@ export default function Home() {
         {/* Community Section */}
         {hasSubmitted && (
           <div>
-            <div className="flex items-center justify-between mb-8">
+            {/* Mobile layout: Title first, then buttons below */}
+            <div className="block md:hidden mb-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">AI Use Case Ideas</h2>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                <Button
+                  onClick={() => setHasSubmitted(false)}
+                  className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
+                >
+                  Submit Another Idea
+                </Button>
+                <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="votes">Sort by upvotes</SelectItem>
+                    <SelectItem value="recent">Most recent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Desktop layout: Title and buttons side by side */}
+            <div className="hidden md:flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">AI Use Case Ideas</h2>
               </div>
