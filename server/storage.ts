@@ -13,7 +13,7 @@ import {
   type InsertVote
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, isNull } from "drizzle-orm";
+import { eq, desc, asc, and, or, isNull, gte } from "drizzle-orm";
 
 export interface IStorage {
   // Ideas
@@ -38,6 +38,7 @@ export interface IStorage {
   createVote(vote: InsertVote): Promise<Vote>;
   getUserVoteForIdea(sessionId: string, ideaId: number): Promise<Vote | undefined>;
   getVoteByIpAndIdea(ipAddress: string, ideaId: number): Promise<Vote | undefined>;
+  getRecentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<Vote[]>;
   deleteVote(sessionId: string, ideaId: number): Promise<void>;
 }
 
@@ -166,6 +167,17 @@ export class DatabaseStorage implements IStorage {
       and(eq(votes.ipAddress, ipAddress), eq(votes.ideaId, ideaId))
     );
     return vote || undefined;
+  }
+
+  async getRecentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<Vote[]> {
+    const cutoffTime = new Date(Date.now() - timeWindowMs);
+    const recentVotes = await db.select().from(votes).where(
+      and(
+        eq(votes.ipAddress, ipAddress),
+        sql`${votes.createdAt} >= ${cutoffTime}`
+      )
+    );
+    return recentVotes;
   }
 
   async deleteVote(sessionId: string, ideaId: number): Promise<void> {
