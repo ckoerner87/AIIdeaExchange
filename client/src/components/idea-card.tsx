@@ -1,8 +1,9 @@
-import { ChevronUp, ChevronDown, Flag, ExternalLink } from "lucide-react";
+import { ChevronUp, ChevronDown, Flag, ExternalLink, Copy } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import type { Idea } from "@shared/schema";
 
 interface IdeaCardProps {
@@ -42,12 +43,36 @@ const formatTimeAgo = (date: Date) => {
 
 export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { toast } = useToast();
   const maxLength = 150; // Character limit for truncation
   const useCase = idea.useCase || idea.description || idea.title || "";
   const shouldTruncate = useCase.length > maxLength;
   const displayText = shouldTruncate && !isExpanded 
     ? useCase.substring(0, maxLength) + "..." 
     : useCase;
+
+  const handleShareIdea = async () => {
+    const shareUrl = `${window.location.origin}/?idea=${idea.id}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: "Link copied!",
+        description: "Share this link to let others see this specific AI use case",
+      });
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast({
+        title: "Link copied!",
+        description: "Share this link to let others see this specific AI use case",
+      });
+    }
+  };
 
   return (
     <Card className="border border-slate-200 hover:shadow-lg transition-shadow">
@@ -119,14 +144,25 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
                 {idea.tools && <span>Tools: {idea.tools}</span>}
                 <span>{formatTimeAgo(idea.submittedAt)}</span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center space-x-1 text-slate-400 hover:text-slate-600"
-              >
-                <Flag className="h-3 w-3" />
-                <span>Report</span>
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleShareIdea}
+                  className="flex items-center space-x-1 text-slate-400 hover:text-slate-600"
+                >
+                  <Copy className="h-3 w-3" />
+                  <span>Share</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center space-x-1 text-slate-400 hover:text-slate-600"
+                >
+                  <Flag className="h-3 w-3" />
+                  <span>Report</span>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

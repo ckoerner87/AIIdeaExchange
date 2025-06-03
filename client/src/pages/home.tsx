@@ -21,6 +21,7 @@ export default function Home() {
   const [showUnlockMessage, setShowUnlockMessage] = useState(false);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
 
   // Get or create session
   const { data: sessionData } = useQuery({
@@ -41,7 +42,7 @@ export default function Home() {
     queryKey: ['/api/stats'],
   });
 
-  // Get ideas (only if user has submitted)
+  // Get ideas (only if user has submitted or has shared access)
   const { data: ideas, isLoading: ideasLoading } = useQuery({
     queryKey: ['/api/ideas', sortBy, selectedCategory],
     queryFn: async () => {
@@ -49,6 +50,7 @@ export default function Home() {
       const res = await fetch(`/api/ideas?sort=${sortBy}${categoryParam}`, {
         headers: {
           'x-session-id': sessionId,
+          'x-shared-access': sharedIdeaAccess ? 'true' : 'false',
         },
       });
       if (!res.ok) {
@@ -57,7 +59,7 @@ export default function Home() {
       }
       return res.json();
     },
-    enabled: !!sessionId && hasSubmitted,
+    enabled: !!sessionId && (hasSubmitted || sharedIdeaAccess),
   });
 
   // Vote mutation
@@ -90,6 +92,25 @@ export default function Home() {
       localStorage.setItem('ai-ideas-session', sessionData.sessionId);
     }
   }, [sessionData]);
+
+  // Check for shared idea URL on mount and grant access
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedIdeaId = urlParams.get('idea');
+    if (sharedIdeaId) {
+      setSharedIdeaAccess(true);
+      setHasSubmitted(true); // Grant access to all ideas
+      // Store the bypass in localStorage for session persistence
+      localStorage.setItem('shared-idea-access', 'true');
+    } else {
+      // Check if user previously accessed via shared link
+      const hasSharedAccess = localStorage.getItem('shared-idea-access');
+      if (hasSharedAccess === 'true') {
+        setSharedIdeaAccess(true);
+        setHasSubmitted(true);
+      }
+    }
+  }, []);
 
   const handleIdeaSubmitted = () => {
     setShowUnlockMessage(true);
