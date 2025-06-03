@@ -217,8 +217,9 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
               name="linkUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-slate-700">
-                    Link Your Stuff - Only Visible Once Your Idea Gets 10+ Upvotes
+                  <FormLabel className="text-sm font-medium text-slate-700 break-words">
+                    <span className="block sm:inline">Link Your Stuff - </span>
+                    <span className="block sm:inline">Only Visible Once Your Idea Gets 10+ Upvotes</span>
                   </FormLabel>
                   <FormControl>
                     <Input

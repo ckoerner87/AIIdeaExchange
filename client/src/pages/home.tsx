@@ -89,7 +89,19 @@ export default function Home() {
   useEffect(() => {
     if (sessionData) {
       setSessionId(sessionData.sessionId);
-      setHasSubmitted(sessionData.hasSubmitted);
+      
+      // Check for shared access first, then server data
+      const hasSharedAccess = localStorage.getItem('shared-idea-access') === 'true';
+      const urlParams = new URLSearchParams(window.location.search);
+      const sharedIdeaId = urlParams.get('idea');
+      
+      if (hasSharedAccess || sharedIdeaId) {
+        setHasSubmitted(true);
+        setSharedIdeaAccess(true);
+      } else {
+        setHasSubmitted(sessionData.hasSubmitted);
+      }
+      
       // Save session ID to localStorage for persistence across page refreshes
       localStorage.setItem('ai-ideas-session', sessionData.sessionId);
     }
