@@ -105,6 +105,13 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
   return (
     <Card className="shadow-lg border border-slate-200">
       <CardContent className="p-8">
+        {/* Prize announcement */}
+        <div className="text-center mb-6">
+          <p className="text-xl font-bold text-slate-900">
+            The most upvoted idea every week will get a free $100 Amazon gift card!
+          </p>
+        </div>
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
