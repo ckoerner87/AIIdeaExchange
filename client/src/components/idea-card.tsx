@@ -135,19 +135,44 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
             </div>
 
             {/* Show link if idea has 10+ votes */}
-            {idea.votes >= 10 && idea.linkUrl && (
-              <div className="mb-3">
-                <a
-                  href={idea.linkUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors text-sm"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>Visit Link</span>
-                </a>
-              </div>
-            )}
+            {idea.votes >= 10 && idea.linkUrl && (() => {
+              // Check if the linkUrl is a valid URL
+              const isValidUrl = (url: string) => {
+                try {
+                  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('www.');
+                } catch {
+                  return false;
+                }
+              };
+
+              const formatUrl = (url: string) => {
+                if (url.startsWith('www.')) {
+                  return `https://${url}`;
+                }
+                return url;
+              };
+
+              return isValidUrl(idea.linkUrl) ? (
+                <div className="mb-3">
+                  <a
+                    href={formatUrl(idea.linkUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors text-sm"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    <span>Visit Link</span>
+                  </a>
+                </div>
+              ) : (
+                <div className="mb-3">
+                  <div className="flex items-center space-x-2 text-slate-500 text-sm">
+                    <ExternalLink className="h-4 w-4" />
+                    <span>{idea.linkUrl}</span>
+                  </div>
+                </div>
+              );
+            })()}
             <div className="flex items-center justify-between text-sm text-slate-500">
               <div className="flex items-center space-x-4">
                 {idea.tools && <span>Tools: {idea.tools}</span>}

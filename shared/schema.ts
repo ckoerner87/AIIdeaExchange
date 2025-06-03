@@ -47,6 +47,12 @@ export const insertIdeaSchema = createInsertSchema(ideas).omit({
   sessionId: true, // Handled separately in the API
 }).extend({
   useCase: z.string().min(100, "Please write at least 100 characters to describe your use case"),
+  linkUrl: z.string().optional().refine((url) => {
+    if (!url || url.trim() === '') return true;
+    return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('www.');
+  }, {
+    message: "Please enter a valid URL starting with http://, https://, or www."
+  }),
 });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
