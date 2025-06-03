@@ -7,7 +7,7 @@ export const ideas = pgTable("ideas", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   useCase: text("use_case"),
-  category: text("category"),
+  category: text("category").default("other"),
   tools: text("tools"),
   linkUrl: text("link_url"),
   sessionId: text("session_id").notNull().default("legacy"), // Track who submitted this idea

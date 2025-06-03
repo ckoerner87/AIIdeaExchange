@@ -13,12 +13,12 @@ import {
   type InsertVote
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and } from "drizzle-orm";
+import { eq, desc, asc, and, or, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // Ideas
   createIdea(idea: InsertIdea): Promise<Idea>;
-  getIdeas(sortBy?: 'votes' | 'recent', category?: string): Promise<Idea[]>;
+  getIdeas(sortBy?: 'votes' | 'recent', category?: string, tool?: string): Promise<Idea[]>;
   getIdeaById(id: number): Promise<Idea | undefined>;
   updateIdea(id: number, updates: Partial<Idea>): Promise<Idea>;
   updateIdeaVotes(id: number, votes: number): Promise<void>;
@@ -44,18 +44,40 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // Ideas
   async createIdea(insertIdea: InsertIdea): Promise<Idea> {
+    // Ensure category defaults to "other" if not provided
+    const ideaData = {
+      ...insertIdea,
+      category: insertIdea.category || "other"
+    };
+    
     const [idea] = await db
       .insert(ideas)
-      .values(insertIdea)
+      .values(ideaData)
       .returning();
     return idea;
   }
 
-  async getIdeas(sortBy: 'votes' | 'recent' = 'votes', category?: string): Promise<Idea[]> {
+  async getIdeas(sortBy: 'votes' | 'recent' = 'votes', category?: string, tool?: string): Promise<Idea[]> {
     let query = db.select().from(ideas);
     
+    const conditions = [];
+    
     if (category) {
-      query = query.where(eq(ideas.category, category));
+      if (category === 'other') {
+        // For "other" category, include both null and "other" values
+        conditions.push(or(eq(ideas.category, 'other'), isNull(ideas.category)));
+      } else {
+        conditions.push(eq(ideas.category, category));
+      }
+    }
+    
+    if (tool) {
+      // Case-insensitive search for tool in the tools field
+      conditions.push(and(ideas.tools, eq(ideas.tools, tool)));
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
     
     if (sortBy === 'votes') {
