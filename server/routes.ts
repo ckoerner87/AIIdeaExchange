@@ -74,14 +74,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all ideas (only if user has submitted)
+  // Get all ideas (only if user has submitted or has shared access)
   app.get("/api/ideas", async (req, res) => {
     try {
       const sessionId = req.headers['x-session-id'] as string;
+      const sharedAccess = req.headers['x-shared-access'] as string;
+      
       if (!sessionId) {
         return res.status(401).json({ message: "Session ID required" });
       }
 
+      // Check if user has shared access bypass
+      if (sharedAccess === 'true') {
+        const sortBy = req.query.sort as 'votes' | 'recent' || 'votes';
+        const category = req.query.category as string;
+        const ideas = await storage.getIdeas(sortBy, category);
+        return res.json(ideas);
+      }
+
+      // Normal flow - check if user has submitted
       const session = await storage.getUserSession(sessionId);
       if (!session || !session.hasSubmitted) {
         return res.status(403).json({ message: "Must submit an idea first" });
