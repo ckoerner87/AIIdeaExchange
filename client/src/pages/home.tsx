@@ -99,7 +99,10 @@ export default function Home() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sharedIdeaId = urlParams.get('idea');
+    console.log('Checking shared link access:', { sharedIdeaId, currentURL: window.location.href });
+    
     if (sharedIdeaId) {
+      console.log('Found shared idea ID, granting access');
       setSharedIdeaAccess(true);
       setHasSubmitted(true); // Grant access to all ideas
       // Store the bypass in localStorage for session persistence
@@ -108,6 +111,7 @@ export default function Home() {
       // Check if user previously accessed via shared link
       const hasSharedAccess = localStorage.getItem('shared-idea-access');
       if (hasSharedAccess === 'true') {
+        console.log('Found stored shared access, granting access');
         setSharedIdeaAccess(true);
         setHasSubmitted(true);
       }
