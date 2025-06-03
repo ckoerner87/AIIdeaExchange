@@ -2,6 +2,7 @@ import { ChevronUp, ChevronDown, Flag, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import type { Idea } from "@shared/schema";
 
 interface IdeaCardProps {
@@ -40,6 +41,14 @@ const formatTimeAgo = (date: Date) => {
 };
 
 export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const maxLength = 150; // Character limit for truncation
+  const useCase = idea.useCase || idea.description || idea.title || "";
+  const shouldTruncate = useCase.length > maxLength;
+  const displayText = shouldTruncate && !isExpanded 
+    ? useCase.substring(0, maxLength) + "..." 
+    : useCase;
+
   return (
     <Card className="border border-slate-200 hover:shadow-lg transition-shadow">
       <CardContent className="p-6">
@@ -69,7 +78,6 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
           </div>
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-3">
-              <h3 className="text-lg font-semibold text-slate-900">{idea.useCase || idea.title}</h3>
               {idea.category && (
                 <Badge 
                   className={`text-xs rounded-full ${categoryColors[idea.category] || categoryColors.other}`}
@@ -79,8 +87,19 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
                 </Badge>
               )}
             </div>
-            {idea.description && <p className="text-slate-600 mb-4">{idea.description}</p>}
-            {idea.useCase && !idea.title && <p className="text-slate-600 mb-4">{idea.useCase}</p>}
+            
+            <div className="mb-4">
+              <p className="text-slate-800 leading-relaxed">{displayText}</p>
+              {shouldTruncate && (
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2"
+                >
+                  {isExpanded ? "Show less" : "Read more"}
+                </button>
+              )}
+            </div>
+
             {/* Show link if idea has 10+ votes */}
             {idea.votes >= 10 && idea.linkUrl && (
               <div className="mb-3">
