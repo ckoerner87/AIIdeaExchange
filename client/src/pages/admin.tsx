@@ -1,11 +1,57 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Trash2, AlertTriangle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Trash2, AlertTriangle, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { useState } from "react";
 
 export default function Admin() {
   const { toast } = useToast();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === "cjk") {
+      setIsAuthenticated(true);
+    } else {
+      toast({
+        title: "Access Denied",
+        description: "Invalid password",
+        variant: "destructive",
+      });
+      setPassword("");
+    }
+  };
+
+  // Show password form if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+          <div className="text-center mb-6">
+            <Lock className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Access</h1>
+            <p className="text-slate-600">Enter password to access admin panel</p>
+          </div>
+          <form onSubmit={handlePasswordSubmit}>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="mb-4"
+              autoFocus
+            />
+            <Button type="submit" className="w-full">
+              Access Admin Panel
+            </Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   // Get all ideas for admin view
   const { data: ideas, isLoading } = useQuery({
