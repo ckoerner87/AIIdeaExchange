@@ -59,12 +59,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid idea data", errors: result.error.errors });
       }
 
-      // Basic validation only
+      // Content validation
       if (!result.data.useCase || result.data.useCase.trim().length < 1) {
         return res.status(400).json({ message: "Please provide a use case" });
       }
 
-      const idea = await storage.createIdea(result.data);
+      // Apply content filter
+      const contentValidation = ContentFilter.validateIdea(result.data.useCase);
+      if (!contentValidation.isValid) {
+        return res.status(400).json({ message: contentValidation.reason || "Invalid content" });
+      }
+
+      // Add sessionId to the idea data
+      const ideaData = { ...result.data, sessionId };
+      const idea = await storage.createIdea(ideaData);
       await storage.updateUserSessionSubmitted(sessionId);
       
       res.json(idea);
