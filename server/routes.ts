@@ -8,6 +8,14 @@ import { googleSheetsService } from "./google-sheets";
 
 import { beehiivService } from "./beehiiv";
 
+// Whitelisted IPs that can vote multiple times (for testing)
+const WHITELISTED_IPS = [
+  "127.0.0.1",
+  "::1",
+  "localhost",
+  "47.161.63.29"  // Your IP for testing
+];
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get or create user session
   app.get("/api/session", async (req, res) => {
@@ -116,11 +124,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get client IP address
       const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
+      const isWhitelisted = WHITELISTED_IPS.includes(clientIp as string);
       
-      // Check if this IP already voted on this idea (one vote per IP)
-      const existingIpVote = await storage.getVoteByIpAndIdea(clientIp as string, ideaId);
-      if (existingIpVote && voteType === 'up') {
-        return res.status(400).json({ message: "You can only upvote once per idea" });
+      // Check if this IP already voted on this idea (one vote per IP) - skip for whitelisted IPs
+      let existingIpVote = null;
+      if (!isWhitelisted) {
+        existingIpVote = await storage.getVoteByIpAndIdea(clientIp as string, ideaId);
+        if (existingIpVote && voteType === 'up') {
+          return res.status(400).json({ message: "You can only upvote once per idea" });
+        }
       }
       
       // Check if user already voted with this session
@@ -134,8 +146,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateIdeaVotes(ideaId, newVotes);
           return res.json({ votes: newVotes, userVote: null });
         } else {
-          // Change vote type (only allow if not blocked by IP restriction)
-          if (voteType === 'up' && existingIpVote) {
+          // Change vote type (only allow if not blocked by IP restriction) - skip for whitelisted IPs
+          if (!isWhitelisted && voteType === 'up' && existingIpVote) {
             return res.status(400).json({ message: "You can only upvote once per idea" });
           }
           await storage.deleteVote(sessionId, ideaId);
