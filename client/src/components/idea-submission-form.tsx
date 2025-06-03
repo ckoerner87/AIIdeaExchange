@@ -28,6 +28,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
     defaultValues: {
       title: "",
       description: "",
+      useCase: "",
       category: "",
       tools: "",
       linkUrl: "",
