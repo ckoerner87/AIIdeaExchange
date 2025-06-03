@@ -117,7 +117,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                 return (
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-slate-700">
-                      What's Your AI Use Case? <span className="text-red-500">*</span>
+                      How are you using AI? The more specific, the better! <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Textarea
@@ -192,6 +192,8 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                         <SelectItem value="manus">Manus</SelectItem>
                         <SelectItem value="mistral">Mistral</SelectItem>
                         <SelectItem value="llama">Llama</SelectItem>
+                        <SelectItem value="gumloop">Gumloop</SelectItem>
+                        <SelectItem value="lindy">Lindy</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
