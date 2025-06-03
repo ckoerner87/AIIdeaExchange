@@ -116,7 +116,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-slate-900">How Do You Use AI?</h1>
-                <p className="text-sm text-slate-600">Share creative AI use cases</p>
+                <p className="text-sm text-slate-600">Discover Real AI Applications & ChatGPT Use Cases</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -132,15 +132,37 @@ export default function Home() {
         {/* Show unlock message */}
         {showUnlockMessage && <UnlockMessage />}
 
+        {/* SEO Content Section */}
+        {!hasSubmitted && (
+          <div className="mb-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                How Do You Use AI? Real ChatGPT & AI Applications
+              </h2>
+              <p className="text-lg text-slate-700 mb-6">
+                Discover hundreds of practical ways people use artificial intelligence and ChatGPT for work, business, and daily life. Learn real AI use cases, creative applications, and proven strategies from our community.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-600 mb-8">
+                <div>✓ AI Content Creation</div>
+                <div>✓ ChatGPT for Business</div>
+                <div>✓ Marketing Automation</div>
+                <div>✓ Data Analysis with AI</div>
+                <div>✓ AI Customer Support</div>
+                <div>✓ Productivity Tools</div>
+                <div>✓ Creative AI Projects</div>
+                <div>✓ AI for E-commerce</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Submission Section */}
         {!hasSubmitted && (
           <div className="mb-12">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Share Your AI Use Case</h2>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Share Your AI Use Case</h3>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                You can't transform your life or business with AI if you don't have any AI use case ideas. 
-                <br /><br />
-                Wanna see how other geniuses are using AI? You've gotta share your own use case first! No matter how dumb or silly. And then everything will become visible. You gotta GIVE!
+                Share how you use AI to unlock access to our complete collection of creative AI applications and ChatGPT use cases from the community.
               </p>
             </div>
             <IdeaSubmissionForm sessionId={sessionData?.sessionId || sessionId} onSubmitted={handleIdeaSubmitted} />
