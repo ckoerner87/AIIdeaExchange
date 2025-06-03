@@ -108,7 +108,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
         {/* Prize announcement */}
         <div className="text-center mb-6">
           <p className="text-xl font-bold text-slate-900">
-            The most upvoted idea every week will get a free $100 Amazon gift card!
+            The most upvoted idea every week will win a free $100 Amazon gift card!
           </p>
         </div>
         
