@@ -41,6 +41,8 @@ export const insertIdeaSchema = createInsertSchema(ideas).omit({
   id: true,
   votes: true,
   submittedAt: true,
+}).extend({
+  useCase: z.string().min(100, "Please write at least 100 characters to describe your use case"),
 });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({

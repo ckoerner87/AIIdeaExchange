@@ -110,22 +110,32 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
             <FormField
               control={form.control}
               name="useCase"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-slate-700">
-                    What's Your AI Use Case? <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      rows={4}
-                      placeholder="Describe how you use AI, what tools you use, and what benefits you've seen..."
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const charCount = field.value?.length || 0;
+                const isMinimumReached = charCount >= 100;
+                
+                return (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      What's Your AI Use Case? <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        rows={4}
+                        placeholder="Describe how you use AI, what tools you use, and what benefits you've seen..."
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <div className="flex justify-between items-center mt-1">
+                      <FormMessage />
+                      <div className={`text-sm ${isMinimumReached ? 'text-green-600' : charCount > 0 ? 'text-amber-600' : 'text-slate-400'}`}>
+                        {charCount}/100 characters minimum
+                      </div>
+                    </div>
+                  </FormItem>
+                );
+              }}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
