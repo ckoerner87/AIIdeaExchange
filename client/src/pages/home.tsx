@@ -158,7 +158,7 @@ export default function Home() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="votes">Sort by votes</SelectItem>
+                    <SelectItem value="votes">Sort by upvotes</SelectItem>
                     <SelectItem value="recent">Most recent</SelectItem>
                   </SelectContent>
                 </Select>
