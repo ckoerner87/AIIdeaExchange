@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Home() {
-  const [sessionId, setSessionId] = useState<string>("");
+  const [sessionId, setSessionId] = useState<string>(() => {
+    // Initialize from localStorage on mount
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('ai-ideas-session') || '';
+    }
+    return '';
+  });
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showUnlockMessage, setShowUnlockMessage] = useState(false);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
@@ -80,6 +86,8 @@ export default function Home() {
     if (sessionData) {
       setSessionId(sessionData.sessionId);
       setHasSubmitted(sessionData.hasSubmitted);
+      // Save session ID to localStorage for persistence across page refreshes
+      localStorage.setItem('ai-ideas-session', sessionData.sessionId);
     }
   }, [sessionData]);
 
