@@ -105,10 +105,12 @@ export default function Admin() {
     const csvContent = "data:text/csv;charset=utf-8," 
       + "Email,Source,Subscribed Date,User Idea Link,Idea Upvotes,Idea Text Preview\n"
       + subscribers.map((sub: any) => {
-        // Find if this subscriber has submitted an idea (basic email matching)
-        const userIdea = currentIdeas.find((idea: any) => 
-          idea.useCase && idea.useCase.toLowerCase().includes(sub.email.split('@')[0].toLowerCase())
-        );
+        // Find if this subscriber has submitted an idea using sessionId
+        let userIdea = null;
+        if (sub.sessionId) {
+          // For gift card popup emails, match by sessionId
+          userIdea = currentIdeas.find((idea: any) => idea.sessionId === sub.sessionId);
+        }
         
         const ideaLink = userIdea ? `https://howdoyouuseai.com/?idea=${userIdea.id}` : "No idea found";
         const ideaUpvotes = userIdea ? userIdea.votes : "N/A";

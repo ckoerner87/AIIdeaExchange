@@ -8,9 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 interface GiftCardPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  sessionId: string;
 }
 
-export default function GiftCardPopup({ isOpen, onClose }: GiftCardPopupProps) {
+export default function GiftCardPopup({ isOpen, onClose, sessionId }: GiftCardPopupProps) {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -31,7 +32,7 @@ export default function GiftCardPopup({ isOpen, onClose }: GiftCardPopupProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, source: 'gift_card_popup' }),
+        body: JSON.stringify({ email, source: 'gift_card_popup', sessionId }),
       });
 
       if (response.ok) {

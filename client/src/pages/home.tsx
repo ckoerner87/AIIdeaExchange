@@ -432,6 +432,7 @@ export default function Home() {
       <GiftCardPopup
         isOpen={showGiftCardPopup}
         onClose={handleGiftCardPopupClose}
+        sessionId={sessionId}
       />
     </div>
   );
