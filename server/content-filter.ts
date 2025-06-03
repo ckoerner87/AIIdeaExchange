@@ -22,27 +22,11 @@ export class ContentFilter {
       return { isValid: false, reason: 'Too short' };
     }
 
-    // Check for gibberish (random keyboard mashing)
-    // Look for patterns that suggest random typing
-    const hasRepeatedChars = /(.)\1{3,}/.test(content); // 4+ repeated characters
-    const hasRandomPattern = /[qwertyuiopasdfghjklzxcvbnm]{8,}/i.test(content.replace(/\s/g, '')); // Long sequences of adjacent keyboard letters
-    const hasExcessiveNumbers = /\d{6,}/.test(content); // 6+ consecutive numbers
-    const wordsCount = content.trim().split(/\s+/).length;
-    const validWordsPattern = /^[a-zA-Z\s\d\.,!?'-]+$/; // Only allow standard characters
+    // Check for obvious gibberish patterns only
+    const hasExcessiveRepeats = /(.)\1{6,}/.test(content); // 7+ repeated characters like "aaaaaaa"
+    const hasRandomNonsense = /^[qwertasdfzxcv]{10,}$/i.test(content.replace(/\s/g, '')); // Pure keyboard mashing
     
-    if (hasRepeatedChars || hasRandomPattern || hasExcessiveNumbers) {
-      return { isValid: false, reason: 'Please provide a meaningful description' };
-    }
-
-    // Check if content contains mostly valid characters (English text)
-    if (!validWordsPattern.test(content)) {
-      return { isValid: false, reason: 'Please use standard English characters' };
-    }
-
-    // Check for very short words suggesting gibberish
-    const words = content.trim().split(/\s+/);
-    const veryShortWords = words.filter(word => word.length === 1 && !/[aAiI]/.test(word));
-    if (veryShortWords.length > words.length * 0.3) {
+    if (hasExcessiveRepeats || hasRandomNonsense) {
       return { isValid: false, reason: 'Please provide a meaningful description' };
     }
 
