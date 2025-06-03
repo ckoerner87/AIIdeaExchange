@@ -183,7 +183,7 @@ export default function Home() {
             <div className="text-center mb-8">
               <h3 className="text-2xl font-bold text-slate-900 mb-4">Share Your AI Use Case</h3>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Share how you use AI to unlock access to our complete collection of creative AI applications and ChatGPT use cases from the community.
+                Wanna see how hundreds of other geniuses are using AI? You've gotta share your own use case first! We don't care if you think it's silly - just share it! We don't need your email, name or your login, just your idea.
               </p>
             </div>
             <IdeaSubmissionForm sessionId={sessionData?.sessionId || sessionId} onSubmitted={handleIdeaSubmitted} />
