@@ -49,9 +49,14 @@ export const insertIdeaSchema = createInsertSchema(ideas).omit({
   useCase: z.string().min(100, "Please write at least 100 characters to describe your use case"),
   linkUrl: z.string().optional().refine((url) => {
     if (!url || url.trim() === '') return true;
-    return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('www.');
+    return url.includes('.') && (
+      url.startsWith('http://') || 
+      url.startsWith('https://') || 
+      url.startsWith('www.') ||
+      /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(url)
+    );
   }, {
-    message: "Please enter a valid URL starting with http://, https://, or www."
+    message: "Please enter a valid URL (e.g., https://example.com, www.example.com, or example.com)"
   }),
 });
 

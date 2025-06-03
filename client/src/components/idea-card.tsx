@@ -139,14 +139,20 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               // Check if the linkUrl is a valid URL
               const isValidUrl = (url: string) => {
                 try {
-                  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('www.');
+                  // More comprehensive URL validation
+                  return url.includes('.') && (
+                    url.startsWith('http://') || 
+                    url.startsWith('https://') || 
+                    url.startsWith('www.') ||
+                    /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(url)
+                  );
                 } catch {
                   return false;
                 }
               };
 
               const formatUrl = (url: string) => {
-                if (url.startsWith('www.')) {
+                if (url.startsWith('www.') || (!url.startsWith('http://') && !url.startsWith('https://') && url.includes('.'))) {
                   return `https://${url}`;
                 }
                 return url;
