@@ -209,6 +209,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to get all ideas (no authentication required)
+  app.get("/api/admin/ideas", async (req, res) => {
+    try {
+      const sortBy = req.query.sort as 'votes' | 'recent' || 'recent';
+      const ideas = await storage.getIdeas(sortBy);
+      res.json(ideas);
+    } catch (error) {
+      console.error("Error getting admin ideas:", error);
+      res.status(500).json({ message: "Failed to get ideas" });
+    }
+  });
+
   // Admin endpoint to delete ideas
   app.delete("/api/admin/ideas/:id", async (req, res) => {
     try {
@@ -220,6 +232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteIdea(id);
       res.json({ message: "Idea deleted successfully" });
     } catch (error) {
+      console.error("Error deleting idea:", error);
       res.status(500).json({ message: "Failed to delete idea" });
     }
   });

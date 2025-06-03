@@ -11,7 +11,7 @@ export default function Admin() {
   const { data: ideas, isLoading } = useQuery({
     queryKey: ['/api/admin/ideas'],
     queryFn: async () => {
-      const res = await fetch('/api/ideas?sort=recent');
+      const res = await fetch('/api/admin/ideas?sort=recent');
       if (!res.ok) {
         throw new Error('Failed to get ideas');
       }
