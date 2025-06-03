@@ -41,8 +41,6 @@ export const insertIdeaSchema = createInsertSchema(ideas).omit({
   id: true,
   votes: true,
   submittedAt: true,
-  title: true,
-  description: true,
 });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
