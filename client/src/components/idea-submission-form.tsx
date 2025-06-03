@@ -241,17 +241,19 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
             <Button
               type="submit"
               disabled={submitMutation.isPending || !sessionId}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 rounded-xl font-bold text-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-[1.05] border-2 border-blue-500"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 rounded-xl font-bold text-lg md:text-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-[1.05] border-2 border-blue-500"
             >
               {submitMutation.isPending ? (
                 <>
                   <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Submitting...
+                  <span className="hidden sm:inline">Submitting...</span>
+                  <span className="sm:hidden">Submitting...</span>
                 </>
               ) : (
                 <>
                   <Rocket className="mr-2 h-5 w-5" />
-                  Share My Idea & Show Me Everyone Else's!
+                  <span className="hidden sm:inline">Share My Idea & Show Me Everyone Else's!</span>
+                  <span className="sm:hidden">Share & View Ideas!</span>
                 </>
               )}
             </Button>
