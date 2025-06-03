@@ -91,7 +91,15 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       });
       return;
     }
-    submitMutation.mutate(data);
+    
+    // Auto-default to "Other" if no category or tools selected
+    const submissionData = {
+      ...data,
+      category: data.category || "Other",
+      tools: data.tools || "Other"
+    };
+    
+    submitMutation.mutate(submissionData);
   };
 
   return (
