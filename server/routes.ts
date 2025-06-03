@@ -309,32 +309,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ideas = await storage.getIdeas('recent');
       const subscriptions = await storage.getAllSubscriptions();
       
+      console.log("CSV Export Debug:");
+      console.log("Ideas count:", ideas.length);
+      console.log("Subscriptions count:", subscriptions.length);
+      console.log("Sample idea sessionIds:", ideas.slice(0, 3).map(i => ({ id: i.id, sessionId: i.sessionId })));
+      console.log("Sample subscription sessionIds:", subscriptions.slice(0, 3).map(s => ({ email: s.email, sessionId: s.sessionId })));
+      
       // Create CSV content with proper email linking
       let csvContent = "Email,Source,SessionId,IdeaText,Category,Tools,Votes,SubmittedAt\n";
       
-      // Create a map of sessionIds that have been processed
-      const processedSessions = new Set();
+      // Create a comprehensive map of all session IDs and their associated data
+      const sessionMap = new Map();
       
-      // First, add all subscriptions with their linked ideas
-      for (const sub of subscriptions) {
-        const linkedIdea = ideas.find(idea => idea.sessionId === sub.sessionId);
-        if (linkedIdea) {
-          // Subscription with idea
-          csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId}","${(linkedIdea.useCase || '').replace(/"/g, '""')}","${linkedIdea.category || 'Other'}","${linkedIdea.tools || ''}","${linkedIdea.votes}","${linkedIdea.submittedAt}"\n`;
-          processedSessions.add(sub.sessionId);
+      // First, map all ideas by sessionId
+      ideas.forEach(idea => {
+        sessionMap.set(idea.sessionId, { idea });
+      });
+      
+      // Then add subscription data to existing sessions or create new entries
+      subscriptions.forEach(sub => {
+        if (sessionMap.has(sub.sessionId)) {
+          sessionMap.get(sub.sessionId).subscription = sub;
         } else {
-          // Subscription without idea
-          csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId}","No idea submitted","","","","${sub.subscribedAt}"\n`;
-          processedSessions.add(sub.sessionId);
+          sessionMap.set(sub.sessionId, { subscription: sub });
         }
-      }
+      });
       
-      // Then add ideas that don't have email subscriptions
-      for (const idea of ideas) {
-        if (!processedSessions.has(idea.sessionId)) {
-          csvContent += `"No email","idea_only","${idea.sessionId}","${(idea.useCase || '').replace(/"/g, '""')}","${idea.category || 'Other'}","${idea.tools || ''}","${idea.votes}","${idea.submittedAt}"\n`;
-        }
-      }
+      // Generate CSV rows from the session map
+      sessionMap.forEach(({ idea, subscription }, sessionId) => {
+        const email = subscription ? subscription.email : "No email";
+        const source = subscription ? (subscription.source || 'homepage') : "idea_only";
+        const ideaText = idea ? (idea.useCase || '').replace(/"/g, '""') : "No idea submitted";
+        const category = idea ? (idea.category || 'Other') : "";
+        const tools = idea ? (idea.tools || '') : "";
+        const votes = idea ? idea.votes : "";
+        const submittedAt = idea ? idea.submittedAt : (subscription ? subscription.subscribedAt : "");
+        
+        csvContent += `"${email}","${source}","${sessionId}","${ideaText}","${category}","${tools}","${votes}","${submittedAt}"\n`;
+      });
+      
+      console.log("Generated CSV rows:", sessionMap.size);
       
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', 'attachment; filename="ai-ideas-export.csv"');
