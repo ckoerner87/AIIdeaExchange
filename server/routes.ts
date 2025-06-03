@@ -202,20 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ message: "Email already subscribed" });
       }
 
-      // Add subscriber to Beehiiv
-      try {
-        const beehiivResult = await beehiivService.addSubscriber(result.data.email);
-        if (!beehiivResult.success) {
-          if (beehiivResult.message === 'Email already subscribed') {
-            return res.status(409).json({ message: "Email already subscribed" });
-          }
-          throw new Error(beehiivResult.message);
-        }
-      } catch (beehiivError: any) {
-        console.error('Failed to add subscriber to Beehiiv:', beehiivError);
-        return res.status(500).json({ message: "Failed to subscribe to newsletter" });
-      }
-
+      // Store email in our database
       const subscription = await storage.createSubscription(result.data);
       
       res.json({ message: "Successfully subscribed", subscription });
