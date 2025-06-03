@@ -24,6 +24,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
+  const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
 
   // Get or create session
   const { data: sessionData } = useQuery({
@@ -98,6 +99,10 @@ export default function Home() {
       if (hasSharedAccess || sharedIdeaId) {
         setHasSubmitted(true);
         setSharedIdeaAccess(true);
+        // Set the highlighted idea ID if coming from shared link
+        if (sharedIdeaId) {
+          setHighlightedIdeaId(parseInt(sharedIdeaId));
+        }
       } else {
         setHasSubmitted(sessionData.hasSubmitted);
       }
@@ -117,6 +122,7 @@ export default function Home() {
       console.log('Found shared idea ID, granting access');
       setSharedIdeaAccess(true);
       setHasSubmitted(true); // Grant access to all ideas
+      setHighlightedIdeaId(parseInt(sharedIdeaId));
       // Store the bypass in localStorage for session persistence
       localStorage.setItem('shared-idea-access', 'true');
     } else {
