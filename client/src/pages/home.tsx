@@ -351,9 +351,10 @@ export default function Home() {
                     <Button
                       onClick={() => setVisibleIdeasCount(prev => prev + 20)}
                       variant="outline"
-                      className="px-8 py-3 text-lg"
+                      className="px-4 md:px-8 py-3 text-sm md:text-lg whitespace-nowrap"
                     >
-                      Show 20 More Ideas ({ideas.length - visibleIdeasCount} remaining)
+                      <span className="hidden sm:inline">Show 20 More Ideas ({ideas.length - visibleIdeasCount} remaining)</span>
+                      <span className="sm:hidden">Show 20 More ({ideas.length - visibleIdeasCount})</span>
                     </Button>
                   </div>
                 )}
