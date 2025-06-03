@@ -62,10 +62,10 @@ export class DatabaseStorage implements IStorage {
     
     const conditions = [];
     
-    if (category) {
-      if (category === 'other') {
-        // For "other" category, include both null and "other" values
-        conditions.push(or(eq(ideas.category, 'other'), isNull(ideas.category)));
+    if (category && category !== 'All') {
+      if (category.toLowerCase() === 'other') {
+        // For "other" category, include both null and "other" values (case insensitive)
+        conditions.push(or(eq(ideas.category, 'Other'), eq(ideas.category, 'other'), isNull(ideas.category)));
       } else {
         conditions.push(eq(ideas.category, category));
       }

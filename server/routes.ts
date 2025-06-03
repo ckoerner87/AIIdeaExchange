@@ -312,17 +312,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create CSV content with proper email linking
       let csvContent = "Email,Source,SessionId,IdeaText,Category,Tools,Votes,SubmittedAt\n";
       
-      // Add subscriptions with their linked ideas
+      // Create a map of sessionIds that have been processed
+      const processedSessions = new Set();
+      
+      // First, add all subscriptions with their linked ideas
       for (const sub of subscriptions) {
         const linkedIdea = ideas.find(idea => idea.sessionId === sub.sessionId);
-        csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId}","${linkedIdea ? (linkedIdea.useCase || '').replace(/"/g, '""') : 'No idea submitted'}","${linkedIdea?.category || ''}","${linkedIdea?.tools || ''}","${linkedIdea?.votes || ''}","${linkedIdea?.submittedAt || sub.subscribedAt}"\n`;
+        if (linkedIdea) {
+          // Subscription with idea
+          csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId}","${(linkedIdea.useCase || '').replace(/"/g, '""')}","${linkedIdea.category || 'Other'}","${linkedIdea.tools || ''}","${linkedIdea.votes}","${linkedIdea.submittedAt}"\n`;
+          processedSessions.add(sub.sessionId);
+        } else {
+          // Subscription without idea
+          csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId}","No idea submitted","","","","${sub.subscribedAt}"\n`;
+          processedSessions.add(sub.sessionId);
+        }
       }
       
-      // Add ideas without email subscriptions
+      // Then add ideas that don't have email subscriptions
       for (const idea of ideas) {
-        const hasSubscription = subscriptions.some(sub => sub.sessionId === idea.sessionId);
-        if (!hasSubscription) {
-          csvContent += `"No email","idea_only","${idea.sessionId}","${(idea.useCase || '').replace(/"/g, '""')}","${idea.category || ''}","${idea.tools || ''}","${idea.votes}","${idea.submittedAt}"\n`;
+        if (!processedSessions.has(idea.sessionId)) {
+          csvContent += `"No email","idea_only","${idea.sessionId}","${(idea.useCase || '').replace(/"/g, '""')}","${idea.category || 'Other'}","${idea.tools || ''}","${idea.votes}","${idea.submittedAt}"\n`;
         }
       }
       
