@@ -303,6 +303,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export CSV with proper email-to-idea linking
+  app.get("/api/admin/export", async (req, res) => {
+    try {
+      const ideas = await storage.getIdeas('recent');
+      const subscriptions = await storage.getAllSubscriptions();
+      
+      // Create CSV content with proper email linking
+      let csvContent = "Email,Source,SessionId,IdeaText,Category,Tools,Votes,SubmittedAt\n";
+      
+      // Add subscriptions with their linked ideas
+      for (const sub of subscriptions) {
+        const linkedIdea = ideas.find(idea => idea.sessionId === sub.sessionId);
+        csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId}","${linkedIdea ? (linkedIdea.useCase || '').replace(/"/g, '""') : 'No idea submitted'}","${linkedIdea?.category || ''}","${linkedIdea?.tools || ''}","${linkedIdea?.votes || ''}","${linkedIdea?.submittedAt || sub.subscribedAt}"\n`;
+      }
+      
+      // Add ideas without email subscriptions
+      for (const idea of ideas) {
+        const hasSubscription = subscriptions.some(sub => sub.sessionId === idea.sessionId);
+        if (!hasSubscription) {
+          csvContent += `"No email","idea_only","${idea.sessionId}","${(idea.useCase || '').replace(/"/g, '""')}","${idea.category || ''}","${idea.tools || ''}","${idea.votes}","${idea.submittedAt}"\n`;
+        }
+      }
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="ai-ideas-export.csv"');
+      res.send(csvContent);
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      res.status(500).json({ message: "Failed to export data" });
+    }
+  });
+
   // SEO Routes - Sitemap and Robots.txt
   app.get("/sitemap.xml", (req, res) => {
     res.type('application/xml');

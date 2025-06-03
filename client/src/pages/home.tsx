@@ -248,8 +248,8 @@ export default function Home() {
             </div>
 
             {/* Filter Dropdowns */}
-            <div className="mb-6 flex flex-wrap gap-4">
-              <div className="flex-1 min-w-[200px]">
+            <div className="mb-6 flex flex-col sm:flex-row gap-4">
+              <div className="w-full sm:flex-1 sm:min-w-[200px]">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Filter by Category" />
@@ -271,7 +271,7 @@ export default function Home() {
                 </Select>
               </div>
               
-              <div className="flex-1 min-w-[200px]">
+              <div className="w-full sm:flex-1 sm:min-w-[200px]">
                 <Select value={selectedTool} onValueChange={setSelectedTool}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Filter by Tool" />
@@ -312,15 +312,24 @@ export default function Home() {
               </div>
             ) : ideas && ideas.length > 0 ? (
               <div className="space-y-6">
-                {ideas.map((idea: any) => (
-                  <IdeaCard 
-                    key={idea.id} 
-                    idea={idea} 
-                    onVote={handleVote}
-                    isVoting={voteMutation.isPending}
-                    isHighlighted={highlightedIdeaId === idea.id}
-                  />
-                ))}
+                {/* Sort ideas to put highlighted one first */}
+                {ideas
+                  .sort((a: any, b: any) => {
+                    if (highlightedIdeaId) {
+                      if (a.id === highlightedIdeaId) return -1;
+                      if (b.id === highlightedIdeaId) return 1;
+                    }
+                    return 0;
+                  })
+                  .map((idea: any) => (
+                    <IdeaCard 
+                      key={idea.id} 
+                      idea={idea} 
+                      onVote={handleVote}
+                      isVoting={voteMutation.isPending}
+                      isHighlighted={highlightedIdeaId === idea.id}
+                    />
+                  ))}
               </div>
             ) : (
               <div className="text-center py-12">

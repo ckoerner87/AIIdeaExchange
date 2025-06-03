@@ -14,7 +14,7 @@ export default function Admin() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
 
-  // Get all ideas for admin view - always call hooks
+  // Get all ideas for admin view
   const { data: ideas, isLoading } = useQuery({
     queryKey: ['/api/admin/ideas'],
     queryFn: async () => {
@@ -24,10 +24,10 @@ export default function Admin() {
       }
       return res.json();
     },
-    enabled: isAuthenticated, // Only fetch when authenticated
+    enabled: isAuthenticated,
   });
 
-  // Get all subscribers - always call hooks
+  // Get all subscribers
   const { data: subscribers } = useQuery({
     queryKey: ['/api/admin/subscribers'],
     queryFn: async () => {
@@ -37,7 +37,7 @@ export default function Admin() {
       }
       return res.json();
     },
-    enabled: isAuthenticated, // Only fetch when authenticated
+    enabled: isAuthenticated,
   });
 
   // Update idea mutation
@@ -73,10 +73,10 @@ export default function Admin() {
     },
   });
 
-  // Delete idea mutation - must be called before any conditional returns
+  // Delete idea mutation
   const deleteMutation = useMutation({
-    mutationFn: async (ideaId: number) => {
-      const res = await fetch(`/api/admin/ideas/${ideaId}`, {
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/admin/ideas/${id}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -137,51 +137,34 @@ export default function Admin() {
   };
 
   const handleExportEmails = async () => {
-    if (!subscribers || subscribers.length === 0) {
+    try {
+      const response = await fetch('/api/admin/export');
+      if (!response.ok) {
+        throw new Error('Failed to export data');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'ai-ideas-export.csv';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
       toast({
-        title: "No subscribers",
-        description: "There are no email subscribers to export.",
+        title: "Export successful",
+        description: "CSV file has been downloaded with email-to-idea linking.",
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "Failed to export data. Please try again.",
         variant: "destructive",
       });
-      return;
     }
-
-    // Get real-time ideas data for linking
-    const ideasResponse = await fetch('/api/admin/ideas');
-    const currentIdeas = await ideasResponse.json();
-
-    // Create enhanced CSV content with source tracking and idea links
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + "Email,Source,Subscribed Date,User Idea Link,Idea Upvotes,Idea Text Preview\n"
-      + subscribers.map((sub: any) => {
-        // Find if this subscriber has submitted an idea using sessionId
-        let userIdea = null;
-        if (sub.sessionId) {
-          // For gift card popup emails, match by sessionId
-          userIdea = currentIdeas.find((idea: any) => idea.sessionId === sub.sessionId);
-        }
-        
-        const ideaLink = userIdea ? `https://howdoyouuseai.com/?idea=${userIdea.id}` : "No idea found";
-        const ideaUpvotes = userIdea ? userIdea.votes : "N/A";
-        const ideaPreview = userIdea ? `"${(userIdea.useCase || '').substring(0, 50)}..."` : "N/A";
-        const source = sub.source || "homepage";
-        
-        return `${sub.email},${source},${new Date(sub.subscribedAt).toLocaleDateString()},${ideaLink},${ideaUpvotes},${ideaPreview}`;
-      }).join("\n");
-
-    // Create download link
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `subscribers_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast({
-      title: "Emails exported",
-      description: `Downloaded ${subscribers.length} email addresses as CSV file.`,
-    });
   };
 
   // Show password form if not authenticated
@@ -213,143 +196,171 @@ export default function Admin() {
   }
 
   return (
-    <div className="bg-slate-50 min-h-screen font-inter">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <AlertTriangle className="text-amber-600 h-8 w-8" />
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
-                <p className="text-sm text-slate-600">Manage submitted ideas and export emails</p>
-              </div>
+    <div className="min-h-screen bg-slate-50 p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
+              <p className="text-slate-600">Manage AI use case ideas and subscribers</p>
             </div>
-            <Button onClick={handleExportEmails} className="flex items-center space-x-2">
-              <Download className="h-4 w-4" />
-              <span>Export Emails ({subscribers?.length || 0})</span>
-            </Button>
+            <div className="flex space-x-4">
+              <Button onClick={handleExportEmails} className="bg-green-600 hover:bg-green-700">
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
           </div>
-        </div>
-      </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">All Ideas</h2>
-          <p className="text-slate-600">Click the delete button to remove inappropriate or spam ideas.</p>
-        </div>
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-blue-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-blue-900 mb-2">Total Ideas</h3>
+              <p className="text-3xl font-bold text-blue-600">{ideas?.length || 0}</p>
+            </div>
+            <div className="bg-green-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-green-900 mb-2">Total Subscribers</h3>
+              <p className="text-3xl font-bold text-green-600">{subscribers?.length || 0}</p>
+            </div>
+            <div className="bg-purple-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-purple-900 mb-2">Conversion Rate</h3>
+              <p className="text-3xl font-bold text-purple-600">
+                {ideas?.length && subscribers?.length 
+                  ? Math.round((subscribers.length / ideas.length) * 100) 
+                  : 0}%
+              </p>
+            </div>
+          </div>
 
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-lg border border-slate-200 p-6 animate-pulse">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-3">
-                    <div className="h-5 bg-slate-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-slate-200 rounded w-full"></div>
-                    <div className="h-4 bg-slate-200 rounded w-2/3"></div>
-                  </div>
-                  <div className="w-20 h-10 bg-slate-200 rounded"></div>
-                </div>
+          {/* Ideas List */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">AI Use Case Ideas</h2>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-slate-600 mt-4">Loading ideas...</p>
               </div>
-            ))}
-          </div>
-        ) : ideas && ideas.length > 0 ? (
-          <div className="space-y-4">
-            {ideas.map((idea: any) => (
-              <div key={idea.id} className="bg-white rounded-lg border border-slate-200 p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      {editingId === idea.id ? (
-                        <div className="flex-1">
-                          <Textarea
-                            value={editText}
-                            onChange={(e) => setEditText(e.target.value)}
-                            className="w-full h-32 text-sm"
-                            placeholder="Edit idea text..."
-                          />
-                          <div className="flex gap-2 mt-2">
-                            <Button size="sm" onClick={handleSave} disabled={updateMutation.isPending}>
-                              <Save className="h-4 w-4 mr-1" />
-                              Save
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={handleCancel}>
-                              <X className="h-4 w-4 mr-1" />
-                              Cancel
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <h3 className="text-lg font-semibold text-slate-900 whitespace-pre-wrap">
-                            {idea.useCase || idea.title}
-                          </h3>
+            ) : ideas && ideas.length > 0 ? (
+              <div className="space-y-4">
+                {ideas.map((idea: any) => (
+                  <div key={idea.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <span className="text-sm font-medium text-slate-500">ID: {idea.id}</span>
+                          <span className="text-sm text-slate-500">•</span>
+                          <span className="text-sm text-slate-500">Votes: {idea.votes}</span>
+                          <span className="text-sm text-slate-500">•</span>
+                          <span className="text-sm text-slate-500">
+                            {new Date(idea.submittedAt).toLocaleDateString()}
+                          </span>
                           {idea.category && (
-                            <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">
-                              {idea.category}
-                            </span>
+                            <>
+                              <span className="text-sm text-slate-500">•</span>
+                              <span className="text-sm text-slate-500 capitalize">{idea.category}</span>
+                            </>
                           )}
-                        </>
+                        </div>
+                        {editingId === idea.id ? (
+                          <div className="space-y-4">
+                            <Textarea
+                              value={editText}
+                              onChange={(e) => setEditText(e.target.value)}
+                              className="w-full min-h-[100px]"
+                              placeholder="Edit idea text..."
+                            />
+                            <div className="flex space-x-2">
+                              <Button 
+                                onClick={handleSave} 
+                                size="sm"
+                                disabled={updateMutation.isPending}
+                              >
+                                <Save className="w-4 h-4 mr-1" />
+                                Save
+                              </Button>
+                              <Button onClick={handleCancel} variant="outline" size="sm">
+                                <X className="w-4 h-4 mr-1" />
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-slate-700 whitespace-pre-wrap">{idea.useCase || idea.description || idea.title || "No content"}</p>
+                        )}
+                        {idea.linkUrl && (
+                          <div className="mt-2">
+                            <a 
+                              href={idea.linkUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              {idea.linkUrl}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                      {editingId !== idea.id && (
+                        <div className="flex space-x-2 ml-4">
+                          <Button
+                            onClick={() => handleEdit(idea)}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(idea)}
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       )}
                     </div>
-                    
-                    {!editingId && idea.description && (
-                      <p className="text-slate-600 mb-3">{idea.description}</p>
-                    )}
-                    
-                    {!editingId && (
-                      <div className="flex items-center gap-4 text-sm text-slate-500">
-                        <span>Votes: {idea.votes}</span>
-                        {idea.tools && <span>Tools: {idea.tools}</span>}
-                        <span>ID: {idea.id}</span>
-                        <span>Submitted: {new Date(idea.submittedAt).toLocaleDateString()}</span>
-                      </div>
-                    )}
-                    
-                    {!editingId && idea.linkUrl && idea.votes >= 10 && (
-                      <div className="mt-3">
-                        <a 
-                          href={idea.linkUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          {idea.linkUrl}
-                        </a>
-                      </div>
-                    )}
                   </div>
-                  
-                  {editingId !== idea.id && (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(idea)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(idea)}
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <AlertTriangle className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No ideas found</h3>
+                <p className="text-slate-600">No AI use case ideas have been submitted yet.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Subscribers List */}
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Email Subscribers</h2>
+            {subscribers && subscribers.length > 0 ? (
+              <div className="bg-slate-50 rounded-lg p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {subscribers.map((subscriber: any, index: number) => (
+                    <div key={index} className="bg-white p-4 rounded-lg border border-slate-200">
+                      <div className="flex items-center space-x-2">
+                        <Mail className="w-4 h-4 text-slate-400" />
+                        <span className="text-sm font-medium text-slate-900">{subscriber.email}</span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {new Date(subscriber.subscribedAt).toLocaleDateString()} • {subscriber.source || 'homepage'}
+                      </p>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
-            ))}
+            ) : (
+              <div className="text-center py-12">
+                <Mail className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No subscribers</h3>
+                <p className="text-slate-600">No email subscribers have signed up yet.</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-slate-500">No ideas found.</p>
-          </div>
-        )}
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
