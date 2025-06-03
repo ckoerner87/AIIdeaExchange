@@ -130,7 +130,9 @@ export default function Home() {
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-4">Share Your AI Use Case</h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Share how you're using AI in your work or life. Once you contribute, you'll unlock access to see what others are doing with AI and vote on the best ideas.
+                You can't transform your life or business with AI if you don't have any AI use case ideas. 
+                <br /><br />
+                Wanna see how other geniuses are using AI? You've gotta share your own use case first! No matter how dumb or silly. And then everything will become visible. You gotta GIVE!
               </p>
             </div>
             <IdeaSubmissionForm sessionId={sessionData?.sessionId || sessionId} onSubmitted={handleIdeaSubmitted} />
