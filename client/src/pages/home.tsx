@@ -307,6 +307,21 @@ export default function Home() {
           <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
         </div>
 
+        {/* Submit Another Idea Button - Between subscription and ideas */}
+        {hasSubmitted && (
+          <div className="mt-12 text-center">
+            <Button
+              onClick={() => setHasSubmitted(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-xl font-bold text-xl transition-all transform hover:scale-105"
+            >
+              Submit Another Idea
+            </Button>
+            <p className="text-slate-600 mt-3 text-sm">
+              Share another way you use AI and help the community discover more creative applications
+            </p>
+          </div>
+        )}
+
         {/* Feature Request Section */}
         <div className="mt-12 text-center">
           <a 
