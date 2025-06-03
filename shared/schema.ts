@@ -10,7 +10,8 @@ export const ideas = pgTable("ideas", {
   category: text("category"),
   tools: text("tools"),
   linkUrl: text("link_url"),
-  votes: integer("votes").notNull().default(0),
+  sessionId: text("session_id").notNull().default("legacy"), // Track who submitted this idea
+  votes: integer("votes").notNull().default(1),
   aiGrade: text("ai_grade"), // Store as decimal string like "7.3"
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
 });
