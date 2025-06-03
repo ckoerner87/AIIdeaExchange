@@ -23,6 +23,7 @@ export default function Home() {
   const [showGiftCardPopup, setShowGiftCardPopup] = useState(false);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedTool, setSelectedTool] = useState<string>('');
   const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
 
@@ -47,10 +48,11 @@ export default function Home() {
 
   // Get ideas (only if user has submitted or has shared access)
   const { data: ideas, isLoading: ideasLoading } = useQuery({
-    queryKey: ['/api/ideas', sortBy, selectedCategory],
+    queryKey: ['/api/ideas', sortBy, selectedCategory, selectedTool],
     queryFn: async () => {
       const categoryParam = selectedCategory ? `&category=${selectedCategory}` : '';
-      const res = await fetch(`/api/ideas?sort=${sortBy}${categoryParam}`, {
+      const toolParam = selectedTool ? `&tool=${selectedTool}` : '';
+      const res = await fetch(`/api/ideas?sort=${sortBy}${categoryParam}${toolParam}`, {
         headers: {
           'x-session-id': sessionId,
           'x-shared-access': sharedIdeaAccess ? 'true' : 'false',
@@ -245,105 +247,51 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Category Filter */}
-            <div className="mb-6">
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={selectedCategory === '' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('')}
-                  className="rounded-full"
-                >
-                  All Categories
-                </Button>
-                <Button
-                  variant={selectedCategory === 'content-creation' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('content-creation')}
-                  className="rounded-full"
-                >
-                  Content Creation
-                </Button>
-                <Button
-                  variant={selectedCategory === 'marketing-ads' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('marketing-ads')}
-                  className="rounded-full"
-                >
-                  Marketing & Ads
-                </Button>
-                <Button
-                  variant={selectedCategory === 'sales-outreach' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('sales-outreach')}
-                  className="rounded-full"
-                >
-                  Sales & Outreach
-                </Button>
-                <Button
-                  variant={selectedCategory === 'automation-ai-agents' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('automation-ai-agents')}
-                  className="rounded-full"
-                >
-                  Automation & AI Agents
-                </Button>
-                <Button
-                  variant={selectedCategory === 'data-analysis-reporting' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('data-analysis-reporting')}
-                  className="rounded-full"
-                >
-                  Data Analysis & Reporting
-                </Button>
-                <Button
-                  variant={selectedCategory === 'productivity-time-saving' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('productivity-time-saving')}
-                  className="rounded-full"
-                >
-                  Productivity & Time-Saving
-                </Button>
-                <Button
-                  variant={selectedCategory === 'customer-support' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('customer-support')}
-                  className="rounded-full"
-                >
-                  Customer Support
-                </Button>
-                <Button
-                  variant={selectedCategory === 'ecommerce-dropshipping' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('ecommerce-dropshipping')}
-                  className="rounded-full"
-                >
-                  E-commerce & Dropshipping
-                </Button>
-                <Button
-                  variant={selectedCategory === 'personal-lifestyle' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('personal-lifestyle')}
-                  className="rounded-full"
-                >
-                  Personal Life & Lifestyle
-                </Button>
-                <Button
-                  variant={selectedCategory === 'real-estate' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('real-estate')}
-                  className="rounded-full"
-                >
-                  Real Estate
-                </Button>
-                <Button
-                  variant={selectedCategory === 'other' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory('other')}
-                  className="rounded-full"
-                >
-                  Other
-                </Button>
+            {/* Filter Dropdowns */}
+            <div className="mb-6 flex flex-wrap gap-4">
+              <div className="flex-1 min-w-[200px]">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Filter by Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="content-creation">Content Creation</SelectItem>
+                    <SelectItem value="marketing-ads">Marketing & Ads</SelectItem>
+                    <SelectItem value="sales-outreach">Sales & Outreach</SelectItem>
+                    <SelectItem value="automation-ai-agents">Automation & AI Agents</SelectItem>
+                    <SelectItem value="data-analysis-reporting">Data Analysis & Reporting</SelectItem>
+                    <SelectItem value="productivity-time-saving">Productivity & Time-Saving</SelectItem>
+                    <SelectItem value="customer-support">Customer Support</SelectItem>
+                    <SelectItem value="ecommerce-dropshipping">E-commerce & Dropshipping</SelectItem>
+                    <SelectItem value="personal-lifestyle">Personal Life & Lifestyle</SelectItem>
+                    <SelectItem value="real-estate">Real Estate</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex-1 min-w-[200px]">
+                <Select value={selectedTool} onValueChange={setSelectedTool}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Filter by Tool" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Tools</SelectItem>
+                    <SelectItem value="ChatGPT">ChatGPT</SelectItem>
+                    <SelectItem value="Claude">Claude</SelectItem>
+                    <SelectItem value="Midjourney">Midjourney</SelectItem>
+                    <SelectItem value="DALL-E">DALL-E</SelectItem>
+                    <SelectItem value="Stable Diffusion">Stable Diffusion</SelectItem>
+                    <SelectItem value="GitHub Copilot">GitHub Copilot</SelectItem>
+                    <SelectItem value="Cursor">Cursor</SelectItem>
+                    <SelectItem value="Notion AI">Notion AI</SelectItem>
+                    <SelectItem value="Zapier">Zapier</SelectItem>
+                    <SelectItem value="Make">Make</SelectItem>
+                    <SelectItem value="Custom API">Custom API</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -370,6 +318,7 @@ export default function Home() {
                     idea={idea} 
                     onVote={handleVote}
                     isVoting={voteMutation.isPending}
+                    isHighlighted={highlightedIdeaId === idea.id}
                   />
                 ))}
               </div>

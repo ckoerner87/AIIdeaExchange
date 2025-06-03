@@ -88,7 +88,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (sharedAccess === 'true') {
         const sortBy = req.query.sort as 'votes' | 'recent' || 'votes';
         const category = req.query.category as string;
-        const ideas = await storage.getIdeas(sortBy, category);
+        const tool = req.query.tool as string;
+        const ideas = await storage.getIdeas(sortBy, category, tool);
         return res.json(ideas);
       }
 
@@ -100,7 +101,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const sortBy = req.query.sort as 'votes' | 'recent' || 'votes';
       const category = req.query.category as string;
-      const ideas = await storage.getIdeas(sortBy, category);
+      const tool = req.query.tool as string;
+      const ideas = await storage.getIdeas(sortBy, category, tool);
       
       res.json(ideas);
     } catch (error) {
