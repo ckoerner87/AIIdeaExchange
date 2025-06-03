@@ -345,6 +345,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Generate CSV rows from the session map
       sessionMap.forEach(({ idea, subscription }, sessionId) => {
+        // Skip legacy ideas without matching subscriptions for cleaner export
+        if (sessionId === 'legacy' && !subscription) {
+          return;
+        }
+        
         const email = subscription ? subscription.email : "No email";
         const source = subscription ? (subscription.source || 'homepage') : "idea_only";
         const ideaText = idea ? (idea.useCase || '').replace(/"/g, '""') : "No idea submitted";
@@ -354,6 +359,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const submittedAt = idea ? idea.submittedAt : (subscription ? subscription.subscribedAt : "");
         
         csvContent += `"${email}","${source}","${sessionId}","${ideaText}","${category}","${tools}","${votes}","${submittedAt}"\n`;
+      });
+      
+      // Also add subscribers without ideas as separate entries
+      subscriptions.forEach(sub => {
+        if (!sessionMap.has(sub.sessionId || 'null')) {
+          csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId || 'no-session'}","No idea submitted","","","","${sub.subscribedAt}"\n`;
+        }
       });
       
       console.log("Generated CSV rows:", sessionMap.size);
