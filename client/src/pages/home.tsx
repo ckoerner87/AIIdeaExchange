@@ -26,6 +26,8 @@ export default function Home() {
   const [selectedTool, setSelectedTool] = useState<string>('');
   const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
+  const [visibleIdeasCount, setVisibleIdeasCount] = useState(20);
+  const [newlySubmittedIdeaId, setNewlySubmittedIdeaId] = useState<number | null>(null);
 
   // Get or create session
   const { data: sessionData } = useQuery({
@@ -138,8 +140,15 @@ export default function Home() {
     }
   }, []);
 
-  const handleIdeaSubmitted = () => {
+  const handleIdeaSubmitted = (newIdeaId?: number) => {
     setShowGiftCardPopup(true);
+    if (newIdeaId) {
+      setNewlySubmittedIdeaId(newIdeaId);
+      // Clear the highlight after 5 seconds
+      setTimeout(() => {
+        setNewlySubmittedIdeaId(null);
+      }, 5000);
+    }
     queryClient.invalidateQueries({ queryKey: ['/api/session'] });
   };
 
@@ -312,24 +321,42 @@ export default function Home() {
               </div>
             ) : ideas && ideas.length > 0 ? (
               <div className="space-y-6">
-                {/* Sort ideas to put highlighted one first */}
+                {/* Sort ideas to put highlighted/newly submitted one first */}
                 {ideas
                   .sort((a: any, b: any) => {
                     if (highlightedIdeaId) {
                       if (a.id === highlightedIdeaId) return -1;
                       if (b.id === highlightedIdeaId) return 1;
                     }
+                    if (newlySubmittedIdeaId) {
+                      if (a.id === newlySubmittedIdeaId) return -1;
+                      if (b.id === newlySubmittedIdeaId) return 1;
+                    }
                     return 0;
                   })
+                  .slice(0, visibleIdeasCount)
                   .map((idea: any) => (
                     <IdeaCard 
                       key={idea.id} 
                       idea={idea} 
                       onVote={handleVote}
                       isVoting={voteMutation.isPending}
-                      isHighlighted={highlightedIdeaId === idea.id}
+                      isHighlighted={highlightedIdeaId === idea.id || newlySubmittedIdeaId === idea.id}
                     />
                   ))}
+                
+                {/* Show More Button */}
+                {ideas.length > visibleIdeasCount && (
+                  <div className="text-center pt-8">
+                    <Button
+                      onClick={() => setVisibleIdeasCount(prev => prev + 20)}
+                      variant="outline"
+                      className="px-8 py-3 text-lg"
+                    >
+                      Show 20 More Ideas ({ideas.length - visibleIdeasCount} remaining)
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-12">

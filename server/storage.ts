@@ -52,7 +52,7 @@ export class DatabaseStorage implements IStorage {
     
     const [idea] = await db
       .insert(ideas)
-      .values(ideaData)
+      .values([ideaData])
       .returning();
     return idea;
   }

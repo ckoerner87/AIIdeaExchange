@@ -17,7 +17,7 @@ import type { InsertIdea } from "@shared/schema";
 
 interface IdeaSubmissionFormProps {
   sessionId: string;
-  onSubmitted: () => void;
+  onSubmitted: (newIdeaId?: number) => void;
 }
 
 export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmissionFormProps) {
@@ -54,7 +54,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Idea submitted successfully!",
         description: "Your AI use case has been added to the community.",
@@ -72,7 +72,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
         ),
       });
       form.reset();
-      onSubmitted();
+      onSubmitted(data?.id);
     },
     onError: (error: any) => {
       toast({
