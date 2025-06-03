@@ -103,12 +103,13 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
   };
 
   return (
-    <Card className="shadow-lg border border-slate-200">
-      <CardContent className="p-8">
+    <Card className="shadow-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
+      <CardContent className="p-8 relative z-10">
         {/* Prize announcement */}
-        <div className="text-center mb-6">
-          <p className="text-xl font-bold text-slate-900">
-            The most upvoted idea every week will win a free $100 Amazon gift card!
+        <div className="text-center mb-6 bg-gradient-to-r from-yellow-100 to-orange-100 p-4 rounded-lg border-2 border-yellow-300">
+          <p className="text-xl font-bold text-amber-800">
+            🏆 The most upvoted idea every week will win a free $100 Amazon gift card! 🏆
           </p>
         </div>
         
@@ -233,7 +234,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
             <Button
               type="submit"
               disabled={submitMutation.isPending || !sessionId}
-              className="w-full bg-primary text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-200 transition-all transform hover:scale-[1.02]"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 rounded-xl font-bold text-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-300 transition-all transform hover:scale-[1.05] border-2 border-blue-500"
             >
               {submitMutation.isPending ? (
                 <>
