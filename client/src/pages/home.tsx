@@ -50,8 +50,8 @@ export default function Home() {
   const { data: ideas, isLoading: ideasLoading } = useQuery({
     queryKey: ['/api/ideas', sortBy, selectedCategory, selectedTool],
     queryFn: async () => {
-      const categoryParam = selectedCategory ? `&category=${selectedCategory}` : '';
-      const toolParam = selectedTool ? `&tool=${selectedTool}` : '';
+      const categoryParam = selectedCategory && selectedCategory !== 'all' ? `&category=${selectedCategory}` : '';
+      const toolParam = selectedTool && selectedTool !== 'all' ? `&tool=${selectedTool}` : '';
       const res = await fetch(`/api/ideas?sort=${sortBy}${categoryParam}${toolParam}`, {
         headers: {
           'x-session-id': sessionId,
@@ -255,7 +255,7 @@ export default function Home() {
                     <SelectValue placeholder="Filter by Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     <SelectItem value="content-creation">Content Creation</SelectItem>
                     <SelectItem value="marketing-ads">Marketing & Ads</SelectItem>
                     <SelectItem value="sales-outreach">Sales & Outreach</SelectItem>
@@ -277,7 +277,7 @@ export default function Home() {
                     <SelectValue placeholder="Filter by Tool" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Tools</SelectItem>
+                    <SelectItem value="all">All Tools</SelectItem>
                     <SelectItem value="ChatGPT">ChatGPT</SelectItem>
                     <SelectItem value="Claude">Claude</SelectItem>
                     <SelectItem value="Midjourney">Midjourney</SelectItem>

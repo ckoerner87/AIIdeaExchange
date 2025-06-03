@@ -10,6 +10,7 @@ interface IdeaCardProps {
   idea: Idea;
   onVote: (ideaId: number, voteType: 'up' | 'down') => void;
   isVoting: boolean;
+  isHighlighted?: boolean;
 }
 
 const categoryColors: Record<string, string> = {
@@ -41,7 +42,7 @@ const formatTimeAgo = (date: Date) => {
   }
 };
 
-export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
+export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false }: IdeaCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
   const maxLength = 150; // Character limit for truncation
@@ -75,8 +76,16 @@ export default function IdeaCard({ idea, onVote, isVoting }: IdeaCardProps) {
   };
 
   return (
-    <Card className="border border-slate-200 hover:shadow-lg transition-shadow">
+    <Card className={`border hover:shadow-lg transition-all ${isHighlighted ? 'border-blue-400 bg-blue-50 shadow-lg ring-2 ring-blue-200' : 'border-slate-200'}`}>
       <CardContent className="p-6">
+        {isHighlighted && (
+          <div className="mb-4 bg-blue-100 border border-blue-300 rounded-lg p-3">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-blue-800 text-sm font-medium">This is the shared idea you were sent!</span>
+            </div>
+          </div>
+        )}
         <div className="flex items-start space-x-4">
           <div className="flex flex-col items-center space-y-1">
             <Button
