@@ -31,7 +31,7 @@ export default function GiftCardPopup({ isOpen, onClose }: GiftCardPopupProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, source: 'gift_card_popup' }),
       });
 
       if (response.ok) {

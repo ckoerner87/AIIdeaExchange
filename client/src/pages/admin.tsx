@@ -84,7 +84,7 @@ export default function Admin() {
     }
   };
 
-  const handleExportEmails = () => {
+  const handleExportEmails = async () => {
     if (!subscribers || subscribers.length === 0) {
       toast({
         title: "No subscribers",
@@ -94,10 +94,26 @@ export default function Admin() {
       return;
     }
 
-    // Create CSV content
+    // Get real-time ideas data for linking
+    const ideasResponse = await fetch('/api/admin/ideas');
+    const currentIdeas = await ideasResponse.json();
+
+    // Create enhanced CSV content with source tracking and idea links
     const csvContent = "data:text/csv;charset=utf-8," 
-      + "Email,Subscribed Date\n"
-      + subscribers.map((sub: any) => `${sub.email},${new Date(sub.subscribedAt).toLocaleDateString()}`).join("\n");
+      + "Email,Source,Subscribed Date,User Idea Link,Idea Upvotes,Idea Text Preview\n"
+      + subscribers.map((sub: any) => {
+        // Find if this subscriber has submitted an idea (basic email matching)
+        const userIdea = currentIdeas.find((idea: any) => 
+          idea.useCase && idea.useCase.toLowerCase().includes(sub.email.split('@')[0].toLowerCase())
+        );
+        
+        const ideaLink = userIdea ? `https://howdoyouuseai.com/?idea=${userIdea.id}` : "No idea found";
+        const ideaUpvotes = userIdea ? userIdea.votes : "N/A";
+        const ideaPreview = userIdea ? `"${(userIdea.useCase || '').substring(0, 50)}..."` : "N/A";
+        const source = sub.source || "homepage";
+        
+        return `${sub.email},${source},${new Date(sub.subscribedAt).toLocaleDateString()},${ideaLink},${ideaUpvotes},${ideaPreview}`;
+      }).join("\n");
 
     // Create download link
     const encodedUri = encodeURI(csvContent);

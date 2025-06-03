@@ -26,7 +26,7 @@ export default function SubscriptionForm({ subscriberCount }: SubscriptionFormPr
 
   const subscribeMutation = useMutation({
     mutationFn: async (data: InsertSubscription) => {
-      const res = await apiRequest('POST', '/api/subscribe', data);
+      const res = await apiRequest('POST', '/api/subscribe', { ...data, source: 'homepage' });
       return res.json();
     },
     onSuccess: () => {
