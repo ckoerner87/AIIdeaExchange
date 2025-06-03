@@ -139,15 +139,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingVote = await storage.getUserVoteForIdea(sessionId, ideaId);
       
       if (existingVote) {
-        if (existingVote.voteType === voteType) {
-          // Remove vote if clicking same vote type
+        if (isWhitelisted) {
+          // For whitelisted IPs, always allow additional votes without removing existing ones
+          await storage.createVote({ sessionId: sessionId + '-' + Date.now(), ideaId, voteType, ipAddress: clientIp as string });
+          const voteChange = voteType === 'up' ? 1 : -1;
+          const newVotes = idea.votes + voteChange;
+          await storage.updateIdeaVotes(ideaId, newVotes);
+          return res.json({ votes: newVotes, userVote: voteType });
+        } else if (existingVote.voteType === voteType) {
+          // Remove vote if clicking same vote type (non-whitelisted users)
           await storage.deleteVote(sessionId, ideaId);
           const newVotes = voteType === 'up' ? idea.votes - 1 : idea.votes + 1;
           await storage.updateIdeaVotes(ideaId, newVotes);
           return res.json({ votes: newVotes, userVote: null });
         } else {
-          // Change vote type (only allow if not blocked by IP restriction) - skip for whitelisted IPs
-          if (!isWhitelisted && voteType === 'up' && existingIpVote) {
+          // Change vote type (only allow if not blocked by IP restriction)
+          if (voteType === 'up' && existingIpVote) {
             return res.status(400).json({ message: "You can only upvote once per idea" });
           }
           await storage.deleteVote(sessionId, ideaId);
