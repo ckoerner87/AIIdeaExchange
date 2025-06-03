@@ -11,6 +11,32 @@ export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
 
+  // Get all ideas for admin view - always call hooks
+  const { data: ideas, isLoading } = useQuery({
+    queryKey: ['/api/admin/ideas'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/ideas?sort=recent');
+      if (!res.ok) {
+        throw new Error('Failed to get ideas');
+      }
+      return res.json();
+    },
+    enabled: isAuthenticated, // Only fetch when authenticated
+  });
+
+  // Get all subscribers - always call hooks
+  const { data: subscribers } = useQuery({
+    queryKey: ['/api/admin/subscribers'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/subscribers');
+      if (!res.ok) {
+        throw new Error('Failed to get subscribers');
+      }
+      return res.json();
+    },
+    enabled: isAuthenticated, // Only fetch when authenticated
+  });
+
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === "cjk") {
@@ -52,30 +78,6 @@ export default function Admin() {
       </div>
     );
   }
-
-  // Get all ideas for admin view
-  const { data: ideas, isLoading } = useQuery({
-    queryKey: ['/api/admin/ideas'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/ideas?sort=recent');
-      if (!res.ok) {
-        throw new Error('Failed to get ideas');
-      }
-      return res.json();
-    },
-  });
-
-  // Get all subscribers
-  const { data: subscribers } = useQuery({
-    queryKey: ['/api/admin/subscribers'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/subscribers');
-      if (!res.ok) {
-        throw new Error('Failed to get subscribers');
-      }
-      return res.json();
-    },
-  });
 
   // Delete idea mutation
   const deleteMutation = useMutation({
