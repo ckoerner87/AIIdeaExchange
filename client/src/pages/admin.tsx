@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, AlertTriangle, Lock } from "lucide-react";
+import { Trash2, AlertTriangle, Lock, Download, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useState } from "react";
@@ -65,6 +65,18 @@ export default function Admin() {
     },
   });
 
+  // Get all subscribers
+  const { data: subscribers } = useQuery({
+    queryKey: ['/api/admin/subscribers'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/subscribers');
+      if (!res.ok) {
+        throw new Error('Failed to get subscribers');
+      }
+      return res.json();
+    },
+  });
+
   // Delete idea mutation
   const deleteMutation = useMutation({
     mutationFn: async (ideaId: number) => {
@@ -98,17 +110,53 @@ export default function Admin() {
     }
   };
 
+  const handleExportEmails = () => {
+    if (!subscribers || subscribers.length === 0) {
+      toast({
+        title: "No subscribers",
+        description: "There are no email subscribers to export.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create CSV content
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + "Email,Subscribed Date\n"
+      + subscribers.map((sub: any) => `${sub.email},${new Date(sub.subscribedAt).toLocaleDateString()}`).join("\n");
+
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `subscribers_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Emails exported",
+      description: `Downloaded ${subscribers.length} email addresses as CSV file.`,
+    });
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen font-inter">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center space-x-3">
-            <AlertTriangle className="text-amber-600 h-8 w-8" />
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
-              <p className="text-sm text-slate-600">Manage submitted ideas</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <AlertTriangle className="text-amber-600 h-8 w-8" />
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
+                <p className="text-sm text-slate-600">Manage submitted ideas and export emails</p>
+              </div>
             </div>
+            <Button onClick={handleExportEmails} className="flex items-center space-x-2">
+              <Download className="h-4 w-4" />
+              <span>Export Emails ({subscribers?.length || 0})</span>
+            </Button>
           </div>
         </div>
       </header>

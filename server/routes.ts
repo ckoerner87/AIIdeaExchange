@@ -233,6 +233,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to get all subscribers (no authentication required)
+  app.get("/api/admin/subscribers", async (req, res) => {
+    try {
+      const subscribers = await storage.getAllSubscriptions();
+      res.json(subscribers);
+    } catch (error) {
+      console.error("Error getting subscribers:", error);
+      res.status(500).json({ message: "Failed to get subscribers" });
+    }
+  });
+
   // Admin endpoint to delete ideas
   app.delete("/api/admin/ideas/:id", async (req, res) => {
     try {

@@ -122,7 +122,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                     <FormControl>
                       <Textarea
                         rows={4}
-                        placeholder="Describe how you use AI, what tools you use, and what benefits you've seen..."
+                        placeholder="Prompt ideas, prompt tips, real life stories, AI automations you're using, etc..."
                         className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
                         {...field}
                       />
