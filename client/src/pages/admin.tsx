@@ -1,7 +1,8 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, AlertTriangle, Lock, Download, Mail } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Trash2, AlertTriangle, Lock, Download, Mail, Edit, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useState } from "react";
@@ -10,6 +11,8 @@ export default function Admin() {
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
 
   // Get all ideas for admin view - always call hooks
   const { data: ideas, isLoading } = useQuery({

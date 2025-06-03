@@ -257,6 +257,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to update ideas
+  app.put("/api/admin/ideas/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid idea ID" });
+      }
+
+      const { useCase, title, description, category, tools, linkUrl } = req.body;
+      const updates: any = {};
+      
+      if (useCase !== undefined) updates.useCase = useCase;
+      if (title !== undefined) updates.title = title;
+      if (description !== undefined) updates.description = description;
+      if (category !== undefined) updates.category = category;
+      if (tools !== undefined) updates.tools = tools;
+      if (linkUrl !== undefined) updates.linkUrl = linkUrl;
+
+      const updatedIdea = await storage.updateIdea(id, updates);
+      res.json(updatedIdea);
+    } catch (error) {
+      console.error("Error updating idea:", error);
+      res.status(500).json({ message: "Failed to update idea" });
+    }
+  });
+
   // Admin endpoint to delete ideas
   app.delete("/api/admin/ideas/:id", async (req, res) => {
     try {

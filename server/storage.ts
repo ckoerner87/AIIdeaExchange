@@ -20,6 +20,7 @@ export interface IStorage {
   createIdea(idea: InsertIdea): Promise<Idea>;
   getIdeas(sortBy?: 'votes' | 'recent', category?: string): Promise<Idea[]>;
   getIdeaById(id: number): Promise<Idea | undefined>;
+  updateIdea(id: number, updates: Partial<Idea>): Promise<Idea>;
   updateIdeaVotes(id: number, votes: number): Promise<void>;
   deleteIdea(id: number): Promise<void>;
   
@@ -67,6 +68,11 @@ export class DatabaseStorage implements IStorage {
   async getIdeaById(id: number): Promise<Idea | undefined> {
     const [idea] = await db.select().from(ideas).where(eq(ideas.id, id));
     return idea || undefined;
+  }
+
+  async updateIdea(id: number, updates: Partial<Idea>): Promise<Idea> {
+    const [idea] = await db.update(ideas).set(updates).where(eq(ideas.id, id)).returning();
+    return idea;
   }
 
   async updateIdeaVotes(id: number, votes: number): Promise<void> {
