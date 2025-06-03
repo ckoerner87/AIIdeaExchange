@@ -13,7 +13,7 @@ import {
   type InsertVote
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, isNull, gte } from "drizzle-orm";
+import { eq, desc, asc, and, or, isNull, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Ideas
@@ -171,13 +171,9 @@ export class DatabaseStorage implements IStorage {
 
   async getRecentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<Vote[]> {
     const cutoffTime = new Date(Date.now() - timeWindowMs);
-    const recentVotes = await db.select().from(votes).where(
-      and(
-        eq(votes.ipAddress, ipAddress),
-        sql`${votes.createdAt} >= ${cutoffTime}`
-      )
-    );
-    return recentVotes;
+    // Simple implementation - get all votes from this IP and filter in memory
+    const allVotes = await db.select().from(votes).where(eq(votes.ipAddress, ipAddress));
+    return allVotes.filter(vote => vote.createdAt >= cutoffTime);
   }
 
   async deleteVote(sessionId: string, ideaId: number): Promise<void> {

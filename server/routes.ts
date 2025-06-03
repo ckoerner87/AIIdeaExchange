@@ -192,8 +192,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.json({ votes: newVotes, userVote: null });
         } else {
           // Change vote type (only allow if not blocked by IP restriction)
-          if (voteType === 'up' && existingIpVote) {
-            return res.status(400).json({ message: "You can only upvote once per idea" });
+          if (voteType === 'up' && !isWhitelisted) {
+            const existingIpVote = await storage.getVoteByIpAndIdea(clientIp as string, ideaId);
+            if (existingIpVote) {
+              return res.status(400).json({ message: "You can only upvote once per idea" });
+            }
           }
           await storage.deleteVote(sessionId, ideaId);
           await storage.createVote({ sessionId, ideaId, voteType, ipAddress: clientIp as string });
