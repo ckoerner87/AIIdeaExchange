@@ -271,16 +271,16 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <div className="flex items-center justify-between mb-8">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
               <p className="text-slate-600">Manage AI use case ideas and subscribers</p>
             </div>
             <div className="flex space-x-4">
-              <Button onClick={handleExportEmails} className="bg-green-600 hover:bg-green-700">
+              <Button onClick={handleExportEmails} className="bg-green-600 hover:bg-green-700 text-sm">
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
               </Button>
@@ -430,10 +430,10 @@ export default function Admin() {
                   {ideas
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                     .map((idea: any) => (
-                      <div key={idea.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
+                      <div key={idea.id} className="border border-slate-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-4 sm:space-y-0">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2 text-xs sm:text-sm">
                               <span className="text-sm font-medium text-slate-500">ID: {idea.id}</span>
                               <span className="text-sm text-slate-500">•</span>
                               {editingVotes === idea.id ? (
@@ -471,16 +471,16 @@ export default function Admin() {
                                   Votes: {idea.votes}
                                 </button>
                               )}
-                              <span className="text-sm text-slate-500">•</span>
-                              <span className="text-sm text-slate-500">
-                                Given: {idea.upvotesGiven || 0} upvotes
+                              <span className="text-sm text-slate-500 hidden sm:inline">•</span>
+                              <span className="text-xs sm:text-sm text-slate-500">
+                                Given: {idea.upvotesGiven || 0}
                               </span>
-                              <span className="text-sm text-slate-500">•</span>
-                              <span className="text-sm text-slate-500">
+                              <span className="text-sm text-slate-500 hidden sm:inline">•</span>
+                              <span className="text-xs sm:text-sm text-slate-500">
                                 Ratio: {idea.votes > 0 ? ((idea.upvotesGiven || 0) / idea.votes).toFixed(1) : '0.0'}:1
                               </span>
-                              <span className="text-sm text-slate-500">•</span>
-                              <span className="text-sm text-slate-500">
+                              <span className="text-sm text-slate-500 hidden sm:inline">•</span>
+                              <span className="text-xs sm:text-sm text-slate-500">
                                 {new Date(idea.submittedAt).toLocaleDateString()}
                               </span>
                               {idea.category && (
@@ -526,7 +526,7 @@ export default function Admin() {
                             </div>
                           </div>
                         ) : (
-                          <p className="text-slate-700 whitespace-pre-wrap">{idea.useCase || idea.description || idea.title || "No content"}</p>
+                          <p className="text-slate-700 whitespace-pre-wrap break-words overflow-wrap-anywhere">{idea.useCase || idea.description || idea.title || "No content"}</p>
                         )}
                         {idea.linkUrl && (
                           <div className="mt-2">

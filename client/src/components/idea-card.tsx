@@ -94,7 +94,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
               onClick={() => onVote(idea.id, 'up')}
               disabled={isVoting}
-              aria-label={`Upvote idea: ${idea.useCase.substring(0, 50)}...`}
+              aria-label={`Upvote idea: ${idea.useCase?.substring(0, 50) || idea.title || 'this idea'}...`}
             >
               <ChevronUp className="text-slate-600 hover:text-blue-600 h-5 w-5" />
             </Button>
@@ -107,8 +107,9 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
               onClick={() => onVote(idea.id, 'down')}
               disabled={isVoting}
+              aria-label={`Downvote idea: ${idea.useCase?.substring(0, 50) || idea.title || 'this idea'}...`}
             >
-              <ChevronDown className="text-slate-400 hover:text-red-400 h-5 w-5" />
+              <ChevronDown className="text-slate-600 hover:text-red-600 h-5 w-5" />
             </Button>
           </div>
           <div className="flex-1">
