@@ -177,20 +177,22 @@ export default function Admin() {
         <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
           <div className="text-center mb-6">
             <Lock className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Access</h1>
-            <p className="text-slate-600">Enter password to access admin panel</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
+            <p className="text-slate-600">Authorized access required</p>
           </div>
-          <form onSubmit={handlePasswordSubmit}>
+          <form onSubmit={handlePasswordSubmit} autoComplete="off">
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
+              placeholder="Access code"
               className="mb-4"
               autoFocus
+              autoComplete="new-password"
+              name="admin-access-code"
             />
             <Button type="submit" className="w-full">
-              Access Admin Panel
+              Continue
             </Button>
           </form>
         </div>

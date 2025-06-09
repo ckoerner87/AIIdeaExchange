@@ -1,12 +1,9 @@
 User-agent: *
 Allow: /
-
-# Important pages for crawling
-Allow: /api/stats
-Allow: /og-image.png
+Disallow: /admin
 
 # Sitemap location
 Sitemap: https://howdoyouuseai.com/sitemap.xml
 
-# Crawl delay for respectful crawling
-Crawl-delay: 1
+# This is a legitimate community platform for sharing AI use cases
+# Admin section is for authorized content management only

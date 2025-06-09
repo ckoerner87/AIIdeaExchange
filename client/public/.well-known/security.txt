@@ -1,0 +1,9 @@
+Contact: mailto:security@howdoyouuseai.com
+Expires: 2025-12-31T23:59:59.000Z
+Encryption: https://howdoyouuseai.com/pgp-key.txt
+Preferred-Languages: en
+Canonical: https://howdoyouuseai.com/.well-known/security.txt
+
+# This is a legitimate community platform for AI use case sharing
+# Admin access is restricted to authorized content management
+# No user credentials are collected or stored beyond session management
