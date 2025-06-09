@@ -295,10 +295,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get upvote statistics for each idea's submitter
       const ideasWithStats = await Promise.all(ideas.map(async (idea: any) => {
-        const userSession = await storage.getUserSession(idea.sessionId);
+        // Get actual votes given by this user from the votes table
+        const votes = await storage.getAllVotesBySession(idea.sessionId);
+        const actualUpvotesGiven = votes.filter(vote => vote.voteType === 'up').length;
+        
         return {
           ...idea,
-          upvotesGiven: userSession?.upvotesGiven || 0
+          upvotesGiven: actualUpvotesGiven
         };
       }));
       

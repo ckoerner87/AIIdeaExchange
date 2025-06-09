@@ -274,7 +274,7 @@ export default function Admin() {
                     const totalUsers = ideas.length;
                     
                     // Debug logging
-                    console.log('Debug - Ideas with upvotes:', ideas.map(idea => ({ id: idea.id, upvotesGiven: idea.upvotesGiven })));
+                    console.log('Debug - Ideas with upvotes:', ideas.map((idea: any) => ({ id: idea.id, upvotesGiven: idea.upvotesGiven })));
                     console.log('Debug - Total upvotes given:', totalUpvotesGiven);
                     console.log('Debug - Total users:', totalUsers);
                     
