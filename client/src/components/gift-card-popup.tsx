@@ -114,62 +114,8 @@ export default function GiftCardPopup({ isOpen, onClose, sessionId, submittedIde
             If it's the most upvoted of the week we'll send you a $100 Amazon gift card. Where should we send it?
           </p>
 
-          {/* Social Sharing Section */}
-          {submittedIdeaId && (
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center space-x-2 mb-3">
-                <Share2 className="h-5 w-5 text-blue-600" />
-                <h4 className="font-semibold text-blue-900">Share your idea to get more votes!</h4>
-              </div>
-              <p className="text-sm text-blue-700 mb-3">
-                Share your idea on social media to increase your chances of winning the weekly $100 prize.
-              </p>
-              <div className="flex space-x-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleShare('twitter')}
-                  className="flex items-center space-x-1 border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  <Twitter className="h-4 w-4" />
-                  <span>Twitter</span>
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleShare('facebook')}
-                  className="flex items-center space-x-1 border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  <Facebook className="h-4 w-4" />
-                  <span>Facebook</span>
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleShare('linkedin')}
-                  className="flex items-center space-x-1 border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  <Linkedin className="h-4 w-4" />
-                  <span>LinkedIn</span>
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleShare('copy')}
-                  className="flex items-center space-x-1 border-blue-300 text-blue-700 hover:bg-blue-100"
-                >
-                  <Copy className="h-4 w-4" />
-                  <span>Copy Link</span>
-                </Button>
-              </div>
-            </div>
-          )}
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email Form */}
+          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
             <Input
               type="email"
               placeholder="your-email@example.com (not required)"
@@ -196,6 +142,58 @@ export default function GiftCardPopup({ isOpen, onClose, sessionId, submittedIde
               </Button>
             </div>
           </form>
+
+          {/* Social Sharing Section at Bottom */}
+          {submittedIdeaId && (
+            <div className="border-t border-slate-200 pt-4">
+              <div className="flex items-center space-x-2 mb-3">
+                <Share2 className="h-4 w-4 text-slate-600" />
+                <span className="text-sm font-medium text-slate-700">Share your idea to get more votes!</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleShare('twitter')}
+                  className="flex flex-col items-center space-y-1 h-12 text-xs"
+                >
+                  <Twitter className="h-4 w-4" />
+                  <span>Twitter</span>
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleShare('facebook')}
+                  className="flex flex-col items-center space-y-1 h-12 text-xs"
+                >
+                  <Facebook className="h-4 w-4" />
+                  <span>Facebook</span>
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleShare('linkedin')}
+                  className="flex flex-col items-center space-y-1 h-12 text-xs"
+                >
+                  <Linkedin className="h-4 w-4" />
+                  <span>LinkedIn</span>
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleShare('copy')}
+                  className="flex flex-col items-center space-y-1 h-12 text-xs"
+                >
+                  <Copy className="h-4 w-4" />
+                  <span>Copy</span>
+                </Button>
+              </div>
+            </div>
+          )}
           
           <p className="text-xs text-slate-500 mt-3 text-center">
             This is completely optional. You can close this anytime.
