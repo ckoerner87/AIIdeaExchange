@@ -43,13 +43,13 @@ export default function Admin() {
 
   // Update idea mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, useCase }: { id: number; useCase: string }) => {
+    mutationFn: async ({ id, useCase, linkUrl }: { id: number; useCase: string; linkUrl?: string }) => {
       const res = await fetch(`/api/admin/ideas/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ useCase }),
+        body: JSON.stringify({ useCase, linkUrl: editUrl }),
       });
       if (!res.ok) {
         throw new Error('Failed to update idea');
@@ -232,6 +232,41 @@ export default function Admin() {
                   ? Math.round((subscribers.length / ideas.length) * 100) 
                   : 0}%
               </p>
+            </div>
+          </div>
+
+          {/* Community Engagement Summary */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Community Engagement</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-blue-600">
+                  {ideas?.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0) || 0}
+                </div>
+                <div className="text-sm text-blue-700">Total Upvotes Given</div>
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-green-600">
+                  {ideas?.reduce((sum: number, idea: any) => sum + idea.votes, 0) || 0}
+                </div>
+                <div className="text-sm text-green-700">Total Upvotes Received</div>
+              </div>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-purple-600">
+                  {ideas?.length && ideas.reduce((sum: number, idea: any) => sum + idea.votes, 0) > 0 ? (
+                    (ideas.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0) / 
+                     ideas.reduce((sum: number, idea: any) => sum + idea.votes, 0) * 100
+                    ).toFixed(1)
+                  ) : '0.0'}%
+                </div>
+                <div className="text-sm text-purple-700">Community Ratio</div>
+              </div>
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-orange-600">
+                  {ideas?.filter((idea: any) => (idea.upvotesGiven || 0) > 0).length || 0}
+                </div>
+                <div className="text-sm text-orange-700">Active Voters</div>
+              </div>
             </div>
           </div>
 

@@ -233,15 +233,15 @@ export default function Home() {
                   <h4 className="text-lg font-semibold text-green-900">Need Ideas? Ask ChatGPT!</h4>
                 </div>
                 <p className="text-sm text-green-800 mb-3">
-                  Copy this prompt to ChatGPT, then paste the best responses into the form below. Please be very detailed and tactical:
+                  Copy this prompt to ChatGPT, then paste the best responses into the form below:
                 </p>
                 <div className="relative bg-white border border-green-300 rounded-lg p-4">
                   <div className="font-mono text-sm text-slate-700 mb-3">
-                    What are the 5 most innovative, unique or genius ways that I use AI?
+                    What are the 5 most innovative, unique or genius ways that I use AI? Please be very detailed and tactical.
                   </div>
                   <button
                     onClick={(event) => {
-                      navigator.clipboard.writeText("What are the 5 most innovative, unique or genius ways that I use AI?");
+                      navigator.clipboard.writeText("What are the 5 most innovative, unique or genius ways that I use AI? Please be very detailed and tactical.");
                       // Show temporary feedback
                       const btn = event.currentTarget as HTMLButtonElement;
                       const originalText = btn.textContent;
