@@ -315,6 +315,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to get upvote trends over time
+  app.get("/api/admin/upvote-trends", async (req, res) => {
+    try {
+      const ideas = await storage.getIdeas('recent');
+      
+      // Create a map to track cumulative data by date
+      const dailyData = new Map();
+      
+      // Process ideas chronologically
+      const sortedIdeas = ideas.sort((a, b) => 
+        new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
+      );
+      
+      // For each day, calculate the average upvotes per user up to that point
+      for (let i = 0; i < sortedIdeas.length; i++) {
+        const currentIdea = sortedIdeas[i];
+        const currentDate = new Date(currentIdea.submittedAt).toISOString().split('T')[0];
+        
+        // Get all ideas submitted up to this date (inclusive)
+        const ideasUpToDate = sortedIdeas.slice(0, i + 1);
+        
+        // Calculate upvotes given by each user up to this date
+        const userUpvoteCounts = await Promise.all(
+          ideasUpToDate.map(async (idea: any) => {
+            const votes = await storage.getAllVotesBySession(idea.sessionId);
+            // Only count upvotes to others' ideas, and only those that existed at this date
+            const relevantVotes = votes.filter(vote => {
+              if (vote.voteType !== 'up') return false;
+              // Find the idea that was voted on
+              const votedIdea = ideasUpToDate.find(i => i.id === vote.ideaId);
+              return votedIdea && votedIdea.id !== idea.id;
+            });
+            return relevantVotes.length;
+          })
+        );
+        
+        const totalUpvotes = userUpvoteCounts.reduce((sum, count) => sum + count, 0);
+        const averageUpvotes = ideasUpToDate.length > 0 ? totalUpvotes / ideasUpToDate.length : 0;
+        
+        dailyData.set(currentDate, {
+          date: currentDate,
+          averageUpvotes: Math.round(averageUpvotes * 10) / 10, // Round to 1 decimal
+          totalUsers: ideasUpToDate.length,
+          totalUpvotes: totalUpvotes
+        });
+      }
+      
+      // Convert to array and ensure we have data for the last 30 days minimum
+      const dataArray = Array.from(dailyData.values());
+      
+      res.json(dataArray);
+    } catch (error) {
+      console.error("Error getting upvote trends:", error);
+      res.status(500).json({ message: "Failed to get upvote trends" });
+    }
+  });
+
   // Admin endpoint to get all subscribers (no authentication required)
   app.get("/api/admin/subscribers", async (req, res) => {
     try {

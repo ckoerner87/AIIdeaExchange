@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, AlertTriangle, Lock, Download, Mail, Edit, Save, X } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useState } from "react";
@@ -35,6 +36,19 @@ export default function Admin() {
       const res = await fetch('/api/admin/subscribers');
       if (!res.ok) {
         throw new Error('Failed to get subscribers');
+      }
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  // Get upvote trends over time
+  const { data: upvoteTrends } = useQuery({
+    queryKey: ['/api/admin/upvote-trends'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/upvote-trends');
+      if (!res.ok) {
+        throw new Error('Failed to get upvote trends');
       }
       return res.json();
     },
@@ -273,16 +287,58 @@ export default function Admin() {
                     // Total number of users (all idea submitters)
                     const totalUsers = ideas.length;
                     
-                    // Debug logging
-                    console.log('Debug - Ideas with upvotes:', ideas.map((idea: any) => ({ id: idea.id, upvotesGiven: idea.upvotesGiven })));
-                    console.log('Debug - Total upvotes given:', totalUpvotesGiven);
-                    console.log('Debug - Total users:', totalUsers);
+
                     
                     return totalUsers > 0 ? (totalUpvotesGiven / totalUsers).toFixed(1) : '0.0';
                   })()}
                 </div>
                 <div className="text-sm text-teal-700">Average Upvotes per User</div>
               </div>
+            </div>
+          </div>
+
+          {/* Upvote Trends Chart */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Average Upvotes per User Over Time</h2>
+            <div className="h-80">
+              {upvoteTrends && upvoteTrends.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={upvoteTrends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="date" 
+                      tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    />
+                    <YAxis 
+                      domain={[0, 'dataMax']}
+                      tickFormatter={(value) => value.toFixed(1)}
+                    />
+                    <Tooltip 
+                      labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                      formatter={(value: number) => [value.toFixed(1), 'Average Upvotes per User']}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="averageUpvotes" 
+                      stroke="#0891b2" 
+                      strokeWidth={2}
+                      dot={{ fill: '#0891b2', strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Loading trend data...
+                </div>
+              )}
+            </div>
+            <div className="mt-4 text-sm text-gray-600">
+              Shows how community engagement has evolved since site launch. Only counts upvotes given to other users' ideas.
             </div>
           </div>
 
