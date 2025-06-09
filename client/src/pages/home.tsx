@@ -244,22 +244,32 @@ export default function Home() {
                   Copy this prompt to ChatGPT, then paste the best responses into the form below:
                 </p>
                 <div className="relative bg-white border border-green-300 rounded-lg p-4">
-                  <div className="font-mono text-sm text-slate-700 mb-3">
-                    Based on all our past chats, tell me the 5 most innovative, unique, or genius ways I've actually used AI in real-world execution — especially in business, content, or parenting.
+                  <div className="font-mono text-sm text-slate-700 mb-3 whitespace-pre-line">
+                    {`Based on all our past chats, tell me the 5 most innovative, unique, or genius ways I've actually used AI in real-world execution — especially in business, content, or parenting.
 
 For each one, break it down tactically with:
 
-- The original idea or use-case
-- The problem it solved
-- The exact workflow or prompt structure used
-- What made it clever or non-obvious
-- How it could be scaled, productized, or improved
+The original idea or use-case
+The problem it solved
+The exact workflow or prompt structure used
+What made it clever or non-obvious
+How it could be scaled, productized, or improved
 
-Prioritize examples that combine creativity + execution. If relevant, include what most people would've done instead — and why mine was better.
+Prioritize examples that combine creativity + execution. If relevant, include what most people would've done instead — and why mine was better.`}
                   </div>
                   <button
                     onClick={(event) => {
-                      navigator.clipboard.writeText("Based on all our past chats, tell me the 5 most innovative, unique, or genius ways I've actually used AI in real-world execution — especially in business, content, or parenting.\n\nFor each one, break it down tactically with:\n\n- The original idea or use-case\n- The problem it solved\n- The exact workflow or prompt structure used\n- What made it clever or non-obvious\n- How it could be scaled, productized, or improved\n\nPrioritize examples that combine creativity + execution. If relevant, include what most people would've done instead — and why mine was better.");
+                      navigator.clipboard.writeText(`Based on all our past chats, tell me the 5 most innovative, unique, or genius ways I've actually used AI in real-world execution — especially in business, content, or parenting.
+
+For each one, break it down tactically with:
+
+The original idea or use-case
+The problem it solved
+The exact workflow or prompt structure used
+What made it clever or non-obvious
+How it could be scaled, productized, or improved
+
+Prioritize examples that combine creativity + execution. If relevant, include what most people would've done instead — and why mine was better.`);
                       // Show temporary feedback
                       const btn = event.currentTarget as HTMLButtonElement;
                       const originalText = btn.textContent;
