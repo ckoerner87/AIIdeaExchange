@@ -201,29 +201,7 @@ export default function Home() {
         {/* Show unlock message */}
         {showUnlockMessage && <UnlockMessage />}
 
-        {/* SEO Content Section */}
-        {!hasSubmitted && (
-          <div className="mb-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                How Do You Use AI? Real ChatGPT & AI Applications
-              </h2>
-              <p className="text-lg text-slate-700 mb-6">
-                Discover hundreds of practical ways people use artificial intelligence and ChatGPT for work, business, and daily life. Learn real AI use cases, creative applications, and proven strategies from our community.
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-600 mb-8">
-                <div>✓ AI Content Creation</div>
-                <div>✓ ChatGPT for Business</div>
-                <div>✓ Marketing Automation</div>
-                <div>✓ Data Analysis with AI</div>
-                <div>✓ AI Customer Support</div>
-                <div>✓ Productivity Tools</div>
-                <div>✓ Creative AI Projects</div>
-                <div>✓ AI for E-commerce</div>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Submission Section */}
         {!hasSubmitted && (
@@ -504,6 +482,28 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           <p className="text-slate-600 mt-3 text-sm">
             Help us improve the platform by sharing your suggestions
           </p>
+        </div>
+
+        {/* SEO Content Section - Moved to bottom for cleaner UX while preserving SEO */}
+        <div className="mt-16 border-t border-slate-200 pt-12">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              How Do You Use AI? Real ChatGPT & AI Applications
+            </h2>
+            <p className="text-lg text-slate-700 mb-6">
+              Discover hundreds of practical ways people use artificial intelligence and ChatGPT for work, business, and daily life. Learn real AI use cases, creative applications, and proven strategies from our community.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-600 mb-8">
+              <div>✓ AI Content Creation</div>
+              <div>✓ ChatGPT for Business</div>
+              <div>✓ Marketing Automation</div>
+              <div>✓ Data Analysis with AI</div>
+              <div>✓ AI Customer Support</div>
+              <div>✓ Productivity Tools</div>
+              <div>✓ Creative AI Projects</div>
+              <div>✓ AI for E-commerce</div>
+            </div>
+          </div>
         </div>
       </main>
 
