@@ -15,6 +15,8 @@ export default function Admin() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [editUrl, setEditUrl] = useState("");
+  const [editingVotes, setEditingVotes] = useState<number | null>(null);
+  const [editVoteValue, setEditVoteValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
 
@@ -112,6 +114,39 @@ export default function Admin() {
       toast({
         title: "Error",
         description: error.message || "Failed to delete idea",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation to update vote count
+  const updateVotesMutation = useMutation({
+    mutationFn: async ({ id, votes }: { id: number; votes: number }) => {
+      const res = await fetch(`/api/admin/ideas/${id}/votes`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ votes }),
+      });
+      if (!res.ok) {
+        throw new Error('Failed to update vote count');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Vote count updated",
+        description: "The vote count has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
+      setEditingVotes(null);
+      setEditVoteValue("");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update vote count",
         variant: "destructive",
       });
     },

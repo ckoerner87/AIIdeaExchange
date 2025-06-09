@@ -366,6 +366,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to update vote count
+  app.patch("/api/admin/ideas/:id/votes", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { votes } = req.body;
+      
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid idea ID" });
+      }
+      
+      if (typeof votes !== 'number' || votes < 0) {
+        return res.status(400).json({ message: "Votes must be a non-negative number" });
+      }
+
+      await storage.updateIdeaVotes(id, votes);
+      res.json({ message: "Vote count updated successfully", votes });
+    } catch (error) {
+      console.error("Error updating vote count:", error);
+      res.status(500).json({ message: "Failed to update vote count" });
+    }
+  });
+
   // Export CSV with proper email-to-idea linking
   app.get("/api/admin/export", async (req, res) => {
     try {
