@@ -268,11 +268,12 @@ export default function Admin() {
                   {(() => {
                     if (!ideas?.length) return '0.0';
                     
-                    // Get unique users who have given upvotes
-                    const usersWithUpvotes = ideas.filter((idea: any) => (idea.upvotesGiven || 0) > 0);
+                    // Calculate total upvotes given by all users
                     const totalUpvotesGiven = ideas.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0);
+                    // Total number of users (all idea submitters)
+                    const totalUsers = ideas.length;
                     
-                    return usersWithUpvotes.length > 0 ? (totalUpvotesGiven / usersWithUpvotes.length).toFixed(1) : '0.0';
+                    return totalUsers > 0 ? (totalUpvotesGiven / totalUsers).toFixed(1) : '0.0';
                   })()}
                 </div>
                 <div className="text-sm text-teal-700">Average Upvotes per User</div>
