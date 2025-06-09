@@ -472,7 +472,7 @@ export default function Admin() {
                     Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, ideas.length)} of {ideas.length} ideas
                   </div>
                   <div className="text-sm text-gray-600">
-                    Sorted by upvotes (highest first)
+                    Sorted by {sortBy === 'votes' ? 'upvotes (highest first)' : 'most recent first'}
                   </div>
                 </div>
 
