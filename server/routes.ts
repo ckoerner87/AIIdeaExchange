@@ -318,54 +318,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to get upvote trends over time
   app.get("/api/admin/upvote-trends", async (req, res) => {
     try {
-      const ideas = await storage.getIdeas('recent');
+      // Get current stats from admin ideas endpoint (reuse existing calculation)
+      const ideas = await storage.getIdeas('votes');
       
-      // Create a map to track cumulative data by date
-      const dailyData = new Map();
+      if (ideas.length === 0) {
+        return res.json([]);
+      }
       
-      // Process ideas chronologically
-      const sortedIdeas = ideas.sort((a, b) => 
-        new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
-      );
+      // Create sample data points showing progression over time
+      // Sample at 10%, 25%, 50%, 75%, 90%, 100% of ideas
+      const samplePoints = [0.1, 0.25, 0.5, 0.75, 0.9, 1.0];
+      const dataPoints = [];
       
-      // For each day, calculate the average upvotes per user up to that point
-      for (let i = 0; i < sortedIdeas.length; i++) {
-        const currentIdea = sortedIdeas[i];
+      for (const percentage of samplePoints) {
+        const index = Math.floor(ideas.length * percentage) - 1;
+        if (index < 0) continue;
+        
+        const currentIdea = ideas[index];
         const currentDate = new Date(currentIdea.submittedAt).toISOString().split('T')[0];
         
-        // Get all ideas submitted up to this date (inclusive)
-        const ideasUpToDate = sortedIdeas.slice(0, i + 1);
+        // Use ideas up to this point
+        const ideasUpToDate = ideas.slice(0, index + 1);
         
-        // Calculate upvotes given by each user up to this date
-        const userUpvoteCounts = await Promise.all(
-          ideasUpToDate.map(async (idea: any) => {
-            const votes = await storage.getAllVotesBySession(idea.sessionId);
-            // Only count upvotes to others' ideas, and only those that existed at this date
-            const relevantVotes = votes.filter(vote => {
-              if (vote.voteType !== 'up') return false;
-              // Find the idea that was voted on
-              const votedIdea = ideasUpToDate.find(i => i.id === vote.ideaId);
-              return votedIdea && votedIdea.id !== idea.id;
-            });
-            return relevantVotes.length;
-          })
-        );
+        // Get upvote statistics (reuse the same logic as admin page)
+        const ideasWithStats = await Promise.all(ideasUpToDate.map(async (idea: any) => {
+          const votes = await storage.getAllVotesBySession(idea.sessionId);
+          const actualUpvotesGiven = votes.filter(vote => 
+            vote.voteType === 'up' && vote.ideaId !== idea.id
+          ).length;
+          return { ...idea, upvotesGiven: actualUpvotesGiven };
+        }));
         
-        const totalUpvotes = userUpvoteCounts.reduce((sum, count) => sum + count, 0);
-        const averageUpvotes = ideasUpToDate.length > 0 ? totalUpvotes / ideasUpToDate.length : 0;
+        const totalUpvotesGiven = ideasWithStats.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0);
+        const averageUpvotes = ideasWithStats.length > 0 ? totalUpvotesGiven / ideasWithStats.length : 0;
         
-        dailyData.set(currentDate, {
+        dataPoints.push({
           date: currentDate,
-          averageUpvotes: Math.round(averageUpvotes * 10) / 10, // Round to 1 decimal
-          totalUsers: ideasUpToDate.length,
-          totalUpvotes: totalUpvotes
+          averageUpvotes: Math.round(averageUpvotes * 10) / 10,
+          totalUsers: ideasWithStats.length,
+          totalUpvotes: totalUpvotesGiven
         });
       }
       
-      // Convert to array and ensure we have data for the last 30 days minimum
-      const dataArray = Array.from(dailyData.values());
-      
-      res.json(dataArray);
+      res.json(dataPoints);
     } catch (error) {
       console.error("Error getting upvote trends:", error);
       res.status(500).json({ message: "Failed to get upvote trends" });
