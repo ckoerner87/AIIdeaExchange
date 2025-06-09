@@ -255,6 +255,14 @@ export default function Admin() {
                           <span className="text-sm text-slate-500">Votes: {idea.votes}</span>
                           <span className="text-sm text-slate-500">•</span>
                           <span className="text-sm text-slate-500">
+                            Given: {idea.upvotesGiven || 0} upvotes
+                          </span>
+                          <span className="text-sm text-slate-500">•</span>
+                          <span className="text-sm text-slate-500">
+                            Ratio: {idea.votes > 0 ? ((idea.upvotesGiven || 0) / idea.votes).toFixed(1) : '0.0'}:1
+                          </span>
+                          <span className="text-sm text-slate-500">•</span>
+                          <span className="text-sm text-slate-500">
                             {new Date(idea.submittedAt).toLocaleDateString()}
                           </span>
                           {idea.category && (

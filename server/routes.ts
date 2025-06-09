@@ -292,7 +292,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const sortBy = req.query.sort as 'votes' | 'recent' || 'recent';
       const ideas = await storage.getIdeas(sortBy);
-      res.json(ideas);
+      
+      // Get upvote statistics for each idea's submitter
+      const ideasWithStats = await Promise.all(ideas.map(async (idea: any) => {
+        const userSession = await storage.getUserSession(idea.sessionId);
+        return {
+          ...idea,
+          upvotesGiven: userSession?.upvotesGiven || 0
+        };
+      }));
+      
+      res.json(ideasWithStats);
     } catch (error) {
       console.error("Error getting admin ideas:", error);
       res.status(500).json({ message: "Failed to get ideas" });
