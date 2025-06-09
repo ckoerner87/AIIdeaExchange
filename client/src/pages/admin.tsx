@@ -80,7 +80,10 @@ export default function Admin() {
         title: "Idea updated",
         description: "The idea has been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas', sortBy] });
+      queryClient.removeQueries({ 
+        predicate: (query) => query.queryKey[0] === '/api/admin/ideas'
+      });
+      queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
       setEditingId(null);
       setEditText("");
     },
@@ -109,14 +112,15 @@ export default function Admin() {
         title: "Idea deleted",
         description: "The idea has been removed successfully.",
       });
-      // Force refetch by invalidating all variations of the query
-      queryClient.invalidateQueries({ 
+      // Force refetch by removing from cache and refetching
+      queryClient.removeQueries({ 
         predicate: (query) => query.queryKey[0] === '/api/admin/ideas'
       });
-      // Also invalidate the main ideas query in case user views both
-      queryClient.invalidateQueries({ 
+      queryClient.removeQueries({ 
         predicate: (query) => query.queryKey[0] === '/api/ideas'
       });
+      // Immediately refetch current query
+      queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
     },
     onError: (error: any) => {
       toast({
@@ -147,7 +151,10 @@ export default function Admin() {
         title: "Vote count updated",
         description: "The vote count has been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas', sortBy] });
+      queryClient.removeQueries({ 
+        predicate: (query) => query.queryKey[0] === '/api/admin/ideas'
+      });
+      queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
       setEditingVotes(null);
       setEditVoteValue("");
     },
@@ -225,7 +232,10 @@ export default function Admin() {
         title: "Duplicates deleted",
         description: `Removed ${data.deletedIds?.length || 0} duplicate entries`,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas', sortBy] });
+      queryClient.removeQueries({ 
+        predicate: (query) => query.queryKey[0] === '/api/admin/ideas'
+      });
+      queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
     },
     onError: (error: any) => {
       toast({
