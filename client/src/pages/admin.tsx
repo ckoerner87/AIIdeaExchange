@@ -204,6 +204,31 @@ export default function Admin() {
     setEditVoteValue("");
   };
 
+  // Delete duplicates mutation
+  const deleteDuplicatesMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/admin/delete-duplicates', {
+        method: 'POST',
+      });
+      if (!res.ok) throw new Error('Failed to delete duplicates');
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Duplicates deleted",
+        description: `Removed ${data.deletedIds?.length || 0} duplicate entries`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete duplicates",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleDelete = (idea: any) => {
     if (window.confirm(`Are you sure you want to delete this idea: "${idea.useCase || idea.title}"?`)) {
       deleteMutation.mutate(idea.id);
@@ -409,7 +434,31 @@ export default function Admin() {
 
           {/* Ideas List */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">AI Use Case Ideas</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4 sm:mb-0">AI Use Case Ideas</h2>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm font-medium text-slate-700">Sort by:</label>
+                  <select 
+                    value={sortBy} 
+                    onChange={(e) => setSortBy(e.target.value as 'votes' | 'recent')}
+                    className="px-3 py-1 border border-slate-300 rounded text-sm"
+                  >
+                    <option value="votes">Most Upvotes</option>
+                    <option value="recent">Most Recent</option>
+                  </select>
+                </div>
+                <Button 
+                  onClick={() => deleteDuplicatesMutation.mutate()}
+                  disabled={deleteDuplicatesMutation.isPending}
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  {deleteDuplicatesMutation.isPending ? "Deleting..." : "Delete Duplicates"}
+                </Button>
+              </div>
+            </div>
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>

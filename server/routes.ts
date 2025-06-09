@@ -76,6 +76,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const idea = await storage.createIdea(ideaData);
       await storage.updateUserSessionSubmitted(sessionId);
       
+      // If this is a test submission, auto-delete it after 10 seconds
+      if (contentValidation.isTestSubmission) {
+        setTimeout(async () => {
+          try {
+            await storage.deleteIdea(idea.id);
+            console.log(`Auto-deleted test submission ${idea.id}`);
+          } catch (error) {
+            console.error(`Failed to auto-delete test submission ${idea.id}:`, error);
+          }
+        }, 10000);
+      }
+      
       res.json(idea);
     } catch (error) {
       console.error("Error creating idea:", error);
@@ -374,6 +386,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting idea:", error);
       res.status(500).json({ message: "Failed to delete idea" });
+    }
+  });
+
+  // Admin endpoint to auto-delete duplicate entries
+  app.post("/api/admin/delete-duplicates", async (req, res) => {
+    try {
+      const ideas = await storage.getIdeas();
+      const duplicates: number[] = [];
+      const seen = new Map<string, number>();
+
+      // Find duplicates based on useCase text
+      for (const idea of ideas) {
+        const key = (idea.useCase || '').trim().toLowerCase();
+        if (key && seen.has(key)) {
+          // Keep the one with more votes, delete the other
+          const existingId = seen.get(key)!;
+          const existingIdea = ideas.find((i: any) => i.id === existingId);
+          if (existingIdea && idea.votes > existingIdea.votes) {
+            duplicates.push(existingId);
+            seen.set(key, idea.id);
+          } else {
+            duplicates.push(idea.id);
+          }
+        } else {
+          seen.set(key, idea.id);
+        }
+      }
+
+      // Delete duplicates
+      for (const id of duplicates) {
+        await storage.deleteIdea(id);
+      }
+
+      res.json({ 
+        message: `Deleted ${duplicates.length} duplicate entries`,
+        deletedIds: duplicates
+      });
+    } catch (error) {
+      console.error("Error deleting duplicates:", error);
+      res.status(500).json({ message: "Failed to delete duplicates" });
     }
   });
 
