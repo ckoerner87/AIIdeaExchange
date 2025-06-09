@@ -240,7 +240,7 @@ export default function Admin() {
           {/* Community Engagement Summary */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-6">Community Engagement</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-blue-600">
                   {ideas?.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0) || 0}
@@ -268,6 +268,14 @@ export default function Admin() {
                   {ideas?.filter((idea: any) => (idea.upvotesGiven || 0) > 0).length || 0}
                 </div>
                 <div className="text-sm text-orange-700">Active Voters</div>
+              </div>
+              <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
+                <div className="text-2xl font-bold text-teal-600">
+                  {ideas?.length ? (
+                    (ideas.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0) / ideas.length).toFixed(1)
+                  ) : '0.0'}
+                </div>
+                <div className="text-sm text-teal-700">Average Upvotes per User</div>
               </div>
             </div>
           </div>
