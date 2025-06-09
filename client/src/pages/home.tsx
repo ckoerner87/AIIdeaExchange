@@ -222,9 +222,42 @@ export default function Home() {
           <div className="mb-12">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-bold text-slate-900 mb-4">Share Your AI Use Case</h3>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-6">
                 Wanna see how hundreds of other geniuses are using AI? You've gotta share your own use case first! We don't care if you think it's silly - just share it! We don't need your email, name or your login, just your idea.
               </p>
+              
+              {/* ChatGPT Prompt Suggestion */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 max-w-3xl mx-auto">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <h4 className="text-lg font-semibold text-green-900">Need Ideas? Ask ChatGPT!</h4>
+                </div>
+                <p className="text-sm text-green-800 mb-3">
+                  Copy this prompt to ChatGPT, then paste the best responses into the form below:
+                </p>
+                <div className="relative bg-white border border-green-300 rounded-lg p-4">
+                  <div className="font-mono text-sm text-slate-700 mb-3">
+                    "What are the 5 most innovative, unique or genius ways that I use AI?"
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText("What are the 5 most innovative, unique or genius ways that I use AI?");
+                      // Show temporary feedback
+                      const btn = event.target as HTMLButtonElement;
+                      const originalText = btn.textContent;
+                      btn.textContent = "Copied!";
+                      btn.classList.add("bg-green-600");
+                      setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.classList.remove("bg-green-600");
+                      }, 2000);
+                    }}
+                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-md transition-colors"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
             </div>
             <IdeaSubmissionForm sessionId={sessionData?.sessionId || sessionId} onSubmitted={handleIdeaSubmitted} />
           </div>
