@@ -142,10 +142,11 @@ export default function Home() {
     }
   }, []);
 
-  const handleIdeaSubmitted = (newIdeaId?: number) => {
+  const handleIdeaSubmitted = (newIdeaId?: number, ideaText?: string) => {
     setShowGiftCardPopup(true);
     if (newIdeaId) {
       setNewlySubmittedIdeaId(newIdeaId);
+      setSubmittedIdeaText(ideaText || '');
       // Clear the highlight after 15 seconds
       setTimeout(() => {
         setNewlySubmittedIdeaId(null);
@@ -558,6 +559,8 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
         isOpen={showGiftCardPopup}
         onClose={handleGiftCardPopupClose}
         sessionId={sessionId}
+        submittedIdeaId={newlySubmittedIdeaId || undefined}
+        submittedIdeaText={submittedIdeaText}
       />
     </div>
   );

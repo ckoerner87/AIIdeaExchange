@@ -72,7 +72,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
         ),
       });
       form.reset();
-      onSubmitted(data?.id);
+      onSubmitted(data?.id, data?.useCase);
     },
     onError: (error: any) => {
       toast({
