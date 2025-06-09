@@ -18,13 +18,14 @@ export default function Admin() {
   const [editingVotes, setEditingVotes] = useState<number | null>(null);
   const [editVoteValue, setEditVoteValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
   const itemsPerPage = 50;
 
   // Get all ideas for admin view
   const { data: ideas, isLoading } = useQuery({
-    queryKey: ['/api/admin/ideas'],
+    queryKey: ['/api/admin/ideas', sortBy],
     queryFn: async () => {
-      const res = await fetch('/api/admin/ideas?sort=votes');
+      const res = await fetch(`/api/admin/ideas?sort=${sortBy}`);
       if (!res.ok) {
         throw new Error('Failed to get ideas');
       }
@@ -154,7 +155,7 @@ export default function Admin() {
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "cjk") {
+    if (password === "xxx") {
       setIsAuthenticated(true);
     } else {
       toast({
