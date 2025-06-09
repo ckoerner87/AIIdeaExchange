@@ -17,7 +17,7 @@ import { eq, desc, asc, and, or, isNull, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Ideas
-  createIdea(idea: InsertIdea): Promise<Idea>;
+  createIdea(idea: InsertIdea & { sessionId: string }): Promise<Idea>;
   getIdeas(sortBy?: 'votes' | 'recent', category?: string, tool?: string): Promise<Idea[]>;
   getIdeaById(id: number): Promise<Idea | undefined>;
   updateIdea(id: number, updates: Partial<Idea>): Promise<Idea>;
@@ -47,11 +47,18 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // Ideas
-  async createIdea(insertIdea: InsertIdea): Promise<Idea> {
+  async createIdea(insertIdea: InsertIdea & { sessionId: string }): Promise<Idea> {
     // Ensure category defaults to "other" if not provided
     const ideaData = {
-      ...insertIdea,
-      category: insertIdea.category || "other"
+      sessionId: insertIdea.sessionId,
+      title: insertIdea.title,
+      description: insertIdea.description,
+      useCase: insertIdea.useCase,
+      category: insertIdea.category || "other",
+      tools: insertIdea.tools || null,
+      linkUrl: insertIdea.linkUrl || null,
+      aiGrade: insertIdea.aiGrade || null,
+      votes: 0
     };
     
     const [idea] = await db

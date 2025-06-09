@@ -3,6 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    
+    <!-- Critical CSS inline -->
+    <style>
+      html { font-family: system-ui, -apple-system, sans-serif; }
+      body { margin: 0; background: #f8fafc; }
+      .loading-spinner { 
+        border: 2px solid #f3f3f3; 
+        border-top: 2px solid #3498db; 
+        border-radius: 50%; 
+        width: 20px; 
+        height: 20px; 
+        animation: spin 1s linear infinite; 
+        margin: 20px auto;
+      }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
     <title>How Do You Use AI? - Creative AI Use Cases & ChatGPT Ideas | AI Tools Community</title>
     <meta name="description" content="Discover hundreds of creative ways to use AI and ChatGPT. Share your AI use cases, learn practical AI applications, and explore how others use artificial intelligence for work, business, and daily life." />
     <meta name="keywords" content="how do you use AI, how to use AI, ChatGPT uses, AI use cases, artificial intelligence applications, AI tools, ChatGPT ideas, AI for business, practical AI uses, AI examples" />
@@ -28,6 +50,15 @@
     <meta name="googlebot" content="index, follow" />
     <meta name="language" content="en" />
     <meta name="theme-color" content="#1e293b" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/api/session" as="fetch" crossorigin />
+    <link rel="preload" href="/api/stats" as="fetch" crossorigin />
+    
+    <!-- Resource hints for better loading -->
+    <link rel="prefetch" href="/api/ideas" />
+    <link rel="dns-prefetch" href="//www.google-analytics.com" />
+    <link rel="dns-prefetch" href="//www.googletagmanager.com" />
     
     <!-- Security Headers to prevent phishing detection -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'none';" />
