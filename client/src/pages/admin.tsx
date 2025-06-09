@@ -376,32 +376,32 @@ export default function Admin() {
                   {ideas
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                     .map((idea: any) => (
-                    <div key={idea.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="text-sm font-medium text-slate-500">ID: {idea.id}</span>
-                          <span className="text-sm text-slate-500">•</span>
-                          <span className="text-sm text-slate-500">Votes: {idea.votes}</span>
-                          <span className="text-sm text-slate-500">•</span>
-                          <span className="text-sm text-slate-500">
-                            Given: {idea.upvotesGiven || 0} upvotes
-                          </span>
-                          <span className="text-sm text-slate-500">•</span>
-                          <span className="text-sm text-slate-500">
-                            Ratio: {idea.votes > 0 ? ((idea.upvotesGiven || 0) / idea.votes).toFixed(1) : '0.0'}:1
-                          </span>
-                          <span className="text-sm text-slate-500">•</span>
-                          <span className="text-sm text-slate-500">
-                            {new Date(idea.submittedAt).toLocaleDateString()}
-                          </span>
-                          {idea.category && (
-                            <>
+                      <div key={idea.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <span className="text-sm font-medium text-slate-500">ID: {idea.id}</span>
                               <span className="text-sm text-slate-500">•</span>
-                              <span className="text-sm text-slate-500 capitalize">{idea.category}</span>
-                            </>
-                          )}
-                        </div>
+                              <span className="text-sm text-slate-500">Votes: {idea.votes}</span>
+                              <span className="text-sm text-slate-500">•</span>
+                              <span className="text-sm text-slate-500">
+                                Given: {idea.upvotesGiven || 0} upvotes
+                              </span>
+                              <span className="text-sm text-slate-500">•</span>
+                              <span className="text-sm text-slate-500">
+                                Ratio: {idea.votes > 0 ? ((idea.upvotesGiven || 0) / idea.votes).toFixed(1) : '0.0'}:1
+                              </span>
+                              <span className="text-sm text-slate-500">•</span>
+                              <span className="text-sm text-slate-500">
+                                {new Date(idea.submittedAt).toLocaleDateString()}
+                              </span>
+                              {idea.category && (
+                                <>
+                                  <span className="text-sm text-slate-500">•</span>
+                                  <span className="text-sm text-slate-500 capitalize">{idea.category}</span>
+                                </>
+                              )}
+                            </div>
                         {editingId === idea.id ? (
                           <div className="space-y-4">
                             <div>
