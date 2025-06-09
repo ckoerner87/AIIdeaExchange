@@ -8,13 +8,7 @@ import { googleSheetsService } from "./google-sheets";
 
 
 
-// Whitelisted IPs that can vote multiple times (for testing)
-const WHITELISTED_IPS = [
-  "127.0.0.1",
-  "::1",
-  "localhost",
-  "47.161.63.29"  // Your IP for testing
-];
+// Remove IP restrictions - allow unlimited voting from any IP
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get or create user session
@@ -143,76 +137,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Idea not found" });
       }
 
-      // Get client IP address
+      // Get client IP address for tracking only
       const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
-      const isWhitelisted = WHITELISTED_IPS.includes(clientIp as string);
-      
-      // Rate limiting for all IPs (including whitelisted for rate limits only)
-      const recentVotes = await storage.getRecentVotesByIp(clientIp as string, 60000); // Last 1 minute
-      if (recentVotes.length >= 5) {
-        return res.status(429).json({ message: "Too many votes. Please wait before voting again." });
-      }
-      
-      const veryRecentVotes = await storage.getRecentVotesByIp(clientIp as string, 10000); // Last 10 seconds
-      if (veryRecentVotes.length >= 2) {
-        return res.status(429).json({ message: "Voting too quickly. Please slow down." });
-      }
-
-      // Anti-gaming measures (skip for whitelisted IPs)
-      if (!isWhitelisted) {
-        // Prevent voting on own submission
-        if (idea.sessionId === sessionId) {
-          return res.status(400).json({ message: "You cannot vote on your own idea" });
-        }
-        
-        // Check if this IP already voted on ANY idea (one vote total per IP)
-        const existingIpVote = await storage.getVoteByIpAndIdea(clientIp as string, ideaId);
-        if (existingIpVote) {
-          return res.status(400).json({ message: "You can only vote once per idea from this location" });
-        }
-      }
       
       // Check if user already voted with this session
       const existingVote = await storage.getUserVoteForIdea(sessionId, ideaId);
       
       if (existingVote) {
-        if (isWhitelisted) {
-          // For whitelisted IPs, always allow additional votes without removing existing ones
-          await storage.createVote({ sessionId: sessionId + '-' + Date.now(), ideaId, voteType, ipAddress: clientIp as string });
-          const voteChange = voteType === 'up' ? 1 : -1;
-          const newVotes = idea.votes + voteChange;
-          await storage.updateIdeaVotes(ideaId, newVotes);
-          return res.json({ votes: newVotes, userVote: voteType });
-        } else if (existingVote.voteType === voteType) {
-          // Remove vote if clicking same vote type (non-whitelisted users)
-          await storage.deleteVote(sessionId, ideaId);
-          const newVotes = voteType === 'up' ? idea.votes - 1 : idea.votes + 1;
-          await storage.updateIdeaVotes(ideaId, newVotes);
-          return res.json({ votes: newVotes, userVote: null });
-        } else {
-          // Change vote type (only allow if not blocked by IP restriction)
-          if (voteType === 'up' && !isWhitelisted) {
-            const existingIpVote = await storage.getVoteByIpAndIdea(clientIp as string, ideaId);
-            if (existingIpVote) {
-              return res.status(400).json({ message: "You can only upvote once per idea" });
-            }
-          }
-          await storage.deleteVote(sessionId, ideaId);
-          await storage.createVote({ sessionId, ideaId, voteType, ipAddress: clientIp as string });
-          const voteChange = voteType === 'up' ? 2 : -2; // Change from down to up or vice versa
-          const newVotes = idea.votes + voteChange;
-          await storage.updateIdeaVotes(ideaId, newVotes);
-          return res.json({ votes: newVotes, userVote: voteType });
-        }
+        // Always allow additional votes without removing existing ones
+        await storage.createVote({ sessionId: sessionId + '-' + Date.now(), ideaId, voteType, ipAddress: clientIp as string });
+        const voteChange = voteType === 'up' ? 1 : -1;
+        const newVotes = idea.votes + voteChange;
+        await storage.updateIdeaVotes(ideaId, newVotes);
+        return res.json({ votes: newVotes, userVote: voteType });
       } else {
-        // New vote
+        // New vote - always allow
         await storage.createVote({ sessionId, ideaId, voteType, ipAddress: clientIp as string });
         const voteChange = voteType === 'up' ? 1 : -1;
         const newVotes = idea.votes + voteChange;
         await storage.updateIdeaVotes(ideaId, newVotes);
         
         // Reward system: Give bonus upvotes for upvoting others' ideas
-        if (voteType === 'up' && !isWhitelisted) {
+        if (voteType === 'up') {
           await storage.incrementUpvotesGiven(sessionId);
           
           // Check if user earned a reward (every 3 upvotes given)
