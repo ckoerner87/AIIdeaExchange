@@ -273,6 +273,11 @@ export default function Admin() {
                     // Total number of users (all idea submitters)
                     const totalUsers = ideas.length;
                     
+                    // Debug logging
+                    console.log('Debug - Ideas with upvotes:', ideas.map(idea => ({ id: idea.id, upvotesGiven: idea.upvotesGiven })));
+                    console.log('Debug - Total upvotes given:', totalUpvotesGiven);
+                    console.log('Debug - Total users:', totalUsers);
+                    
                     return totalUsers > 0 ? (totalUpvotesGiven / totalUsers).toFixed(1) : '0.0';
                   })()}
                 </div>
