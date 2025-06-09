@@ -184,6 +184,25 @@ export default function Admin() {
     setEditUrl("");
   };
 
+  const handleEditVotes = (idea: any) => {
+    setEditingVotes(idea.id);
+    setEditVoteValue(idea.votes.toString());
+  };
+
+  const handleSaveVotes = () => {
+    if (editingVotes && editVoteValue.trim()) {
+      const votes = parseInt(editVoteValue);
+      if (!isNaN(votes) && votes >= 0) {
+        updateVotesMutation.mutate({ id: editingVotes, votes });
+      }
+    }
+  };
+
+  const handleCancelVotes = () => {
+    setEditingVotes(null);
+    setEditVoteValue("");
+  };
+
   const handleDelete = (idea: any) => {
     if (window.confirm(`Are you sure you want to delete this idea: "${idea.useCase || idea.title}"?`)) {
       deleteMutation.mutate(idea.id);
@@ -417,7 +436,41 @@ export default function Admin() {
                             <div className="flex items-center space-x-2 mb-2">
                               <span className="text-sm font-medium text-slate-500">ID: {idea.id}</span>
                               <span className="text-sm text-slate-500">•</span>
-                              <span className="text-sm text-slate-500">Votes: {idea.votes}</span>
+                              {editingVotes === idea.id ? (
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm text-slate-500">Votes:</span>
+                                  <Input
+                                    type="number"
+                                    value={editVoteValue}
+                                    onChange={(e) => setEditVoteValue(e.target.value)}
+                                    className="w-20 h-6 text-xs"
+                                    min="0"
+                                  />
+                                  <Button
+                                    onClick={handleSaveVotes}
+                                    size="sm"
+                                    className="h-6 px-2 text-xs"
+                                    disabled={updateVotesMutation.isPending}
+                                  >
+                                    <Save className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    onClick={handleCancelVotes}
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleEditVotes(idea)}
+                                  className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+                                >
+                                  Votes: {idea.votes}
+                                </button>
+                              )}
                               <span className="text-sm text-slate-500">•</span>
                               <span className="text-sm text-slate-500">
                                 Given: {idea.upvotesGiven || 0} upvotes

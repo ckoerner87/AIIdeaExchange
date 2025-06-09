@@ -8,7 +8,8 @@ import { googleSheetsService } from "./google-sheets";
 
 
 
-// Remove IP restrictions - allow unlimited voting from any IP
+// Admin IP to exclude from metrics (but allow unlimited voting)
+const ADMIN_IP = "47.161.63.29"; // Your IP - excluded from all metrics calculations
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get or create user session
@@ -239,13 +240,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sortBy = req.query.sort as 'votes' | 'recent' || 'recent';
       const ideas = await storage.getIdeas(sortBy);
       
-      // Get upvote statistics for each idea's submitter
+      // Get upvote statistics for each idea's submitter (exclude admin IP)
       const ideasWithStats = await Promise.all(ideas.map(async (idea: any) => {
         // Get actual votes given by this user from the votes table
         const votes = await storage.getAllVotesBySession(idea.sessionId);
-        // Only count upvotes given to OTHER people's ideas (exclude self-upvotes)
+        // Only count upvotes given to OTHER people's ideas (exclude self-upvotes and admin IP)
         const actualUpvotesGiven = votes.filter(vote => 
-          vote.voteType === 'up' && vote.ideaId !== idea.id
+          vote.voteType === 'up' && 
+          vote.ideaId !== idea.id && 
+          vote.ipAddress !== ADMIN_IP
         ).length;
         
         return {
@@ -286,11 +289,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Use ideas up to this point
         const ideasUpToDate = ideas.slice(0, index + 1);
         
-        // Get upvote statistics (reuse the same logic as admin page)
+        // Get upvote statistics (exclude admin IP from metrics)
         const ideasWithStats = await Promise.all(ideasUpToDate.map(async (idea: any) => {
           const votes = await storage.getAllVotesBySession(idea.sessionId);
           const actualUpvotesGiven = votes.filter(vote => 
-            vote.voteType === 'up' && vote.ideaId !== idea.id
+            vote.voteType === 'up' && 
+            vote.ideaId !== idea.id && 
+            vote.ipAddress !== ADMIN_IP
           ).length;
           return { ...idea, upvotesGiven: actualUpvotesGiven };
         }));
