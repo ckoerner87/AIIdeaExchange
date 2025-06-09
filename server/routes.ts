@@ -297,7 +297,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ideasWithStats = await Promise.all(ideas.map(async (idea: any) => {
         // Get actual votes given by this user from the votes table
         const votes = await storage.getAllVotesBySession(idea.sessionId);
-        const actualUpvotesGiven = votes.filter(vote => vote.voteType === 'up').length;
+        // Only count upvotes given to OTHER people's ideas (exclude self-upvotes)
+        const actualUpvotesGiven = votes.filter(vote => 
+          vote.voteType === 'up' && vote.ideaId !== idea.id
+        ).length;
         
         return {
           ...idea,
