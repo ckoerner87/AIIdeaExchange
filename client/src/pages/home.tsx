@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Lightbulb, Bell } from "lucide-react";
+import { Lightbulb, Bell, ChevronDown, ChevronUp } from "lucide-react";
 import IdeaSubmissionForm from "@/components/idea-submission-form";
 import IdeaCard from "@/components/idea-card";
 import SubscriptionForm from "@/components/subscription-form";
@@ -28,6 +28,7 @@ export default function Home() {
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
   const [visibleIdeasCount, setVisibleIdeasCount] = useState(20);
   const [newlySubmittedIdeaId, setNewlySubmittedIdeaId] = useState<number | null>(null);
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
   // Get or create session
   const { data: sessionData } = useQuery({
@@ -223,7 +224,8 @@ export default function Home() {
                 </p>
                 <div className="relative bg-white border border-green-300 rounded-lg p-4">
                   <div className="font-mono text-sm text-slate-700 mb-3 whitespace-pre-line">
-                    {`Based on all our past chats, tell me the 5 most innovative, unique, or genius ways I've actually used AI in real-world execution — especially in business, content, or parenting.
+                    {isPromptExpanded ? (
+                      `Based on all our past chats, tell me the 5 most innovative, unique, or genius ways I've actually used AI in real-world execution — especially in business, content, or parenting.
 
 For each one, break it down tactically with:
 
@@ -233,8 +235,31 @@ The exact workflow or prompt structure used
 What made it clever or non-obvious
 How it could be scaled, productized, or improved
 
-Prioritize examples that combine creativity + execution. If relevant, include what most people would've done instead — and why mine was better.`}
+Prioritize examples that combine creativity + execution. If relevant, include what most people would've done instead — and why mine was better.`
+                    ) : (
+                      `Based on all our past chats, tell me the 5 most innovative...`
+                    )}
                   </div>
+                  
+                  {/* Expand/Collapse button */}
+                  <button
+                    onClick={() => setIsPromptExpanded(!isPromptExpanded)}
+                    className="absolute bottom-2 left-2 text-green-600 hover:text-green-800 text-xs flex items-center gap-1 transition-colors"
+                  >
+                    {isPromptExpanded ? (
+                      <>
+                        <ChevronUp className="w-3 h-3" />
+                        Show less
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-3 h-3" />
+                        Read more
+                      </>
+                    )}
+                  </button>
+                  
+                  {/* Copy button */}
                   <button
                     onClick={(event) => {
                       navigator.clipboard.writeText(`Based on all our past chats, tell me the 5 most innovative, unique, or genius ways I've actually used AI in real-world execution — especially in business, content, or parenting.
