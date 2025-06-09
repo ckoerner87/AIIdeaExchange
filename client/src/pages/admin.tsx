@@ -271,9 +271,9 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 sm:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-8 overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 space-y-4 sm:space-y-0">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Admin Dashboard</h1>
@@ -534,7 +534,7 @@ export default function Admin() {
                               href={idea.linkUrl} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-sm"
+                              className="text-blue-600 hover:text-blue-800 text-sm break-all"
                             >
                               {idea.linkUrl}
                             </a>

@@ -208,7 +208,7 @@ export default function Home() {
         {!hasSubmitted && (
           <div className="mb-12">
             <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">Need more AI ideas? We've got hundreds! But share yours first!</h3>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Need more AI ideas? We've got hundreds! But share yours first!</h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-6">
                 Wanna see how hundreds of other geniuses are using AI? You've gotta share your own use case first! We don't care if you think it's silly - just share it! We don't need your email, name or your login, just your idea.
               </p>
@@ -217,7 +217,7 @@ export default function Home() {
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 max-w-3xl mx-auto">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h4 className="text-lg font-semibold text-green-900">Need Ideas? Ask ChatGPT!</h4>
+                  <h3 className="text-lg font-semibold text-green-900">Need Ideas? Ask ChatGPT!</h3>
                 </div>
                 <p className="text-sm text-green-800 mb-3">
                   Copy this prompt to ChatGPT, then paste the best responses into the form below:
