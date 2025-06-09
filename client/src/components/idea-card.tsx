@@ -94,8 +94,9 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
               onClick={() => onVote(idea.id, 'up')}
               disabled={isVoting}
+              aria-label={`Upvote idea: ${idea.useCase.substring(0, 50)}...`}
             >
-              <ChevronUp className="text-slate-400 hover:text-secondary h-5 w-5" />
+              <ChevronUp className="text-slate-600 hover:text-blue-600 h-5 w-5" />
             </Button>
             <div className="px-2 text-center">
               <span className="text-sm font-semibold text-slate-700 block">{idea.votes}</span>
