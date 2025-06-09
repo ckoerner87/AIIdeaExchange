@@ -15,12 +15,14 @@ export default function Admin() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [editUrl, setEditUrl] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
 
   // Get all ideas for admin view
   const { data: ideas, isLoading } = useQuery({
     queryKey: ['/api/admin/ideas'],
     queryFn: async () => {
-      const res = await fetch('/api/admin/ideas?sort=recent');
+      const res = await fetch('/api/admin/ideas?sort=votes');
       if (!res.ok) {
         throw new Error('Failed to get ideas');
       }
@@ -43,7 +45,7 @@ export default function Admin() {
   });
 
   // Get upvote trends over time
-  const { data: upvoteTrends } = useQuery({
+  const { data: upvoteTrends, isLoading: trendsLoading, error: trendsError } = useQuery({
     queryKey: ['/api/admin/upvote-trends'],
     queryFn: async () => {
       const res = await fetch('/api/admin/upvote-trends');
@@ -301,7 +303,15 @@ export default function Admin() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Average Upvotes per User Over Time</h2>
             <div className="h-80">
-              {upvoteTrends && upvoteTrends.length > 0 ? (
+              {trendsLoading ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Loading trend data...
+                </div>
+              ) : trendsError ? (
+                <div className="flex items-center justify-center h-full text-red-500">
+                  Error loading trends: {trendsError.message}
+                </div>
+              ) : upvoteTrends && upvoteTrends.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={upvoteTrends}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -333,7 +343,7 @@ export default function Admin() {
                 </ResponsiveContainer>
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
-                  Loading trend data...
+                  No trend data available yet
                 </div>
               )}
             </div>
@@ -351,9 +361,22 @@ export default function Admin() {
                 <p className="text-slate-600 mt-4">Loading ideas...</p>
               </div>
             ) : ideas && ideas.length > 0 ? (
-              <div className="space-y-4">
-                {ideas.map((idea: any) => (
-                  <div key={idea.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+              <>
+                {/* Pagination Info */}
+                <div className="flex justify-between items-center mb-4">
+                  <div className="text-sm text-gray-600">
+                    Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, ideas.length)} of {ideas.length} ideas
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Sorted by upvotes (highest first)
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {ideas
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map((idea: any) => (
+                    <div key={idea.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
@@ -452,7 +475,31 @@ export default function Admin() {
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
+
+                {/* Pagination Controls */}
+                {ideas.length > itemsPerPage && (
+                  <div className="flex justify-center items-center space-x-4 mt-8">
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-sm text-gray-600">
+                      Page {currentPage} of {Math.ceil(ideas.length / itemsPerPage)}
+                    </span>
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage(prev => Math.min(Math.ceil(ideas.length / itemsPerPage), prev + 1))}
+                      disabled={currentPage === Math.ceil(ideas.length / itemsPerPage)}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-12">
                 <AlertTriangle className="mx-auto h-12 w-12 text-slate-400 mb-4" />
