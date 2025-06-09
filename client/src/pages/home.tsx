@@ -181,9 +181,17 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-600">
-                {(stats as any)?.totalIdeas || 0} ideas shared
-              </span>
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full shadow-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  <span className="font-bold text-lg">
+                    {(stats as any)?.totalIdeas || 0}
+                  </span>
+                  <span className="text-sm font-medium">
+                    ideas shared
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
