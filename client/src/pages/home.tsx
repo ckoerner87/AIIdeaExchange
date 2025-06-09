@@ -28,6 +28,7 @@ export default function Home() {
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
   const [visibleIdeasCount, setVisibleIdeasCount] = useState(20);
   const [newlySubmittedIdeaId, setNewlySubmittedIdeaId] = useState<number | null>(null);
+  const [submittedIdeaText, setSubmittedIdeaText] = useState<string>('');
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
   // Get or create session
@@ -145,10 +146,10 @@ export default function Home() {
     setShowGiftCardPopup(true);
     if (newIdeaId) {
       setNewlySubmittedIdeaId(newIdeaId);
-      // Clear the highlight after 5 seconds
+      // Clear the highlight after 15 seconds
       setTimeout(() => {
         setNewlySubmittedIdeaId(null);
-      }, 5000);
+      }, 15000);
     }
     queryClient.invalidateQueries({ queryKey: ['/api/session'] });
   };

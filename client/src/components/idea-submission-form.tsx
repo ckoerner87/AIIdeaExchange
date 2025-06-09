@@ -17,7 +17,7 @@ import type { InsertIdea } from "@shared/schema";
 
 interface IdeaSubmissionFormProps {
   sessionId: string;
-  onSubmitted: (newIdeaId?: number) => void;
+  onSubmitted: (newIdeaId?: number, ideaText?: string) => void;
 }
 
 export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmissionFormProps) {
