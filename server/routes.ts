@@ -376,6 +376,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to delete ideas
   app.delete("/api/admin/ideas/:id", async (req, res) => {
     try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid idea ID" });

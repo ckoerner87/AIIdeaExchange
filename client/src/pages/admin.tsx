@@ -6,7 +6,7 @@ import { Trash2, AlertTriangle, Lock, Download, Mail, Edit, Save, X } from "luci
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Admin() {
   const { toast } = useToast();
@@ -20,6 +20,19 @@ export default function Admin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
   const itemsPerPage = 50;
+
+  // Load saved password and auth state on mount
+  useEffect(() => {
+    const savedPassword = localStorage.getItem('adminPassword');
+    const savedAuth = localStorage.getItem('adminAuthenticated');
+    
+    if (savedPassword === 'xxx' && savedAuth === 'true') {
+      setPassword('xxx');
+      setIsAuthenticated(true);
+    } else if (savedPassword) {
+      setPassword(savedPassword);
+    }
+  }, []);
 
   // Get all ideas for admin view
   const { data: ideas, isLoading } = useQuery({
@@ -171,6 +184,9 @@ export default function Admin() {
     e.preventDefault();
     if (password === "xxx") {
       setIsAuthenticated(true);
+      // Save password and auth state to localStorage
+      localStorage.setItem('adminPassword', 'xxx');
+      localStorage.setItem('adminAuthenticated', 'true');
     } else {
       toast({
         title: "Access Denied",
@@ -178,6 +194,9 @@ export default function Admin() {
         variant: "destructive",
       });
       setPassword("");
+      // Clear any stored auth
+      localStorage.removeItem('adminPassword');
+      localStorage.removeItem('adminAuthenticated');
     }
   };
 
