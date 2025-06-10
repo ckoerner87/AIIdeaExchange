@@ -300,6 +300,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to get upvote trends over time
   app.get("/api/admin/upvote-trends", async (req, res) => {
     try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
       // Get current stats from admin ideas endpoint (reuse existing calculation)
       const ideas = await storage.getIdeas('votes');
       

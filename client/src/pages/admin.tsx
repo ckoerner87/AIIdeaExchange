@@ -88,13 +88,20 @@ export default function Admin() {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedIdea) => {
       toast({
         title: "Idea updated",
         description: "The idea has been updated successfully.",
       });
-      queryClient.invalidateQueries();
-      queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
+      
+      // Update the query data manually
+      queryClient.setQueryData(['/api/admin/ideas', sortBy], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((idea: any) => 
+          idea.id === updatedIdea.id ? updatedIdea : idea
+        );
+      });
+      
       setEditingId(null);
       setEditText("");
     },
@@ -110,34 +117,28 @@ export default function Admin() {
   // Delete idea mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      console.log('Deleting idea with ID:', id);
       const res = await fetch(`/api/admin/ideas/${id}`, {
         method: 'DELETE',
       });
-      console.log('Delete response status:', res.status);
       if (!res.ok) {
         throw new Error('Failed to delete idea');
       }
-      const result = await res.json();
-      console.log('Delete response:', result);
-      return result;
+      return { success: true, deletedId: id };
     },
-    onSuccess: (data, variables) => {
-      console.log('Delete mutation onSuccess called', { data, deletedId: variables });
+    onSuccess: (data) => {
       toast({
         title: "Idea deleted",
         description: "The idea has been removed successfully.",
       });
       
-      // Force complete cache invalidation and refetch
-      console.log('Invalidating all queries...');
-      queryClient.invalidateQueries();
+      // Update the query data manually by removing the deleted item
+      queryClient.setQueryData(['/api/admin/ideas', sortBy], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.filter((idea: any) => idea.id !== data.deletedId);
+      });
       
-      // Wait a moment then refetch
-      setTimeout(() => {
-        console.log('Refetching admin ideas with sortBy:', sortBy);
-        queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
-      }, 100);
+      // Also invalidate to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
     },
     onError: (error: any) => {
       toast({
@@ -163,13 +164,20 @@ export default function Admin() {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       toast({
         title: "Vote count updated",
         description: "The vote count has been updated successfully.",
       });
-      queryClient.invalidateQueries();
-      queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
+      
+      // Update the query data manually
+      queryClient.setQueryData(['/api/admin/ideas', sortBy], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((idea: any) => 
+          idea.id === variables.id ? { ...idea, votes: variables.votes } : idea
+        );
+      });
+      
       setEditingVotes(null);
       setEditVoteValue("");
     },
@@ -253,8 +261,14 @@ export default function Admin() {
         title: "Duplicates deleted",
         description: `Removed ${data.deletedIds?.length || 0} duplicate entries`,
       });
-      queryClient.invalidateQueries();
-      queryClient.refetchQueries({ queryKey: ['/api/admin/ideas', sortBy] });
+      
+      // Update the query data manually by removing deleted items
+      queryClient.setQueryData(['/api/admin/ideas', sortBy], (oldData: any) => {
+        if (!oldData || !data.deletedIds) return oldData;
+        return oldData.filter((idea: any) => !data.deletedIds.includes(idea.id));
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
     },
     onError: (error: any) => {
       toast({
