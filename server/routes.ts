@@ -14,8 +14,23 @@ const ADMIN_IPS = [
   "104.28.50.131",          // Additional whitelisted IP
   "104.28.50.175",          // Additional whitelisted IP
   "2a09:bac2:bab7:1923::281:8d",  // IPv6 address
-  "2a09:bac2:bbe1:1923::281:3f"   // IPv6 address
+  "2a09:bac2:bbe1:1923::281:3f",   // IPv6 address
+  '::1',                    // localhost IPv6
+  '127.0.0.1',              // localhost IPv4
+  '::ffff:127.0.0.1'        // IPv4-mapped IPv6
 ];
+
+function getClientIP(req: any): string {
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+         req.connection?.remoteAddress || 
+         req.socket?.remoteAddress ||
+         req.ip || 
+         '127.0.0.1';
+}
+
+function isAdminIP(ip: string): boolean {
+  return ADMIN_IPS.includes(ip);
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get or create user session
@@ -438,6 +453,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to update vote count
   app.patch("/api/admin/ideas/:id/votes", async (req, res) => {
     try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
       const id = parseInt(req.params.id);
       const { votes } = req.body;
       
@@ -454,6 +475,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating vote count:", error);
       res.status(500).json({ message: "Failed to update vote count" });
+    }
+  });
+
+  // Admin endpoint to get subscribers
+  app.get("/api/admin/subscribers", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const subscribers = await storage.getAllSubscriptions();
+      res.json(subscribers);
+    } catch (error) {
+      console.error("Error getting subscribers:", error);
+      res.status(500).json({ message: "Failed to get subscribers" });
     }
   });
 
