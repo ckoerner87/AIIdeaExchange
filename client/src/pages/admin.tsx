@@ -18,7 +18,7 @@ export default function Admin() {
   const [editingVotes, setEditingVotes] = useState<number | null>(null);
   const [editVoteValue, setEditVoteValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
+  const [sortBy, setSortBy] = useState<'votes' | 'recent'>('recent');
   const itemsPerPage = 50;
 
   // Load saved password and auth state on mount
