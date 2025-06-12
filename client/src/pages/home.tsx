@@ -383,18 +383,16 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
             {/* Amazon Gift Card Banner */}
             <div className="mb-6 bg-gradient-to-r from-yellow-100 to-yellow-200 border-2 border-yellow-300 rounded-lg p-6 shadow-lg">
-              <p className="text-xl font-bold text-yellow-900 text-center flex items-center justify-center">
-                <span className="mr-2">🏆</span>
-                The most upvoted idea every week will win a free $100 Amazon gift card!
-                <span className="ml-2">🏆</span>
-              </p>
-            </div>
-
-            {/* Reward System Info */}
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <p className="text-lg font-bold text-blue-900 text-center">
-                Get 1 free upvote for every 3 upvotes you give out!
-              </p>
+              <div className="text-center">
+                <p className="text-xl font-bold text-yellow-900 flex items-center justify-center mb-2">
+                  <span className="mr-2">🏆</span>
+                  The most upvoted idea every week will win a free $100 Amazon gift card!
+                  <span className="ml-2">🏆</span>
+                </p>
+                <p className="text-lg font-bold text-yellow-800">
+                  Get 1 free upvote for every 3 upvotes you give out!
+                </p>
+              </div>
             </div>
 
             {/* Submit Your Own Idea Button - Top (only when paywall is disabled) */}
@@ -459,7 +457,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               <div className="w-full sm:flex-1 sm:min-w-[200px] relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg blur opacity-75 animate-pulse"></div>
                 <Select value={selectedTool} onValueChange={setSelectedTool}>
-                  <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-bounce">
+                  <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-slow-bounce">
                     <SelectValue placeholder="🛠️ Filter by Tool" />
                   </SelectTrigger>
                   <SelectContent>
