@@ -501,8 +501,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Export CSV with proper email-to-idea linking
+  // Admin endpoint to get paywall status
+  app.get("/api/admin/paywall-status", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Check if paywall is enabled (stored in environment or default to true)
+      const paywallEnabled = process.env.PAYWALL_ENABLED !== 'false';
+      res.json({ enabled: paywallEnabled });
+    } catch (error) {
+      console.error('Error getting paywall status:', error);
+      res.status(500).json({ message: "Failed to get paywall status" });
+    }
+  });
+
+  // Admin endpoint to toggle paywall
+  app.post("/api/admin/paywall-toggle", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { enabled } = req.body;
+      
+      // Store paywall setting (in production, this would be stored in database)
+      // For now, we'll store it in memory and update the environment variable approach
+      global.paywallEnabled = enabled;
+      
+      res.json({ 
+        enabled, 
+        message: enabled ? "Paywall enabled" : "Paywall disabled"
+      });
+    } catch (error) {
+      console.error('Error toggling paywall:', error);
+      res.status(500).json({ message: "Failed to toggle paywall" });
+    }
+  });
+
   app.get("/api/admin/export", async (req, res) => {
     try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
       const ideas = await storage.getIdeas('recent');
       const subscriptions = await storage.getAllSubscriptions();
       

@@ -19,6 +19,7 @@ export default function Admin() {
   const [editVoteValue, setEditVoteValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('recent');
+  const [paywallEnabled, setPaywallEnabled] = useState(true);
   const itemsPerPage = 50;
 
   // Load saved password and auth state on mount
@@ -33,6 +34,24 @@ export default function Admin() {
       setPassword(savedPassword);
     }
   }, []);
+
+  // Get paywall status
+  const { data: paywallStatus } = useQuery({
+    queryKey: ['/api/admin/paywall-status'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/paywall-status');
+      if (!res.ok) throw new Error('Failed to get paywall status');
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  // Update local state when paywall status loads
+  useEffect(() => {
+    if (paywallStatus?.enabled !== undefined) {
+      setPaywallEnabled(paywallStatus.enabled);
+    }
+  }, [paywallStatus]);
 
   // Get all ideas for admin view
   const { data: ideas, isLoading } = useQuery({
@@ -279,6 +298,35 @@ export default function Admin() {
     },
   });
 
+  // Toggle paywall mutation
+  const togglePaywallMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const res = await fetch('/api/admin/paywall-toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled })
+      });
+      if (!res.ok) throw new Error('Failed to toggle paywall');
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setPaywallEnabled(data.enabled);
+      toast({
+        title: data.enabled ? "Paywall enabled" : "Paywall disabled",
+        description: data.enabled 
+          ? "Users must submit an idea to see all ideas" 
+          : "All users can view ideas without submitting",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to toggle paywall",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleDelete = (idea: any) => {
     if (window.confirm(`Are you sure you want to delete this idea: "${idea.useCase || idea.title}"?`)) {
       deleteMutation.mutate(idea.id);
@@ -359,6 +407,29 @@ export default function Admin() {
               <Button onClick={handleExportEmails} className="bg-green-600 hover:bg-green-700 text-sm">
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
+              </Button>
+            </div>
+          </div>
+
+          {/* Paywall Control */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-yellow-900 mb-1">Access Control</h3>
+                <p className="text-sm text-yellow-700">
+                  {paywallEnabled 
+                    ? "Users must submit an idea to view all ideas" 
+                    : "All users can view ideas without submitting"
+                  }
+                </p>
+              </div>
+              <Button
+                onClick={() => togglePaywallMutation.mutate(!paywallEnabled)}
+                disabled={togglePaywallMutation.isPending}
+                variant={paywallEnabled ? "destructive" : "default"}
+                className="ml-4"
+              >
+                {paywallEnabled ? "Disable Paywall" : "Enable Paywall"}
               </Button>
             </div>
           </div>
