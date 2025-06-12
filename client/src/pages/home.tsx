@@ -424,10 +424,11 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
             {/* Filter Dropdowns */}
             <div className="mb-6 flex flex-col sm:flex-row gap-4">
-              <div className="w-full sm:flex-1 sm:min-w-[200px]">
+              <div className="w-full sm:flex-1 sm:min-w-[200px] relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Filter by Category" />
+                  <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-bounce">
+                    <SelectValue placeholder="🎯 Filter by Category" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
@@ -446,10 +447,11 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 </Select>
               </div>
               
-              <div className="w-full sm:flex-1 sm:min-w-[200px]">
+              <div className="w-full sm:flex-1 sm:min-w-[200px] relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg blur opacity-75 animate-pulse"></div>
                 <Select value={selectedTool} onValueChange={setSelectedTool}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Filter by Tool" />
+                  <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-bounce">
+                    <SelectValue placeholder="🛠️ Filter by Tool" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Tools</SelectItem>
