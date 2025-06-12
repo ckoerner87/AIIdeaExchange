@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema } from "@shared/schema";
+import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, userSessions } from "@shared/schema";
+import { db } from "./db";
 import { nanoid } from "nanoid";
 import { ContentFilter } from "./content-filter";
 import { googleSheetsService } from "./google-sheets";
@@ -356,6 +357,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error getting upvote trends:", error);
       res.status(500).json({ message: "Failed to get upvote trends" });
+    }
+  });
+
+  // Admin endpoint to get user statistics
+  app.get("/api/admin/user-stats", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Get all user sessions and calculate upvote statistics
+      const allSessions = await db.select().from(userSessions);
+      
+      // Calculate total upvotes given by all users
+      const totalUpvotesGiven = allSessions.reduce((sum, session) => sum + (session.upvotesGiven || 0), 0);
+      
+      // Count users who have given at least one upvote
+      const activeVoters = allSessions.filter(session => (session.upvotesGiven || 0) > 0).length;
+      
+      // Total registered users (those who have sessions)
+      const totalUsers = allSessions.length;
+
+      res.json({
+        totalUsers,
+        activeVoters,
+        totalUpvotesGiven,
+        averageUpvotesPerUser: totalUsers > 0 ? (totalUpvotesGiven / totalUsers) : 0,
+        averageUpvotesPerActiveVoter: activeVoters > 0 ? (totalUpvotesGiven / activeVoters) : 0
+      });
+    } catch (error) {
+      console.error("Error getting user stats:", error);
+      res.status(500).json({ message: "Failed to get user stats" });
     }
   });
 

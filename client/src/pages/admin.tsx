@@ -46,6 +46,17 @@ export default function Admin() {
     enabled: isAuthenticated,
   });
 
+  // Get user statistics
+  const { data: userStats } = useQuery({
+    queryKey: ['/api/admin/user-stats'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/user-stats');
+      if (!res.ok) throw new Error('Failed to get user stats');
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
   // Update local state when paywall status loads
   useEffect(() => {
     if (paywallStatus?.enabled !== undefined) {
@@ -476,24 +487,13 @@ export default function Admin() {
               </div>
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-orange-600">
-                  {ideas?.filter((idea: any) => (idea.upvotesGiven || 0) > 0).length || 0}
+                  {userStats?.activeVoters || '0'}
                 </div>
                 <div className="text-sm text-orange-700">Active Voters</div>
               </div>
               <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-teal-600">
-                  {(() => {
-                    if (!ideas?.length) return '0.0';
-                    
-                    // Calculate total upvotes given by all users
-                    const totalUpvotesGiven = ideas.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0);
-                    // Total number of users (all idea submitters)
-                    const totalUsers = ideas.length;
-                    
-
-                    
-                    return totalUsers > 0 ? (totalUpvotesGiven / totalUsers).toFixed(1) : '0.0';
-                  })()}
+                  {userStats?.averageUpvotesPerUser ? userStats.averageUpvotesPerUser.toFixed(1) : '0.0'}
                 </div>
                 <div className="text-sm text-teal-700">Average Upvotes per User</div>
               </div>
