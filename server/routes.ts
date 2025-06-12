@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, userSessions } from "@shared/schema";
+import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, userSessions, votes } from "@shared/schema";
 import { db } from "./db";
 import { nanoid } from "nanoid";
 import { ContentFilter } from "./content-filter";
@@ -367,7 +367,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (sessionsUpToDate.length > 0) {
           const totalUsers = sessionsUpToDate.length;
-          const totalUpvotesGiven = sessionsUpToDate.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
+          
+          // Get actual vote counts from votes table for this date range
+          const sessionIds = sessionsUpToDate.map((session: any) => `'${session.sessionId}'`).join(',');
+          const [voteData] = await db.execute(`
+            SELECT COUNT(*) as vote_count
+            FROM votes v 
+            WHERE v.session_id IN (${sessionIds}) 
+            AND v.vote_type = 'up'
+            AND v.created_at <= '${currentDate.toISOString()}'
+          `);
+          
+          const totalUpvotesGiven = Number(voteData.vote_count) || 0;
           const averageUpvotes = totalUsers > 0 ? totalUpvotesGiven / totalUsers : 0;
           
           dataPoints.push({
@@ -426,14 +437,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Only count users who have actually submitted ideas
       const usersWhoSubmitted = allSessions.filter(session => session.hasSubmitted);
       
-      // Calculate total upvotes given by users who submitted ideas
-      const totalUpvotesGiven = usersWhoSubmitted.reduce((sum, session) => sum + (session.upvotesGiven || 0), 0);
+      // Get actual vote counts from votes table for accurate statistics
+      const voteStatsResult = await db.execute(`
+        SELECT 
+          COUNT(DISTINCT v.session_id) as active_voters,
+          COUNT(*) as total_upvotes
+        FROM votes v 
+        JOIN user_sessions us ON v.session_id = us.session_id 
+        WHERE us.has_submitted = true AND v.vote_type = 'up'
+      `);
       
-      // Count users who have given at least one upvote (among those who submitted)
-      const activeVoters = usersWhoSubmitted.filter(session => (session.upvotesGiven || 0) > 0).length;
-      
-      // Total users = only those who have submitted ideas
+      const voteStats = voteStatsResult.rows[0];
       const totalUsers = usersWhoSubmitted.length;
+      const activeVoters = Number(voteStats.active_voters) || 0;
+      const totalUpvotesGiven = Number(voteStats.total_upvotes) || 0;
 
       res.json({
         totalUsers,
