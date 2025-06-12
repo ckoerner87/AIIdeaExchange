@@ -384,9 +384,14 @@ export default function Admin() {
   // Toggle paywall mutation
   const togglePaywallMutation = useMutation({
     mutationFn: async (enabled: boolean) => {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      
       const res = await fetch('/api/admin/paywall-toggle', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ enabled })
       });
       if (!res.ok) throw new Error('Failed to toggle paywall');
@@ -400,6 +405,9 @@ export default function Admin() {
           ? "Users must submit an idea to see all ideas" 
           : "All users can view ideas without submitting",
       });
+      // Invalidate paywall status queries to refresh the state
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/paywall-status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/paywall-status'] });
     },
     onError: (error: any) => {
       toast({
