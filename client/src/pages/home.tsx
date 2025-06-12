@@ -362,9 +362,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               </div>
             </div>
 
-            {/* Submit Your Own Idea Button and Sort - Top (only when paywall is disabled) */}
+            {/* Submit Your Own Idea Button and Sort - Top (only when paywall is disabled) - Sticky */}
             {!paywallEnabled && (
-              <div className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="sticky top-0 z-20 bg-slate-50 py-4 mb-8 flex flex-col sm:flex-row items-center justify-center gap-4 shadow-sm border-b border-slate-200">
                 <div className="text-center">
                   <Button
                     onClick={() => setShowSubmissionForm(!showSubmissionForm)}
@@ -410,7 +410,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             )}
 
             {/* Filter Dropdowns - Sticky */}
-            <div className="sticky top-0 z-10 bg-slate-50 py-4 mb-6 flex flex-col sm:flex-row gap-4 shadow-sm border-b border-slate-200">
+            <div className="sticky top-20 z-10 bg-slate-50 py-4 mb-6 flex flex-col sm:flex-row gap-4 shadow-sm border-b border-slate-200">
               <div className="w-full sm:flex-1 sm:min-w-[200px] relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
