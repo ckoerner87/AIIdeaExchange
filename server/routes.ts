@@ -329,46 +329,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!isAdminIP(clientIP)) {
         return res.status(403).json({ message: "Access denied" });
       }
-      // Get current stats from admin ideas endpoint (reuse existing calculation)
-      const ideas = await storage.getIdeas('votes');
+
+      // Get all user sessions and ideas efficiently
+      const allSessions = await db.select().from(userSessions);
+      const allIdeas = await storage.getIdeas('recent');
       
-      if (ideas.length === 0) {
+      if (allIdeas.length === 0) {
         return res.json([]);
       }
+
+      // Find the earliest submission date (platform launch)
+      const earliestDate = new Date(Math.min(...allIdeas.map((idea: any) => new Date(idea.submittedAt).getTime())));
+      const today = new Date();
       
-      // Create sample data points showing progression over time
-      // Sample at 10%, 25%, 50%, 75%, 90%, 100% of ideas
-      const samplePoints = [0.1, 0.25, 0.5, 0.75, 0.9, 1.0];
+      // Generate daily data points from launch to today
       const dataPoints = [];
+      const currentDate = new Date(earliestDate);
       
-      for (const percentage of samplePoints) {
-        const index = Math.floor(ideas.length * percentage) - 1;
-        if (index < 0) continue;
+      // Create session lookup map for efficiency
+      const sessionMap = new Map<string, any>();
+      allSessions.forEach((session: any) => {
+        sessionMap.set(session.sessionId, session);
+      });
+      
+      // Track dates we've already processed to avoid duplicates
+      const processedDates = new Set<string>();
+      
+      // Generate data points every 2 days to balance performance and detail
+      while (currentDate <= today) {
+        const dateStr = currentDate.toISOString().split('T')[0];
         
-        const currentIdea = ideas[index];
-        const currentDate = new Date(currentIdea.submittedAt).toISOString().split('T')[0];
+        // Skip if we've already processed this date
+        if (processedDates.has(dateStr)) {
+          currentDate.setDate(currentDate.getDate() + 2);
+          continue;
+        }
         
-        // Use ideas up to this point
-        const ideasUpToDate = ideas.slice(0, index + 1);
+        processedDates.add(dateStr);
         
-        // Get upvote statistics (exclude admin IPs from metrics)
-        const ideasWithStats = await Promise.all(ideasUpToDate.map(async (idea: any) => {
-          const votes = await storage.getAllVotesBySession(idea.sessionId);
-          const actualUpvotesGiven = votes.filter(vote => 
-            vote.voteType === 'up' && 
-            vote.ideaId !== idea.id && 
-            !ADMIN_IPS.includes(vote.ipAddress)
-          ).length;
-          return { ...idea, upvotesGiven: actualUpvotesGiven };
-        }));
+        // Get all ideas submitted up to this date
+        const ideasUpToDate = allIdeas.filter((idea: any) => 
+          new Date(idea.submittedAt) <= currentDate
+        );
         
-        const totalUpvotesGiven = ideasWithStats.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0);
-        const averageUpvotes = ideasWithStats.length > 0 ? totalUpvotesGiven / ideasWithStats.length : 0;
+        if (ideasUpToDate.length > 0) {
+          // Get unique sessions for these ideas
+          const uniqueSessionIds = new Set(ideasUpToDate.map((idea: any) => idea.sessionId));
+          const sessionsUpToDate = Array.from(uniqueSessionIds)
+            .map(sessionId => sessionMap.get(sessionId))
+            .filter((session: any) => session !== null && session !== undefined);
+          
+          const totalUsers = sessionsUpToDate.length;
+          const totalUpvotesGiven = sessionsUpToDate.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
+          const averageUpvotes = totalUsers > 0 ? totalUpvotesGiven / totalUsers : 0;
+          
+          dataPoints.push({
+            date: dateStr,
+            averageUpvotes: parseFloat(averageUpvotes.toFixed(6)),
+            totalUsers,
+            totalUpvotes: totalUpvotesGiven
+          });
+        }
+        
+        // Move to next point (every 2 days)
+        currentDate.setDate(currentDate.getDate() + 2);
+      }
+      
+      // Ensure we have today's data point
+      const todayStr = today.toISOString().split('T')[0];
+      if (!processedDates.has(todayStr)) {
+        const uniqueSessionIds = new Set(allIdeas.map((idea: any) => idea.sessionId));
+        const allSessionsToday = Array.from(uniqueSessionIds)
+          .map(sessionId => sessionMap.get(sessionId))
+          .filter((session: any) => session !== null && session !== undefined);
+        
+        const totalUsers = allSessionsToday.length;
+        const totalUpvotesGiven = allSessionsToday.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
+        const averageUpvotes = totalUsers > 0 ? totalUpvotesGiven / totalUsers : 0;
         
         dataPoints.push({
-          date: currentDate,
-          averageUpvotes: Math.round(averageUpvotes * 10) / 10,
-          totalUsers: ideasWithStats.length,
+          date: todayStr,
+          averageUpvotes: parseFloat(averageUpvotes.toFixed(6)),
+          totalUsers,
           totalUpvotes: totalUpvotesGiven
         });
       }
