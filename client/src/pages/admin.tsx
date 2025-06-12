@@ -571,11 +571,11 @@ export default function Admin() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-blue-50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-blue-900 mb-2">Total Ideas</h3>
-              <p className="text-3xl font-bold text-blue-600">{ideas?.length || 0}</p>
+              <p className="text-3xl font-bold text-blue-600">{(ideas?.length || 0).toLocaleString()}</p>
             </div>
             <div className="bg-green-50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-green-900 mb-2">Total Subscribers</h3>
-              <p className="text-3xl font-bold text-green-600">{subscribers?.length || 0}</p>
+              <p className="text-3xl font-bold text-green-600">{(subscribers?.length || 0).toLocaleString()}</p>
             </div>
             <div className="bg-purple-50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-purple-900 mb-2">Conversion Rate</h3>
@@ -593,7 +593,7 @@ export default function Admin() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-green-600">
-                  {ideas?.reduce((sum: number, idea: any) => sum + idea.votes, 0) || 0}
+                  {(ideas?.reduce((sum: number, idea: any) => sum + idea.votes, 0) || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-green-700">Total Upvotes Received</div>
               </div>
@@ -609,7 +609,7 @@ export default function Admin() {
               </div>
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-orange-600">
-                  {userStatsLoading ? '...' : userStatsError ? 'Error' : (userStats?.activeVoters || '0')}
+                  {userStatsLoading ? '...' : userStatsError ? 'Error' : ((userStats?.activeVoters || 0).toLocaleString())}
                 </div>
                 <div className="text-sm text-orange-700">Active Voters</div>
                 {userStatsError && (
