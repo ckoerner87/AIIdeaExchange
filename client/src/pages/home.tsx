@@ -375,6 +375,11 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 text-center">
                 {paywallEnabled ? "AI Use Case Ideas" : "AI + Ideas = Life Changing. Start here 👇"}
               </h1>
+              {!paywallEnabled && (
+                <p className="text-lg text-slate-600 text-center mt-2">
+                  100s of free, real world AI use case ideas
+                </p>
+              )}
               {paywallEnabled && (
                 <div className="mt-4 text-center">
                   <Button
