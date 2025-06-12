@@ -57,6 +57,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update session activity
+  app.post("/api/session/activity", async (req, res) => {
+    try {
+      const sessionId = req.headers['x-session-id'] as string;
+      
+      if (!sessionId) {
+        return res.status(400).json({ message: "Session ID required" });
+      }
+
+      await storage.updateUserSessionActivity(sessionId);
+      res.json({ message: "Activity updated" });
+    } catch (error) {
+      console.error('Session activity update error:', error);
+      res.status(500).json({ message: "Failed to update activity" });
+    }
+  });
+
   // Get or create user session
   app.get("/api/session", async (req, res) => {
     try {
@@ -706,6 +723,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error toggling paywall:', error);
       res.status(500).json({ message: "Failed to toggle paywall" });
+    }
+  });
+
+  // Admin endpoint to get session metrics
+  app.get("/api/admin/session-metrics", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const metrics = await storage.getSessionMetricsByDay();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error getting session metrics:", error);
+      res.status(500).json({ message: "Failed to get session metrics" });
     }
   });
 

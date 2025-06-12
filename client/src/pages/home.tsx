@@ -66,6 +66,45 @@ export default function Home() {
     },
   });
 
+  // Track user activity for session metrics
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const updateActivity = async () => {
+      try {
+        await fetch('/api/session/activity', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-session-id': sessionId,
+          },
+        });
+      } catch (error) {
+        // Silently fail - activity tracking is not critical
+      }
+    };
+
+    // Update activity on mount and every 30 seconds
+    updateActivity();
+    const interval = setInterval(updateActivity, 30000);
+
+    // Update activity on page visibility change
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        updateActivity();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // Final activity update when component unmounts
+      updateActivity();
+    };
+  }, [sessionId]);
+
   // Get stats
   const { data: stats } = useQuery({
     queryKey: ['/api/stats'],

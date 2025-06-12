@@ -35,6 +35,8 @@ export interface IStorage {
   updateUserSessionSubmitted(sessionId: string): Promise<void>;
   incrementUpvotesGiven(sessionId: string): Promise<void>;
   getUserIdeasBySession(sessionId: string): Promise<Idea[]>;
+  updateUserSessionActivity(sessionId: string): Promise<void>;
+  getSessionMetricsByDay(): Promise<Array<{ date: string; avgTimeOnSiteMinutes: number; totalSessions: number }>>;
   
   // Votes
   createVote(vote: InsertVote): Promise<Vote>;
@@ -209,6 +211,37 @@ export class DatabaseStorage implements IStorage {
     await db.delete(votes).where(
       and(eq(votes.sessionId, sessionId), eq(votes.ideaId, ideaId))
     );
+  }
+
+  async updateUserSessionActivity(sessionId: string): Promise<void> {
+    const now = new Date();
+    const session = await this.getUserSession(sessionId);
+    
+    if (session) {
+      // Calculate session duration from creation to now
+      const sessionDurationMs = now.getTime() - session.createdAt.getTime();
+      
+      await db.update(userSessions)
+        .set({ 
+          lastActiveAt: now,
+          sessionDurationMs: sessionDurationMs
+        })
+        .where(eq(userSessions.sessionId, sessionId));
+    }
+  }
+
+  async getSessionMetricsByDay(): Promise<Array<{ date: string; avgTimeOnSiteMinutes: number; totalSessions: number }>> {
+    const result = await db.select({
+      date: sql<string>`DATE(created_at)`.as('date'),
+      avgTimeOnSiteMinutes: sql<number>`ROUND(AVG(COALESCE(session_duration_ms, 0)) / 60000.0, 2)`.as('avgTimeOnSiteMinutes'),
+      totalSessions: sql<number>`COUNT(*)`.as('totalSessions')
+    })
+    .from(userSessions)
+    .where(sql`created_at >= CURRENT_DATE - INTERVAL '30 days'`)
+    .groupBy(sql`DATE(created_at)`)
+    .orderBy(sql`DATE(created_at) DESC`);
+
+    return result;
   }
 }
 

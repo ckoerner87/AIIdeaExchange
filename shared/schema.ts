@@ -31,6 +31,8 @@ export const userSessions = pgTable("user_sessions", {
   upvotesGiven: integer("upvotes_given").notNull().default(0),
   rewardUpvotesEarned: integer("reward_upvotes_earned").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  lastActiveAt: timestamp("last_active_at").notNull().defaultNow(),
+  sessionDurationMs: integer("session_duration_ms").default(0),
 });
 
 export const votes = pgTable("votes", {
