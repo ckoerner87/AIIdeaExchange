@@ -361,8 +361,8 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
             {/* Submit Your Own Idea Button and Sort - Top (only when paywall is disabled) */}
             {!paywallEnabled && (
-              <div className="mb-8 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4">
-                <div className="flex-1 text-center sm:text-left">
+              <div className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="text-center">
                   <Button
                     onClick={() => setShowSubmissionForm(!showSubmissionForm)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all hover:scale-105"
