@@ -230,9 +230,17 @@ export default function Home() {
         {!hasSubmitted && (
           <div className="mb-12">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Need more AI ideas? We've got hundreds! But share yours first!</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
+                {paywallEnabled 
+                  ? "Need more AI ideas? We've got hundreds! But share yours first!"
+                  : "Share Your AI Use Case!"
+                }
+              </h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-6">
-                Wanna see how hundreds of other geniuses are using AI? You've gotta share your own use case first! We don't care if you think it's silly - just share it! We don't need your email, name or your login, just your idea.
+                {paywallEnabled
+                  ? "Wanna see how hundreds of other geniuses are using AI? You've gotta share your own use case first! We don't care if you think it's silly - just share it! We don't need your email, name or your login, just your idea."
+                  : "Share how you're using AI in your work or personal life. Help others discover new ways to leverage AI technology. No email or login required - just your creative ideas!"
+                }
               </p>
               
               {/* ChatGPT Prompt Suggestion */}
@@ -316,19 +324,23 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           </div>
         )}
 
-        {/* Community Section */}
-        {hasSubmitted && (
+        {/* Community Section - Show when paywall disabled OR when user has submitted */}
+        {(!paywallEnabled || hasSubmitted) && (
           <div>
             {/* Mobile layout: Title first, then buttons below */}
             <div className="block md:hidden mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">AI Use Case Ideas</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
+                {paywallEnabled ? "AI Use Case Ideas" : "Community AI Use Cases"}
+              </h2>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                <Button
-                  onClick={() => setHasSubmitted(false)}
-                  className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
-                >
-                  Submit Another Idea
-                </Button>
+                {paywallEnabled && (
+                  <Button
+                    onClick={() => setHasSubmitted(false)}
+                    className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
+                  >
+                    Submit Another Idea
+                  </Button>
+                )}
                 <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
                   <SelectTrigger className="w-full sm:w-40">
                     <SelectValue />
@@ -344,15 +356,19 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             {/* Desktop layout: Title and buttons side by side */}
             <div className="hidden md:flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900">AI Use Case Ideas</h2>
+                <h2 className="text-2xl font-bold text-slate-900">
+                  {paywallEnabled ? "AI Use Case Ideas" : "Community AI Use Cases"}
+                </h2>
               </div>
               <div className="flex items-center space-x-4">
-                <Button
-                  onClick={() => setHasSubmitted(false)}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  Submit Another Idea
-                </Button>
+                {paywallEnabled && (
+                  <Button
+                    onClick={() => setHasSubmitted(false)}
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    Submit Another Idea
+                  </Button>
+                )}
                 <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
