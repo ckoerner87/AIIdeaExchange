@@ -179,12 +179,15 @@ export default function Admin() {
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       console.log('Attempting to delete idea:', id, 'with token:', authToken);
+      
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      
       const res = await fetch(`/api/admin/ideas/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
-        },
+        headers,
       });
       
       console.log('Delete response status:', res.status);
@@ -403,14 +406,21 @@ export default function Admin() {
       return data;
     },
     onSuccess: (data) => {
+      console.log('Paywall toggle success, updating state to:', data.enabled);
       setPaywallEnabled(data.enabled);
+      
+      // Update the query cache immediately
+      queryClient.setQueryData(['/api/admin/paywall-status'], { enabled: data.enabled });
+      queryClient.setQueryData(['/api/paywall-status'], { enabled: data.enabled });
+      
       toast({
         title: data.enabled ? "Paywall enabled" : "Paywall disabled",
         description: data.enabled 
           ? "Users must submit an idea to see all ideas" 
           : "All users can view ideas without submitting",
       });
-      // Invalidate paywall status queries to refresh the state
+      
+      // Also invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['/api/admin/paywall-status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/paywall-status'] });
     },
