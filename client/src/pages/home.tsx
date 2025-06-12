@@ -330,9 +330,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           <div>
             {/* Page Title */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 text-center">
-                {paywallEnabled ? "AI Use Case Ideas" : "The internet's most genius ways to use AI"}
-              </h2>
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 text-center">
+                {paywallEnabled ? "AI Use Case Ideas" : "AI will change your life, if you have the right ideas. Start here 👇"}
+              </h1>
               {paywallEnabled && (
                 <div className="mt-4 text-center">
                   <Button
