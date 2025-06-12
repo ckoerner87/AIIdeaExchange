@@ -360,9 +360,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         processedDates.add(dateStr);
         
-        // Get ALL sessions that existed by this date (cumulative user count)
+        // Get ALL sessions that existed by this date AND have submitted ideas
         const sessionsUpToDate = allSessions.filter((session: any) => 
-          new Date(session.createdAt) <= currentDate
+          new Date(session.createdAt) <= currentDate && session.hasSubmitted
         );
         
         if (sessionsUpToDate.length > 0) {
@@ -385,9 +385,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ensure we have today's data point
       const todayStr = today.toISOString().split('T')[0];
       if (!processedDates.has(todayStr)) {
-        // Get ALL sessions that exist (current total user count)
-        const totalUsers = allSessions.length;
-        const totalUpvotesGiven = allSessions.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
+        // Get ALL sessions that have submitted ideas (current total user count)
+        const usersWhoSubmitted = allSessions.filter((session: any) => session.hasSubmitted);
+        const totalUsers = usersWhoSubmitted.length;
+        const totalUpvotesGiven = usersWhoSubmitted.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
         const averageUpvotes = totalUsers > 0 ? totalUpvotesGiven / totalUsers : 0;
         
         dataPoints.push({
@@ -422,14 +423,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all user sessions and calculate upvote statistics
       const allSessions = await db.select().from(userSessions);
       
-      // Calculate total upvotes given by all users
-      const totalUpvotesGiven = allSessions.reduce((sum, session) => sum + (session.upvotesGiven || 0), 0);
+      // Only count users who have actually submitted ideas
+      const usersWhoSubmitted = allSessions.filter(session => session.hasSubmitted);
       
-      // Count users who have given at least one upvote
-      const activeVoters = allSessions.filter(session => (session.upvotesGiven || 0) > 0).length;
+      // Calculate total upvotes given by users who submitted ideas
+      const totalUpvotesGiven = usersWhoSubmitted.reduce((sum, session) => sum + (session.upvotesGiven || 0), 0);
       
-      // Total registered users (those who have sessions)
-      const totalUsers = allSessions.length;
+      // Count users who have given at least one upvote (among those who submitted)
+      const activeVoters = usersWhoSubmitted.filter(session => (session.upvotesGiven || 0) > 0).length;
+      
+      // Total users = only those who have submitted ideas
+      const totalUsers = usersWhoSubmitted.length;
 
       res.json({
         totalUsers,
