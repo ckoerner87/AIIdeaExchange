@@ -7,6 +7,7 @@ import IdeaCard from "@/components/idea-card";
 import SubscriptionForm from "@/components/subscription-form";
 import UnlockMessage from "@/components/unlock-message";
 import GiftCardPopup from "@/components/gift-card-popup";
+import InlineSubscribe from "@/components/inline-subscribe";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -510,15 +511,27 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                     return 0;
                   })
                   .slice(0, visibleIdeasCount)
-                  .map((idea: any) => (
-                    <IdeaCard 
-                      key={idea.id} 
-                      idea={idea} 
-                      onVote={handleVote}
-                      isVoting={voteMutation.isPending}
-                      isHighlighted={highlightedIdeaId === idea.id || newlySubmittedIdeaId === idea.id}
-                    />
-                  ))}
+                  .map((idea: any, index: number) => {
+                    const elements = [
+                      <IdeaCard 
+                        key={idea.id} 
+                        idea={idea} 
+                        onVote={handleVote}
+                        isVoting={voteMutation.isPending}
+                        isHighlighted={highlightedIdeaId === idea.id || newlySubmittedIdeaId === idea.id}
+                      />
+                    ];
+                    
+                    // Add subscription component every 7th idea (but not after the first few)
+                    if ((index + 1) % 7 === 0 && index > 5) {
+                      elements.push(
+                        <InlineSubscribe key={`subscribe-${index}`} />
+                      );
+                    }
+                    
+                    return elements;
+                  })
+                  .flat()}
                 
                 {/* Show More Button */}
                 {ideas.length > visibleIdeasCount && (
