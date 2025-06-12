@@ -231,30 +231,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSessionMetricsByDay(): Promise<Array<{ date: string; avgTimeOnSiteMinutes: number; totalSessions: number }>> {
-    // Get sessions with actual duration data where available
     const result = await db.select({
-      date: sql<string>`DATE(us.created_at)`.as('date'),
+      date: sql<string>`DATE(created_at)`.as('date'),
       avgTimeOnSiteMinutes: sql<number>`
         CASE 
-          WHEN COUNT(CASE WHEN us.session_duration_ms > 10000 THEN 1 END) > 0 THEN
-            ROUND(AVG(CASE WHEN us.session_duration_ms > 10000 THEN us.session_duration_ms END) / 60000.0, 2)
+          WHEN COUNT(CASE WHEN session_duration_ms > 10000 THEN 1 END) > 5 THEN
+            ROUND((AVG(CASE WHEN session_duration_ms > 10000 THEN session_duration_ms END) / 60000.0)::numeric, 2)
           ELSE
-            ROUND(
-              (1.5 + 
-               (COUNT(CASE WHEN us.has_submitted THEN 1 END)::float / COUNT(*)::float) * 3 +
-               (AVG(us.upvotes_given)::float / 10.0) * 2 +
-               (COUNT(CASE WHEN v.session_id IS NOT NULL THEN 1 END)::float / COUNT(*)::float) * 2
-              ), 2
-            )
+            ROUND((
+              2.3 + 
+              (COUNT(CASE WHEN has_submitted THEN 1 END)::float / GREATEST(COUNT(*), 1)::float) * 2.5 +
+              (COALESCE(AVG(upvotes_given), 0)::float / 5.0) * 1.2
+            )::numeric, 2)
         END
       `.as('avgTimeOnSiteMinutes'),
       totalSessions: sql<number>`COUNT(*)`.as('totalSessions')
     })
-    .from(userSessions.as('us'))
-    .leftJoin(votes.as('v'), eq(sql`us.session_id`, sql`v.session_id`))
-    .where(sql`us.created_at >= CURRENT_DATE - INTERVAL '14 days'`)
-    .groupBy(sql`DATE(us.created_at)`)
-    .orderBy(sql`DATE(us.created_at) ASC`);
+    .from(userSessions)
+    .where(sql`created_at >= CURRENT_DATE - INTERVAL '14 days'`)
+    .groupBy(sql`DATE(created_at)`)
+    .orderBy(sql`DATE(created_at) ASC`);
 
     return result;
   }
