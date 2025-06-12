@@ -328,58 +328,21 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
         {/* Community Section - Show when paywall disabled OR when user has submitted */}
         {(!paywallEnabled || hasSubmitted) && (
           <div>
-            {/* Mobile layout: Title first, then buttons below */}
-            <div className="block md:hidden mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">
+            {/* Page Title */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-slate-900 text-center">
                 {paywallEnabled ? "AI Use Case Ideas" : "The internet's most genius ways to use AI"}
               </h2>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                {paywallEnabled && (
-                  <Button
-                    onClick={() => setHasSubmitted(false)}
-                    className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
-                  >
-                    Submit Another Idea
-                  </Button>
-                )}
-                <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
-                  <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="votes">Sort by upvotes</SelectItem>
-                    <SelectItem value="recent">Most recent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Desktop layout: Title and buttons side by side */}
-            <div className="hidden md:flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">
-                  {paywallEnabled ? "AI Use Case Ideas" : "The internet's most genius ways to use AI"}
-                </h2>
-              </div>
-              <div className="flex items-center space-x-4">
-                {paywallEnabled && (
+              {paywallEnabled && (
+                <div className="mt-4 text-center">
                   <Button
                     onClick={() => setHasSubmitted(false)}
                     className="bg-primary hover:bg-primary/90"
                   >
                     Submit Another Idea
                   </Button>
-                )}
-                <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="votes">Sort by upvotes</SelectItem>
-                    <SelectItem value="recent">Most recent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Amazon Gift Card Banner */}
@@ -396,16 +359,29 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               </div>
             </div>
 
-            {/* Submit Your Own Idea Button - Top (only when paywall is disabled) */}
+            {/* Submit Your Own Idea Button and Sort - Top (only when paywall is disabled) */}
             {!paywallEnabled && (
-              <div className="mb-8 text-center">
-                <Button
-                  onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all hover:scale-105"
-                >
-                  <Lightbulb className="w-5 h-5 mr-2" />
-                  Submit Your Own Idea
-                </Button>
+              <div className="mb-8 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4">
+                <div className="flex-1 text-center sm:text-left">
+                  <Button
+                    onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all hover:scale-105"
+                  >
+                    <Lightbulb className="w-5 h-5 mr-2" />
+                    Submit Your Own Idea
+                  </Button>
+                </div>
+                <div className="flex-shrink-0">
+                  <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="votes">Sort by upvotes</SelectItem>
+                      <SelectItem value="recent">Most recent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
 
