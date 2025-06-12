@@ -368,9 +368,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 <div className="text-center">
                   <Button
                     onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all hover:scale-105"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-6 text-xl font-bold rounded-xl shadow-lg transition-all hover:scale-105"
                   >
-                    <Lightbulb className="w-5 h-5 mr-2" />
+                    <Lightbulb className="w-6 h-6 mr-3" />
                     Submit Your Own Idea
                   </Button>
                 </div>
@@ -526,18 +526,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                   </div>
                 )}
 
-                {/* Submit Your Own Idea Button - Bottom (only when paywall is disabled) */}
-                {!paywallEnabled && (
-                  <div className="mt-12 text-center">
-                    <Button
-                      onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all hover:scale-105"
-                    >
-                      <Lightbulb className="w-5 h-5 mr-2" />
-                      Submit Your Own Idea
-                    </Button>
-                  </div>
-                )}
+
               </div>
             ) : (
               <div className="text-center py-12">
@@ -549,17 +538,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           </div>
         )}
 
-        {/* Submit Another Idea Button - Above subscription form */}
-        {hasSubmitted && (
-          <div className="mt-16 text-center">
-            <Button
-              onClick={() => setHasSubmitted(false)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-xl font-bold text-xl transition-all transform hover:scale-105"
-            >
-              Submit Another Idea
-            </Button>
-          </div>
-        )}
+
 
         {/* Subscription Section */}
         <div id="subscription-section" className="mt-12">
