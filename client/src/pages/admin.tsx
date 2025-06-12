@@ -383,13 +383,24 @@ export default function Admin() {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
       
+      console.log('Toggle paywall - token:', authToken, 'enabled:', enabled);
+      
       const res = await fetch('/api/admin/paywall-toggle', {
         method: 'POST',
         headers,
         body: JSON.stringify({ enabled })
       });
-      if (!res.ok) throw new Error('Failed to toggle paywall');
-      return res.json();
+      
+      console.log('Toggle response status:', res.status);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Toggle error:', errorText);
+        throw new Error(`Failed to toggle paywall: ${res.status} - ${errorText}`);
+      }
+      
+      const data = await res.json();
+      console.log('Toggle response data:', data);
+      return data;
     },
     onSuccess: (data) => {
       setPaywallEnabled(data.enabled);
