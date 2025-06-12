@@ -127,3 +127,20 @@ img {
 .text-accent {
   color: hsl(var(--accent));
 }
+
+/* Custom slow bounce animation for filters */
+@keyframes slow-bounce {
+  0%, 85% {
+    transform: translateY(0);
+  }
+  5%, 10% {
+    transform: translateY(-8px);
+  }
+  15% {
+    transform: translateY(0);
+  }
+}
+
+.animate-slow-bounce {
+  animation: slow-bounce 3s infinite;
+}

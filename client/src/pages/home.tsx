@@ -381,6 +381,15 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               </div>
             </div>
 
+            {/* Amazon Gift Card Banner */}
+            <div className="mb-6 bg-gradient-to-r from-yellow-100 to-yellow-200 border-2 border-yellow-300 rounded-lg p-6 shadow-lg">
+              <p className="text-xl font-bold text-yellow-900 text-center flex items-center justify-center">
+                <span className="mr-2">🏆</span>
+                The most upvoted idea every week will win a free $100 Amazon gift card!
+                <span className="ml-2">🏆</span>
+              </p>
+            </div>
+
             {/* Reward System Info */}
             <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
               <p className="text-lg font-bold text-blue-900 text-center">
@@ -427,7 +436,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               <div className="w-full sm:flex-1 sm:min-w-[200px] relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-bounce">
+                  <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce">
                     <SelectValue placeholder="🎯 Filter by Category" />
                   </SelectTrigger>
                   <SelectContent>
