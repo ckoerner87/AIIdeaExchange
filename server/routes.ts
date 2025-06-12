@@ -637,8 +637,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Public endpoint to get paywall status (accessible to all users)
   app.get("/api/paywall-status", async (req, res) => {
     try {
-      // Check if paywall is enabled (default to true)
-      const paywallEnabled = (global as any).paywallEnabled !== false;
+      // Check if paywall is enabled (default to false - DISABLED)
+      const paywallEnabled = (global as any).paywallEnabled === true;
       res.json({ enabled: paywallEnabled });
     } catch (error) {
       console.error('Error getting paywall status:', error);
@@ -655,7 +655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const paywallEnabled = (global as any).paywallEnabled !== false;
+      const paywallEnabled = (global as any).paywallEnabled === true;
       res.json({ enabled: paywallEnabled });
     } catch (error) {
       console.error('Error getting paywall status:', error);
