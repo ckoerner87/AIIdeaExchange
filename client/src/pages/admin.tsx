@@ -40,10 +40,16 @@ export default function Admin() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password: 'xxx' })
-        }).then(res => res.json()).then(data => {
+        }).then(res => {
+          if (res.ok) {
+            return res.json();
+          }
+          throw new Error('Auth failed');
+        }).then(data => {
           if (data.token) {
             setAuthToken(data.token);
             localStorage.setItem('adminToken', data.token);
+            console.log('Auto-auth successful, token set:', data.token);
           }
         }).catch(console.error);
       }
@@ -282,6 +288,9 @@ export default function Admin() {
           title: "Access granted",
           description: "Welcome to the admin dashboard",
         });
+        
+        // Force refresh of user stats after successful auth
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/user-stats'] });
       } else {
         toast({
           title: "Access Denied",
