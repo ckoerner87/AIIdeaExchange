@@ -207,13 +207,13 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-3 rounded-lg border-2 border-blue-300 animate-slow-bounce">
+                <div className="relative bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce px-5 py-3 rounded-lg">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                    <span className="font-bold text-lg">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span className="font-bold text-lg text-slate-900">
                       {(stats as any)?.totalIdeas || 0}
                     </span>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium text-slate-700">
                       ideas shared
                     </span>
                   </div>
@@ -504,7 +504,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                     // Add subscription component every 7th idea (but not after the first few)
                     if ((index + 1) % 7 === 0 && index > 5) {
                       elements.push(
-                        <InlineSubscribe key={`subscribe-${index}`} />
+                        <InlineSubscribe key={`subscribe-${selectedCategory}-${selectedTool}-${sortBy}-${index}`} />
                       );
                     }
                     
