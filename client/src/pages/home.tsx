@@ -330,7 +330,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             {/* Mobile layout: Title first, then buttons below */}
             <div className="block md:hidden mb-8">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                {paywallEnabled ? "AI Use Case Ideas" : "Community AI Use Cases"}
+                {paywallEnabled ? "AI Use Case Ideas" : "The internet's most genius ways to use AI"}
               </h2>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
                 {paywallEnabled && (
@@ -357,7 +357,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             <div className="hidden md:flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900">
-                  {paywallEnabled ? "AI Use Case Ideas" : "Community AI Use Cases"}
+                  {paywallEnabled ? "AI Use Case Ideas" : "The internet's most genius ways to use AI"}
                 </h2>
               </div>
               <div className="flex items-center space-x-4">
