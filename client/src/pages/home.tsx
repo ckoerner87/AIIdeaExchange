@@ -348,19 +348,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               )}
             </div>
 
-            {/* Amazon Gift Card Banner */}
-            <div className="mb-6 bg-gradient-to-r from-yellow-100 to-yellow-200 border-2 border-yellow-300 rounded-lg p-6 shadow-lg">
-              <div className="text-center">
-                <p className="text-xl font-bold text-yellow-900 flex items-center justify-center mb-2">
-                  <span className="mr-2">🏆</span>
-                  The most upvoted idea every week will win a free $100 Amazon gift card!
-                  <span className="ml-2">🏆</span>
-                </p>
-                <p className="text-lg font-bold text-yellow-800">
-                  Get 1 free upvote for every 3 upvotes you give out!
-                </p>
-              </div>
-            </div>
+
 
             {/* Submit Your Own Idea Button and Sort - Top (only when paywall is disabled) - Sticky */}
             {!paywallEnabled && (
@@ -456,6 +444,18 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                     <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            {/* Amazon Gift Card Banner - Subtle, below filters */}
+            <div className="mb-6 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg p-4 shadow-sm">
+              <div className="text-center">
+                <p className="text-sm font-medium text-amber-800 mb-1">
+                  🏆 The most upvoted idea every week will win a free $100 Amazon gift card! 🏆
+                </p>
+                <p className="text-xs text-amber-700">
+                  Get 1 free upvote for every 3 upvotes you give out!
+                </p>
               </div>
             </div>
 
