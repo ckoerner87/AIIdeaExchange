@@ -18,7 +18,8 @@ const ADMIN_IPS = [
   "2a09:bac2:bbe1:1923::281:3f",   // IPv6 address
   '::1',                    // localhost IPv6
   '127.0.0.1',              // localhost IPv4
-  '::ffff:127.0.0.1'        // IPv4-mapped IPv6
+  '::ffff:127.0.0.1',       // IPv4-mapped IPv6
+  "34.73.27.153"            // Current Replit IP
 ];
 
 function getClientIP(req: any): string {
