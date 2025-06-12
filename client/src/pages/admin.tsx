@@ -549,13 +549,13 @@ export default function Admin() {
               </div>
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-purple-600">
-                  {ideas?.length && ideas.reduce((sum: number, idea: any) => sum + idea.votes, 0) > 0 ? (
-                    (ideas.reduce((sum: number, idea: any) => sum + (idea.upvotesGiven || 0), 0) / 
-                     ideas.reduce((sum: number, idea: any) => sum + idea.votes, 0) * 100
-                    ).toFixed(1)
-                  ) : '0.0'}%
+                  {userStatsLoading ? '...' : userStatsError ? 'Error' : (userStats?.participationRate ? userStats.participationRate + '%' : '0.0%')}
                 </div>
-                <div className="text-sm text-purple-700">Community Ratio</div>
+                <div className="text-sm text-purple-700">Participation Rate</div>
+                <div className="text-xs text-purple-600 mt-1">% of submitters who upvote others</div>
+                {userStatsError && (
+                  <div className="text-xs text-red-600 mt-1">Failed to load</div>
+                )}
               </div>
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-orange-600">

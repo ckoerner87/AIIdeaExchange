@@ -390,9 +390,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const todayStr = today.toISOString().split('T')[0];
       if (!processedDates.has(todayStr)) {
         // Get ALL sessions that have submitted ideas (current total user count)
-        const usersWhoSubmitted = allSessions.filter((session: any) => session.hasSubmitted);
-        const totalUsers = usersWhoSubmitted.length;
-        const totalUpvotesGiven = usersWhoSubmitted.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
+        const usersWhoSubmittedToday = allSessions.filter((session: any) => session.hasSubmitted);
+        const totalUsers = usersWhoSubmittedToday.length;
+        const totalUpvotesGiven = usersWhoSubmittedToday.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
         const averageUpvotes = totalUsers > 0 ? totalUpvotesGiven / totalUsers : 0;
         
         dataPoints.push({
@@ -468,10 +468,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activeVoters = votersFromSubmitters.size;
       const totalUpvotesGiven = totalUpvotesFromSubmitters;
 
+      // Calculate percentage of idea submitters who upvote others
+      const participationRate = totalUsers > 0 ? (activeVoters / totalUsers * 100) : 0;
+
+      console.log(`User stats: ${totalUsers} users, ${activeVoters} active voters, ${participationRate.toFixed(1)}% participation`);
+
       res.json({
         totalUsers,
         activeVoters,
         totalUpvotesGiven,
+        participationRate: parseFloat(participationRate.toFixed(1)),
         averageUpvotesPerUser: totalUsers > 0 ? (totalUpvotesGiven / totalUsers) : 0,
         averageUpvotesPerActiveVoter: activeVoters > 0 ? (totalUpvotesGiven / activeVoters) : 0
       });
