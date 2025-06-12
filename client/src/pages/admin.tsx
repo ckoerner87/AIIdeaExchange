@@ -20,16 +20,21 @@ export default function Admin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('recent');
   const [paywallEnabled, setPaywallEnabled] = useState(true);
+  const [authToken, setAuthToken] = useState<string>('');
   const itemsPerPage = 50;
 
   // Load saved password and auth state on mount
   useEffect(() => {
     const savedPassword = localStorage.getItem('adminPassword');
     const savedAuth = localStorage.getItem('adminAuthenticated');
+    const savedToken = localStorage.getItem('adminToken');
     
     if (savedPassword === 'xxx' && savedAuth === 'true') {
       setPassword('xxx');
       setIsAuthenticated(true);
+      if (savedToken) {
+        setAuthToken(savedToken);
+      }
     } else if (savedPassword) {
       setPassword(savedPassword);
     }
@@ -50,8 +55,12 @@ export default function Admin() {
   const { data: userStats, isLoading: userStatsLoading, error: userStatsError } = useQuery({
     queryKey: ['/api/admin/user-stats'],
     queryFn: async () => {
-      console.log('Fetching user stats...');
-      const res = await fetch('/api/admin/user-stats');
+      console.log('Fetching user stats with token:', authToken);
+      const res = await fetch('/api/admin/user-stats', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
       console.log('User stats response status:', res.status);
       if (!res.ok) {
         const errorText = await res.text();
@@ -62,7 +71,7 @@ export default function Admin() {
       console.log('User stats data:', data);
       return data;
     },
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !!authToken,
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
@@ -156,11 +165,12 @@ export default function Admin() {
   // Delete idea mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      console.log('Attempting to delete idea:', id);
+      console.log('Attempting to delete idea:', id, 'with token:', authToken);
       const res = await fetch(`/api/admin/ideas/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
         },
       });
       
@@ -236,23 +246,47 @@ export default function Admin() {
     },
   });
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "xxx") {
-      setIsAuthenticated(true);
-      // Save password and auth state to localStorage
-      localStorage.setItem('adminPassword', 'xxx');
-      localStorage.setItem('adminAuthenticated', 'true');
-    } else {
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setIsAuthenticated(true);
+        setAuthToken(data.token);
+        
+        // Save everything to localStorage
+        localStorage.setItem('adminPassword', 'xxx');
+        localStorage.setItem('adminAuthenticated', 'true');
+        localStorage.setItem('adminToken', data.token);
+        
+        toast({
+          title: "Access granted",
+          description: "Welcome to the admin dashboard",
+        });
+      } else {
+        toast({
+          title: "Access Denied",
+          description: "Invalid password",
+          variant: "destructive",
+        });
+        setPassword("");
+        // Clear any stored auth
+        localStorage.removeItem('adminPassword');
+        localStorage.removeItem('adminAuthenticated');
+        localStorage.removeItem('adminToken');
+      }
+    } catch (error) {
       toast({
-        title: "Access Denied",
-        description: "Invalid password",
+        title: "Error",
+        description: "Authentication failed",
         variant: "destructive",
       });
-      setPassword("");
-      // Clear any stored auth
-      localStorage.removeItem('adminPassword');
-      localStorage.removeItem('adminAuthenticated');
     }
   };
 

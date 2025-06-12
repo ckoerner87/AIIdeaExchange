@@ -382,9 +382,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to get user statistics
   app.get("/api/admin/user-stats", async (req, res) => {
     try {
+      // Check for admin token or IP
+      const authToken = req.headers['authorization'];
       const clientIP = getClientIP(req);
       
-      if (!isAdminIP(clientIP)) {
+      if (authToken !== 'Bearer admin-authenticated' && !isAdminIP(clientIP)) {
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -453,9 +455,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to delete ideas
   app.delete("/api/admin/ideas/:id", async (req, res) => {
     try {
+      // Check for admin token or IP
+      const authToken = req.headers['authorization'];
       const clientIP = getClientIP(req);
       
-      if (!isAdminIP(clientIP)) {
+      if (authToken !== 'Bearer admin-authenticated' && !isAdminIP(clientIP)) {
         return res.status(403).json({ message: "Access denied" });
       }
 
