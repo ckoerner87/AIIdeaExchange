@@ -568,7 +568,7 @@ export default function Admin() {
               </div>
               <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-teal-600">
-                  {userStatsLoading ? '...' : userStatsError ? 'Error' : (userStats?.averageUpvotesPerUser ? userStats.averageUpvotesPerUser.toFixed(1) : '0.0')}
+                  {userStatsLoading ? '...' : userStatsError ? 'Error' : (userStats?.averageUpvotesPerUser ? userStats.averageUpvotesPerUser.toFixed(3) : '0.000')}
                 </div>
                 <div className="text-sm text-teal-700">Average Upvotes per User</div>
                 {userStatsError && (
@@ -599,8 +599,9 @@ export default function Admin() {
                       tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     />
                     <YAxis 
-                      domain={[0, 'dataMax']}
-                      tickFormatter={(value) => value.toFixed(1)}
+                      domain={['dataMin', 'dataMax']}
+                      tickFormatter={(value) => value.toFixed(3)}
+                      scale="linear"
                     />
                     <Tooltip 
                       labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { 
@@ -608,7 +609,7 @@ export default function Admin() {
                         month: 'long', 
                         day: 'numeric' 
                       })}
-                      formatter={(value: number) => [value.toFixed(1), 'Average Upvotes per User']}
+                      formatter={(value: number) => [value.toFixed(3), 'Average Upvotes per User']}
                     />
                     <Line 
                       type="monotone" 
