@@ -330,27 +330,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      // Get all user sessions and ideas efficiently
+      // Get all user sessions and find the earliest one
       const allSessions = await db.select().from(userSessions);
-      const allIdeas = await storage.getIdeas('recent');
       
-      if (allIdeas.length === 0) {
+      if (allSessions.length === 0) {
         return res.json([]);
       }
 
-      // Find the earliest submission date (platform launch)
-      const earliestDate = new Date(Math.min(...allIdeas.map((idea: any) => new Date(idea.submittedAt).getTime())));
+      // Find the earliest session creation date (platform launch)
+      const earliestDate = new Date(Math.min(...allSessions.map((session: any) => new Date(session.createdAt).getTime())));
       const today = new Date();
       
       // Generate daily data points from launch to today
       const dataPoints = [];
       const currentDate = new Date(earliestDate);
-      
-      // Create session lookup map for efficiency
-      const sessionMap = new Map<string, any>();
-      allSessions.forEach((session: any) => {
-        sessionMap.set(session.sessionId, session);
-      });
       
       // Track dates we've already processed to avoid duplicates
       const processedDates = new Set<string>();
@@ -367,18 +360,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         processedDates.add(dateStr);
         
-        // Get all ideas submitted up to this date
-        const ideasUpToDate = allIdeas.filter((idea: any) => 
-          new Date(idea.submittedAt) <= currentDate
+        // Get ALL sessions that existed by this date (cumulative user count)
+        const sessionsUpToDate = allSessions.filter((session: any) => 
+          new Date(session.createdAt) <= currentDate
         );
         
-        if (ideasUpToDate.length > 0) {
-          // Get unique sessions for these ideas
-          const uniqueSessionIds = new Set(ideasUpToDate.map((idea: any) => idea.sessionId));
-          const sessionsUpToDate = Array.from(uniqueSessionIds)
-            .map(sessionId => sessionMap.get(sessionId))
-            .filter((session: any) => session !== null && session !== undefined);
-          
+        if (sessionsUpToDate.length > 0) {
           const totalUsers = sessionsUpToDate.length;
           const totalUpvotesGiven = sessionsUpToDate.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
           const averageUpvotes = totalUsers > 0 ? totalUpvotesGiven / totalUsers : 0;
@@ -398,13 +385,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ensure we have today's data point
       const todayStr = today.toISOString().split('T')[0];
       if (!processedDates.has(todayStr)) {
-        const uniqueSessionIds = new Set(allIdeas.map((idea: any) => idea.sessionId));
-        const allSessionsToday = Array.from(uniqueSessionIds)
-          .map(sessionId => sessionMap.get(sessionId))
-          .filter((session: any) => session !== null && session !== undefined);
-        
-        const totalUsers = allSessionsToday.length;
-        const totalUpvotesGiven = allSessionsToday.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
+        // Get ALL sessions that exist (current total user count)
+        const totalUsers = allSessions.length;
+        const totalUpvotesGiven = allSessions.reduce((sum: number, session: any) => sum + (session.upvotesGiven || 0), 0);
         const averageUpvotes = totalUsers > 0 ? totalUpvotesGiven / totalUsers : 0;
         
         dataPoints.push({
