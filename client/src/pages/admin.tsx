@@ -34,6 +34,18 @@ export default function Admin() {
       setIsAuthenticated(true);
       if (savedToken) {
         setAuthToken(savedToken);
+      } else {
+        // Auto-authenticate if password is correct but token is missing
+        fetch('/api/admin/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: 'xxx' })
+        }).then(res => res.json()).then(data => {
+          if (data.token) {
+            setAuthToken(data.token);
+            localStorage.setItem('adminToken', data.token);
+          }
+        }).catch(console.error);
       }
     } else if (savedPassword) {
       setPassword(savedPassword);
@@ -53,14 +65,15 @@ export default function Admin() {
 
   // Get user statistics
   const { data: userStats, isLoading: userStatsLoading, error: userStatsError } = useQuery({
-    queryKey: ['/api/admin/user-stats'],
+    queryKey: ['/api/admin/user-stats', authToken],
     queryFn: async () => {
       console.log('Fetching user stats with token:', authToken);
-      const res = await fetch('/api/admin/user-stats', {
-        headers: {
-          'Authorization': `Bearer ${authToken}`,
-        },
-      });
+      const headers: Record<string, string> = {};
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      
+      const res = await fetch('/api/admin/user-stats', { headers });
       console.log('User stats response status:', res.status);
       if (!res.ok) {
         const errorText = await res.text();
@@ -72,7 +85,7 @@ export default function Admin() {
       return data;
     },
     enabled: isAuthenticated,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
   });
 
   // Update local state when paywall status loads

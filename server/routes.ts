@@ -19,7 +19,8 @@ const ADMIN_IPS = [
   '::1',                    // localhost IPv6
   '127.0.0.1',              // localhost IPv4
   '::ffff:127.0.0.1',       // IPv4-mapped IPv6
-  "34.73.27.153"            // Current Replit IP
+  "34.73.27.153",           // Current Replit IP
+  "47.187.81.160"           // Browser IP
 ];
 
 function getClientIP(req: any): string {
@@ -386,7 +387,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const authToken = req.headers['authorization'];
       const clientIP = getClientIP(req);
       
+      console.log('User stats auth check - Token:', authToken, 'IP:', clientIP);
+      
       if (authToken !== 'Bearer admin-authenticated' && !isAdminIP(clientIP)) {
+        console.log('Access denied for user stats');
         return res.status(403).json({ message: "Access denied" });
       }
 
