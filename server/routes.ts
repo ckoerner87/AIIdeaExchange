@@ -41,6 +41,8 @@ function isAdminIP(ip: string): boolean {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize paywall as disabled by default
+  (global as any).paywallEnabled = false;
   // Admin authentication endpoint
   app.post("/api/admin/auth", async (req, res) => {
     try {
@@ -151,8 +153,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(ideas);
       }
 
-      // Check paywall setting
-      const paywallEnabled = (global as any).paywallEnabled !== false; // Default to true if not set
+      // Check paywall setting (default to false - DISABLED)
+      const paywallEnabled = (global as any).paywallEnabled === true;
       
       // Normal flow - check if user has submitted (only if paywall is enabled)
       const session = await storage.getUserSession(sessionId);
