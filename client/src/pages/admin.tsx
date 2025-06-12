@@ -716,11 +716,12 @@ export default function Admin() {
                           month: 'long', 
                           day: 'numeric' 
                         })}
-                        formatter={(value: number, name: string) => {
+                        formatter={(value: any, name: string) => {
+                          const numValue = typeof value === 'number' ? value : parseFloat(value) || 0;
                           if (name === 'avgTimeOnSiteMinutes') {
-                            return [`${value.toFixed(1)} minutes`, 'Average Time on Site'];
+                            return [`${numValue.toFixed(1)} minutes`, 'Average Time on Site'];
                           }
-                          return [value, name];
+                          return [numValue.toFixed(2), name];
                         }}
                       />
                       <Line 
