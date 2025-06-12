@@ -489,6 +489,12 @@ export default function Admin() {
               <p className="text-slate-600">Manage AI use case ideas and subscribers</p>
             </div>
             <div className="flex space-x-4">
+              <Button 
+                onClick={() => window.location.href = '/'}
+                className="bg-blue-600 hover:bg-blue-700 text-sm"
+              >
+                Go to Homepage
+              </Button>
               <Button onClick={handleExportEmails} className="bg-green-600 hover:bg-green-700 text-sm">
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
