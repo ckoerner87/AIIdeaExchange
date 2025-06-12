@@ -73,22 +73,16 @@ export default function Admin() {
   const { data: userStats, isLoading: userStatsLoading, error: userStatsError } = useQuery({
     queryKey: ['/api/admin/user-stats', authToken],
     queryFn: async () => {
-      console.log('Fetching user stats with token:', authToken);
       const headers: Record<string, string> = {};
       if (authToken) {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
       
       const res = await fetch('/api/admin/user-stats', { headers });
-      console.log('User stats response status:', res.status);
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error('User stats error:', errorText);
-        throw new Error(`Failed to get user stats: ${res.status} - ${errorText}`);
+        throw new Error(`Failed to get user stats: ${res.status}`);
       }
-      const data = await res.json();
-      console.log('User stats data:', data);
-      return data;
+      return res.json();
     },
     enabled: isAuthenticated,
     refetchInterval: 30000,
