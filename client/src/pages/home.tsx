@@ -70,7 +70,7 @@ export default function Home() {
     queryKey: ['/api/stats'],
   });
 
-  // Get ideas (only if user has submitted or has shared access)
+  // Get ideas (show when paywall disabled OR user has submitted OR has shared access)
   const { data: ideas, isLoading: ideasLoading } = useQuery({
     queryKey: ['/api/ideas', sortBy, selectedCategory, selectedTool],
     queryFn: async () => {
@@ -88,7 +88,7 @@ export default function Home() {
       }
       return res.json();
     },
-    enabled: !!sessionId && (hasSubmitted || sharedIdeaAccess),
+    enabled: !!sessionId && (!paywallEnabled || hasSubmitted || sharedIdeaAccess),
   });
 
   // Vote mutation
@@ -226,8 +226,8 @@ export default function Home() {
 
 
 
-        {/* Submission Section */}
-        {!hasSubmitted && (
+        {/* Submission Section - Only show when paywall enabled AND user hasn't submitted */}
+        {paywallEnabled && !hasSubmitted && (
           <div className="mb-12">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">
