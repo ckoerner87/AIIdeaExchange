@@ -167,6 +167,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const category = req.query.category as string;
         const tool = req.query.tool as string;
         const ideas = await storage.getIdeas(sortBy, category, tool);
+        
+        // Add cache-busting headers to ensure fresh data
+        res.set({
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        });
+        
         return res.json(ideas);
       }
 
@@ -183,6 +191,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const tool = req.query.tool as string;
       const ideas = await storage.getIdeas(sortBy, category, tool);
+      
+      // Add cache-busting headers to ensure fresh data
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       
       res.json(ideas);
     } catch (error) {
