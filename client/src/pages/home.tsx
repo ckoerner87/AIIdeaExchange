@@ -205,15 +205,18 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-3 rounded-lg border-2 border-blue-300">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                  <span className="font-bold text-lg">
-                    {(stats as any)?.totalIdeas || 0}
-                  </span>
-                  <span className="text-sm font-medium">
-                    ideas shared
-                  </span>
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-3 rounded-lg border-2 border-blue-300 animate-slow-bounce">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    <span className="font-bold text-lg">
+                      {(stats as any)?.totalIdeas || 0}
+                    </span>
+                    <span className="text-sm font-medium">
+                      ideas shared
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
