@@ -129,9 +129,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(ideas);
       }
 
-      // Normal flow - check if user has submitted
+      // Check paywall setting
+      const paywallEnabled = global.paywallEnabled !== false; // Default to true if not set
+      
+      // Normal flow - check if user has submitted (only if paywall is enabled)
       const session = await storage.getUserSession(sessionId);
-      if (!session || !session.hasSubmitted) {
+      if (paywallEnabled && (!session || !session.hasSubmitted)) {
         return res.status(403).json({ message: "Must submit an idea first" });
       }
 
@@ -501,7 +504,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Export CSV with proper email-to-idea linking
-  // Admin endpoint to get paywall status
+  // Public endpoint to get paywall status (accessible to all users)
+  app.get("/api/paywall-status", async (req, res) => {
+    try {
+      // Check if paywall is enabled (default to true)
+      const paywallEnabled = global.paywallEnabled !== false;
+      res.json({ enabled: paywallEnabled });
+    } catch (error) {
+      console.error('Error getting paywall status:', error);
+      res.status(500).json({ message: "Failed to get paywall status" });
+    }
+  });
+
+  // Admin endpoint to get paywall status (for admin panel)
   app.get("/api/admin/paywall-status", async (req, res) => {
     try {
       const clientIP = getClientIP(req);
@@ -510,8 +525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      // Check if paywall is enabled (stored in environment or default to true)
-      const paywallEnabled = process.env.PAYWALL_ENABLED !== 'false';
+      const paywallEnabled = global.paywallEnabled !== false;
       res.json({ enabled: paywallEnabled });
     } catch (error) {
       console.error('Error getting paywall status:', error);

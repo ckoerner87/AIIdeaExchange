@@ -28,8 +28,28 @@ export default function Home() {
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
   const [visibleIdeasCount, setVisibleIdeasCount] = useState(20);
   const [newlySubmittedIdeaId, setNewlySubmittedIdeaId] = useState<number | null>(null);
+  const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+  const [paywallEnabled, setPaywallEnabled] = useState(true);
   const [submittedIdeaText, setSubmittedIdeaText] = useState<string>('');
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
+
+  // Check paywall status
+  const { data: paywallStatus } = useQuery({
+    queryKey: ['/api/paywall-status'],
+    queryFn: async () => {
+      const res = await fetch('/api/paywall-status');
+      if (!res.ok) return { enabled: true }; // Default to enabled if error
+      return res.json();
+    },
+    refetchInterval: 30000, // Check every 30 seconds
+  });
+
+  // Update paywall state when status loads
+  useEffect(() => {
+    if (paywallStatus?.enabled !== undefined) {
+      setPaywallEnabled(paywallStatus.enabled);
+    }
+  }, [paywallStatus]);
 
   // Get or create session
   const { data: sessionData } = useQuery({
@@ -352,6 +372,40 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               </p>
             </div>
 
+            {/* Submit Your Own Idea Button - Top (only when paywall is disabled) */}
+            {!paywallEnabled && (
+              <div className="mb-8 text-center">
+                <Button
+                  onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all hover:scale-105"
+                >
+                  <Lightbulb className="w-5 h-5 mr-2" />
+                  Submit Your Own Idea
+                </Button>
+              </div>
+            )}
+
+            {/* Submission Form (when toggled) */}
+            {!paywallEnabled && showSubmissionForm && (
+              <div className="mb-8">
+                <IdeaSubmissionForm 
+                  sessionId={sessionId} 
+                  onSubmitted={(ideaId, ideaText) => {
+                    setNewlySubmittedIdeaId(ideaId || null);
+                    if (ideaText) setSubmittedIdeaText(ideaText);
+                    setHasSubmitted(true);
+                    setShowSubmissionForm(false); // Hide form after submission
+                    // Show gift card popup for new submissions
+                    if (ideaId) {
+                      setShowGiftCardPopup(true);
+                    }
+                    // Invalidate ideas cache to refresh the list
+                    queryClient.invalidateQueries({ queryKey: ['/api/ideas'] });
+                  }}
+                />
+              </div>
+            )}
+
             {/* Filter Dropdowns */}
             <div className="mb-6 flex flex-col sm:flex-row gap-4">
               <div className="w-full sm:flex-1 sm:min-w-[200px]">
@@ -451,6 +505,19 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                     >
                       <span className="hidden sm:inline">Show 20 More Ideas ({ideas.length - visibleIdeasCount} remaining)</span>
                       <span className="sm:hidden">Show 20 More ({ideas.length - visibleIdeasCount})</span>
+                    </Button>
+                  </div>
+                )}
+
+                {/* Submit Your Own Idea Button - Bottom (only when paywall is disabled) */}
+                {!paywallEnabled && (
+                  <div className="mt-12 text-center">
+                    <Button
+                      onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all hover:scale-105"
+                    >
+                      <Lightbulb className="w-5 h-5 mr-2" />
+                      Submit Your Own Idea
                     </Button>
                   </div>
                 )}
