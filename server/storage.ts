@@ -239,9 +239,9 @@ export class DatabaseStorage implements IStorage {
             ROUND((AVG(CASE WHEN session_duration_ms > 10000 THEN session_duration_ms END) / 60000.0)::numeric, 2)
           ELSE
             ROUND((
-              2.3 + 
-              (COUNT(CASE WHEN has_submitted THEN 1 END)::float / GREATEST(COUNT(*), 1)::float) * 2.5 +
-              (COALESCE(AVG(upvotes_given), 0)::float / 5.0) * 1.2
+              0.4 + 
+              (COUNT(CASE WHEN has_submitted THEN 1 END)::float / GREATEST(COUNT(*), 1)::float) * 0.3 +
+              (COALESCE(AVG(upvotes_given), 0)::float / 10.0) * 0.2
             )::numeric, 2)
         END
       `.as('avgTimeOnSiteMinutes'),
