@@ -198,6 +198,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Idea not found" });
       }
 
+      // Check downvote restriction: only allow downvotes on ideas with 100+ upvotes
+      if (voteType === 'down' && idea.votes < 100) {
+        return res.status(403).json({ 
+          message: `Downvoting is only enabled for ideas with 100+ upvotes. This idea has ${idea.votes} upvotes.` 
+        });
+      }
+
       // Get client IP address for tracking only
       const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
       

@@ -104,12 +104,25 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
             <Button
               variant="ghost"
               size="sm"
-              className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
-              onClick={() => onVote(idea.id, 'down')}
-              disabled={isVoting}
-              aria-label={`Downvote idea: ${idea.useCase?.substring(0, 50) || idea.title || 'this idea'}...`}
+              className={`p-1 rounded-lg transition-colors ${
+                idea.votes >= 100 
+                  ? "hover:bg-slate-100" 
+                  : "opacity-30 cursor-not-allowed"
+              }`}
+              onClick={() => idea.votes >= 100 && onVote(idea.id, 'down')}
+              disabled={isVoting || idea.votes < 100}
+              aria-label={
+                idea.votes >= 100 
+                  ? `Downvote idea: ${idea.useCase?.substring(0, 50) || idea.title || 'this idea'}...`
+                  : `Downvoting disabled until 100 upvotes (currently ${idea.votes})`
+              }
+              title={idea.votes < 100 ? `Downvoting enabled at 100 upvotes (currently ${idea.votes})` : undefined}
             >
-              <ChevronDown className="text-slate-600 hover:text-red-600 h-5 w-5" />
+              <ChevronDown className={`h-5 w-5 ${
+                idea.votes >= 100 
+                  ? "text-slate-600 hover:text-red-600" 
+                  : "text-slate-300"
+              }`} />
             </Button>
           </div>
           <div className="flex-1">
