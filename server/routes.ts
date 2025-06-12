@@ -130,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check paywall setting
-      const paywallEnabled = global.paywallEnabled !== false; // Default to true if not set
+      const paywallEnabled = (global as any).paywallEnabled !== false; // Default to true if not set
       
       // Normal flow - check if user has submitted (only if paywall is enabled)
       const session = await storage.getUserSession(sessionId);
@@ -508,7 +508,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/paywall-status", async (req, res) => {
     try {
       // Check if paywall is enabled (default to true)
-      const paywallEnabled = global.paywallEnabled !== false;
+      const paywallEnabled = (global as any).paywallEnabled !== false;
       res.json({ enabled: paywallEnabled });
     } catch (error) {
       console.error('Error getting paywall status:', error);
@@ -525,7 +525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const paywallEnabled = global.paywallEnabled !== false;
+      const paywallEnabled = (global as any).paywallEnabled !== false;
       res.json({ enabled: paywallEnabled });
     } catch (error) {
       console.error('Error getting paywall status:', error);
@@ -546,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Store paywall setting (in production, this would be stored in database)
       // For now, we'll store it in memory and update the environment variable approach
-      global.paywallEnabled = enabled;
+      (global as any).paywallEnabled = enabled;
       
       res.json({ 
         enabled, 
