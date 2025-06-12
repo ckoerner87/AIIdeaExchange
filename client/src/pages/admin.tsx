@@ -202,12 +202,19 @@ export default function Admin() {
     },
     onSuccess: (data) => {
       console.log('Delete successful, updating cache for idea:', data.deletedId);
+      
+      // Update the query cache immediately by removing the deleted item
+      queryClient.setQueryData(['/api/admin/ideas', sortBy], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.filter((idea: any) => idea.id !== data.deletedId);
+      });
+      
       toast({
         title: "Idea deleted",
         description: "The idea has been removed successfully.",
       });
       
-      // Force refresh the ideas list
+      // Also invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/user-stats'] });
     },

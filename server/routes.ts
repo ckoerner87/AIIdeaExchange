@@ -1,10 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, userSessions, votes } from "@shared/schema";
+import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, userSessions, votes, ideas } from "@shared/schema";
 import { db } from "./db";
 import { nanoid } from "nanoid";
-import { count, countDistinct, eq, and } from "drizzle-orm";
+import { count, countDistinct, eq, and, sql } from "drizzle-orm";
 import { ContentFilter } from "./content-filter";
 import { googleSheetsService } from "./google-sheets";
 
@@ -274,22 +274,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get stats
   app.get("/api/stats", async (req, res) => {
     try {
-      const ideas = await storage.getIdeas();
+      const currentIdeas = await storage.getIdeas();
       const subscriptions = await storage.getAllSubscriptions();
+      
+      // Get cumulative count by checking the highest ID in the database
+      // This gives us total ideas ever created, regardless of deletions
+      let cumulativeIdeasCount = currentIdeas.length;
+      try {
+        const maxIdQuery = await db.execute(sql`SELECT COALESCE(MAX(id), 0) as max_id FROM ideas`);
+        cumulativeIdeasCount = Number(maxIdQuery.rows[0]?.max_id) || currentIdeas.length;
+      } catch (error) {
+        // Fallback to current count if query fails
+        console.log('Using fallback count for stats');
+      }
       
       // Calculate category counts
       const categoryCounts: Record<string, number> = {};
-      ideas.forEach((idea: any) => {
+      currentIdeas.forEach((idea: any) => {
         const category = idea.category || 'Other';
         categoryCounts[category] = (categoryCounts[category] || 0) + 1;
       });
       
       res.json({
-        totalIdeas: ideas.length,
+        totalIdeas: cumulativeIdeasCount,
         totalSubscribers: subscriptions.length,
         categoryCounts
       });
     } catch (error) {
+      console.error('Error getting stats:', error);
       res.status(500).json({ message: "Failed to get stats" });
     }
   });
