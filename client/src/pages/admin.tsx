@@ -21,6 +21,7 @@ export default function Admin() {
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('recent');
   const [paywallEnabled, setPaywallEnabled] = useState(true);
   const [authToken, setAuthToken] = useState<string>('');
+  const [selectedMetric, setSelectedMetric] = useState<'userStats' | 'sessionMetrics'>('userStats');
   const itemsPerPage = 50;
 
   // Load saved password and auth state on mount
@@ -102,6 +103,19 @@ export default function Admin() {
       const res = await fetch(`/api/admin/ideas?sort=${sortBy}`);
       if (!res.ok) {
         throw new Error('Failed to get ideas');
+      }
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  // Get session metrics
+  const { data: sessionMetrics } = useQuery({
+    queryKey: ['/api/admin/session-metrics'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/session-metrics');
+      if (!res.ok) {
+        throw new Error('Failed to get session metrics');
       }
       return res.json();
     },
@@ -614,57 +628,124 @@ export default function Admin() {
             </div>
           </div>
 
-          {/* Upvote Trends Chart */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Average Upvotes per User Over Time</h2>
+          {/* Analytics Dashboard */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 sm:mb-0">Analytics Dashboard</h2>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setSelectedMetric('userStats')}
+                  variant={selectedMetric === 'userStats' ? 'default' : 'outline'}
+                  size="sm"
+                >
+                  User Engagement
+                </Button>
+                <Button
+                  onClick={() => setSelectedMetric('sessionMetrics')}
+                  variant={selectedMetric === 'sessionMetrics' ? 'default' : 'outline'}
+                  size="sm"
+                >
+                  Time on Site
+                </Button>
+              </div>
+            </div>
+            
             <div className="h-80">
-              {trendsLoading ? (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Loading trend data...
-                </div>
-              ) : trendsError ? (
-                <div className="flex items-center justify-center h-full text-red-500">
-                  Error loading trends: {trendsError.message}
-                </div>
-              ) : upvoteTrends && upvoteTrends.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={upvoteTrends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="date" 
-                      tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    />
-                    <YAxis 
-                      domain={['dataMin', 'dataMax']}
-                      tickFormatter={(value) => value.toFixed(3)}
-                      scale="linear"
-                    />
-                    <Tooltip 
-                      labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                      formatter={(value: number) => [value.toFixed(3), 'Average Upvotes per User']}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="averageUpvotes" 
-                      stroke="#0891b2" 
-                      strokeWidth={2}
-                      dot={{ fill: '#0891b2', strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+              {selectedMetric === 'userStats' ? (
+                trendsLoading ? (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    Loading engagement data...
+                  </div>
+                ) : trendsError ? (
+                  <div className="flex items-center justify-center h-full text-red-500">
+                    Error loading engagement data: {trendsError.message}
+                  </div>
+                ) : upvoteTrends && upvoteTrends.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={upvoteTrends}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis 
+                        domain={['dataMin', 'dataMax']}
+                        tickFormatter={(value) => value.toFixed(3)}
+                        scale="linear"
+                      />
+                      <Tooltip 
+                        labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                        formatter={(value: number) => [value.toFixed(3), 'Average Upvotes per User']}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="averageUpvotes" 
+                        stroke="#0891b2" 
+                        strokeWidth={2}
+                        dot={{ fill: '#0891b2', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    No engagement data available yet
+                  </div>
+                )
               ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  No trend data available yet
-                </div>
+                sessionMetrics ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={sessionMetrics}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis 
+                        domain={['dataMin', 'dataMax']}
+                        tickFormatter={(value) => `${value.toFixed(1)}m`}
+                        scale="linear"
+                      />
+                      <Tooltip 
+                        labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                        formatter={(value: number, name: string) => {
+                          if (name === 'avgTimeOnSiteMinutes') {
+                            return [`${value.toFixed(1)} minutes`, 'Average Time on Site'];
+                          }
+                          return [value, name];
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="avgTimeOnSiteMinutes" 
+                        stroke="#059669" 
+                        strokeWidth={2}
+                        dot={{ fill: '#059669', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    Loading time on site data...
+                  </div>
+                )
               )}
             </div>
+            
             <div className="mt-4 text-sm text-gray-600">
-              Shows how community engagement has evolved since site launch. Only counts upvotes given to other users' ideas.
+              {selectedMetric === 'userStats' 
+                ? 'Shows how community engagement has evolved since site launch. Only counts upvotes given to other users\' ideas.'
+                : 'Shows average time users spend on the site per day. Tracks session duration from creation to last activity.'
+              }
             </div>
           </div>
 
