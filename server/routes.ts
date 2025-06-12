@@ -23,18 +23,36 @@ const ADMIN_IPS = [
 ];
 
 function getClientIP(req: any): string {
-  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
          req.connection?.remoteAddress || 
          req.socket?.remoteAddress ||
          req.ip || 
          '127.0.0.1';
+  console.log('Client IP detected:', ip, 'X-Forwarded-For:', req.headers['x-forwarded-for']);
+  return ip;
 }
 
 function isAdminIP(ip: string): boolean {
-  return ADMIN_IPS.includes(ip);
+  const isAdmin = ADMIN_IPS.includes(ip);
+  console.log('IP check:', ip, 'Is admin:', isAdmin, 'Admin IPs:', ADMIN_IPS);
+  return isAdmin;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Admin authentication endpoint
+  app.post("/api/admin/auth", async (req, res) => {
+    try {
+      const { password } = req.body;
+      if (password === 'xxx') {
+        res.json({ success: true, token: 'admin-authenticated' });
+      } else {
+        res.status(401).json({ message: "Invalid password" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Authentication failed" });
+    }
+  });
+
   // Get or create user session
   app.get("/api/session", async (req, res) => {
     try {

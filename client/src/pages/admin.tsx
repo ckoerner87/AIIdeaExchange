@@ -47,14 +47,23 @@ export default function Admin() {
   });
 
   // Get user statistics
-  const { data: userStats } = useQuery({
+  const { data: userStats, isLoading: userStatsLoading, error: userStatsError } = useQuery({
     queryKey: ['/api/admin/user-stats'],
     queryFn: async () => {
+      console.log('Fetching user stats...');
       const res = await fetch('/api/admin/user-stats');
-      if (!res.ok) throw new Error('Failed to get user stats');
-      return res.json();
+      console.log('User stats response status:', res.status);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('User stats error:', errorText);
+        throw new Error(`Failed to get user stats: ${res.status} - ${errorText}`);
+      }
+      const data = await res.json();
+      console.log('User stats data:', data);
+      return data;
     },
     enabled: isAuthenticated,
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Update local state when paywall status loads
@@ -147,30 +156,37 @@ export default function Admin() {
   // Delete idea mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
+      console.log('Attempting to delete idea:', id);
       const res = await fetch(`/api/admin/ideas/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
+      
+      console.log('Delete response status:', res.status);
+      const responseText = await res.text();
+      console.log('Delete response:', responseText);
+      
       if (!res.ok) {
-        throw new Error('Failed to delete idea');
+        throw new Error(`Failed to delete idea: ${res.status} - ${responseText}`);
       }
+      
       return { success: true, deletedId: id };
     },
     onSuccess: (data) => {
+      console.log('Delete successful, updating cache for idea:', data.deletedId);
       toast({
         title: "Idea deleted",
         description: "The idea has been removed successfully.",
       });
       
-      // Update the query data manually by removing the deleted item
-      queryClient.setQueryData(['/api/admin/ideas', sortBy], (oldData: any) => {
-        if (!oldData) return oldData;
-        return oldData.filter((idea: any) => idea.id !== data.deletedId);
-      });
-      
-      // Also invalidate to ensure consistency
+      // Force refresh the ideas list
       queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/user-stats'] });
     },
     onError: (error: any) => {
+      console.error('Delete error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to delete idea",
@@ -487,15 +503,21 @@ export default function Admin() {
               </div>
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-orange-600">
-                  {userStats?.activeVoters || '0'}
+                  {userStatsLoading ? '...' : userStatsError ? 'Error' : (userStats?.activeVoters || '0')}
                 </div>
                 <div className="text-sm text-orange-700">Active Voters</div>
+                {userStatsError && (
+                  <div className="text-xs text-red-600 mt-1">Failed to load</div>
+                )}
               </div>
               <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
                 <div className="text-2xl font-bold text-teal-600">
-                  {userStats?.averageUpvotesPerUser ? userStats.averageUpvotesPerUser.toFixed(1) : '0.0'}
+                  {userStatsLoading ? '...' : userStatsError ? 'Error' : (userStats?.averageUpvotesPerUser ? userStats.averageUpvotesPerUser.toFixed(1) : '0.0')}
                 </div>
                 <div className="text-sm text-teal-700">Average Upvotes per User</div>
+                {userStatsError && (
+                  <div className="text-xs text-red-600 mt-1">Failed to load</div>
+                )}
               </div>
             </div>
           </div>
