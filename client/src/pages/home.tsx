@@ -240,8 +240,12 @@ export default function Home() {
                   <Lightbulb className="text-white text-base sm:text-lg" />
                 </div>
                 <div>
-                  <h1 className="text-lg sm:text-xl font-bold text-slate-900">How Do You Use AI?</h1>
-                  <p className="text-xs sm:text-sm text-slate-600">Real World Use Cases for AI and ChatGPT</p>
+                  <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+                    How Do You<br/>Use AI?
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-600">
+                    Real World Use Cases<br/>for AI and ChatGPT
+                  </p>
                 </div>
               </div>
               <div className="sm:hidden">
@@ -249,12 +253,9 @@ export default function Home() {
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
                   <div className="relative bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce px-3 py-2 rounded-lg">
                     <div className="flex flex-col text-center">
-                      <div className="flex items-center justify-center space-x-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                        <span className="font-bold text-base text-slate-900">
-                          {(stats as any)?.totalIdeas || 0}
-                        </span>
-                      </div>
+                      <span className="font-bold text-base text-slate-900">
+                        {(stats as any)?.totalIdeas || 0}
+                      </span>
                       <span className="text-xs font-medium text-slate-700 mt-0.5">
                         ideas shared
                       </span>
@@ -268,7 +269,6 @@ export default function Home() {
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
                 <div className="relative bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce px-5 py-3 rounded-lg">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                     <span className="font-bold text-lg text-slate-900">
                       {(stats as any)?.totalIdeas || 0}
                     </span>
