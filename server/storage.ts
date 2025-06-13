@@ -63,6 +63,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: { username: string; email: string; passwordHash: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
+  getAllUsers(): Promise<User[]>;
   
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
@@ -400,6 +401,10 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
   }
 
   // Comment operations
