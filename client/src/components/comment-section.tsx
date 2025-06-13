@@ -66,7 +66,32 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId 
   };
 
   return (
-    <div className="flex gap-3 p-4 border-b border-gray-100 last:border-0">
+    <div className="flex gap-2 p-4 border-b border-gray-100 last:border-0">
+      {/* Voting buttons on the left */}
+      <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onVote(comment.id, 'up')}
+          className="h-6 w-6 p-0 hover:bg-green-50 hover:text-green-600"
+          aria-label="Upvote comment"
+        >
+          <ChevronUp className="w-3 h-3" />
+        </Button>
+        <span className="text-xs font-medium text-gray-600 min-w-[20px] text-center">
+          {comment.votes || 0}
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onVote(comment.id, 'down')}
+          className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-600"
+          aria-label="Downvote comment"
+        >
+          <ChevronDown className="w-3 h-3" />
+        </Button>
+      </div>
+
       <Suspense fallback={<div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />}>
         <Avatar className="w-8 h-8 flex-shrink-0">
           {comment.user?.profileImageUrl && (
@@ -98,30 +123,15 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId 
         </p>
         
         <div className="flex items-center gap-3 mt-2">
-          {/* Voting buttons */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onVote(comment.id, 'up')}
-              className="h-7 w-7 p-0 hover:bg-green-50 hover:text-green-600"
-              aria-label="Upvote comment"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </Button>
-            <span className="text-xs font-medium text-gray-600 min-w-[20px] text-center">
-              {comment.votes || 0}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onVote(comment.id, 'down')}
-              className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600"
-              aria-label="Downvote comment"
-            >
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            aria-label="Reply to comment"
+          >
+            <MessageCircle className="w-3 h-3 mr-1" />
+            Reply
+          </Button>
           
           {currentUserId === comment.userId && (
             <Button
@@ -412,7 +422,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     onDelete={handleDelete}
                     onVote={handleVote}
                     currentUserId={user?.id}
-                    sessionId={sessionId}
+                    sessionId={sessionId ?? undefined}
                   />
                 ))}
               </div>
