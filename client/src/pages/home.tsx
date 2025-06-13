@@ -582,6 +582,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                         onVote={handleVote}
                         isVoting={voteMutation.isPending}
                         isHighlighted={highlightedIdeaId === idea.id || newlySubmittedIdeaId === idea.id}
+                        isSharedLink={isSharedLink && highlightedIdeaId === idea.id}
                       />
                     ];
                     

@@ -124,6 +124,10 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       category: data.category || "Other",
       tools: data.tools || "Other",
       postType: selectedPostType,
+      // Ensure post type is correctly set based on selection
+      mediaUrl: selectedPostType === "media" ? data.mediaUrl : undefined,
+      mediaType: selectedPostType === "media" ? data.mediaType : undefined,
+      linkUrl: selectedPostType === "link" ? data.linkUrl : data.linkUrl, // Keep optional link for text posts
     };
     
     submitMutation.mutate(submissionData);
@@ -328,9 +332,14 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              // Create a preview URL for the file
-                              const url = URL.createObjectURL(file);
-                              field.onChange(url);
+                              // For demo purposes, we'll use a data URL
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                const result = event.target?.result as string;
+                                field.onChange(result);
+                              };
+                              reader.readAsDataURL(file);
+                              
                               // Determine media type
                               const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
                               form.setValue('mediaType', mediaType);
