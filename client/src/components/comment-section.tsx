@@ -142,8 +142,11 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       return response.json();
     },
     onSuccess: () => {
+      // Force refetch comments and ensure section stays expanded
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      queryClient.refetchQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
       setNewComment("");
+      setIsExpanded(true); // Ensure section stays expanded to show new comment
       toast({
         title: "Success",
         description: "Comment posted successfully",

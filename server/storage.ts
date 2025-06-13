@@ -55,6 +55,9 @@ export interface IStorage {
   
   // Users
   getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: { username: string; email: string; passwordHash: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   
   // Comments
@@ -282,6 +285,32 @@ export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: { username: string; email: string; passwordHash: string }): Promise<User> {
+    const userId = Math.random().toString(36).substring(2, 15);
+    const [user] = await db
+      .insert(users)
+      .values({
+        id: userId,
+        username: userData.username,
+        email: userData.email,
+        passwordHash: userData.passwordHash,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
     return user;
   }
 

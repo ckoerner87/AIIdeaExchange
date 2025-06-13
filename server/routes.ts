@@ -60,6 +60,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Signup endpoint for notification system
+  app.post('/api/auth/signup', async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+
+      // Validate input
+      if (!username || !email || !password) {
+        return res.status(400).json({ message: 'Username, email, and password are required' });
+      }
+
+      // Validate username format and profanity
+      const usernameValidation = ContentFilter.validateUsername(username);
+      if (!usernameValidation.isValid) {
+        return res.status(400).json({ message: usernameValidation.reason });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'Please enter a valid email address' });
+      }
+
+      // Check if username already exists
+      const existingUserByUsername = await storage.getUserByUsername(username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: 'Username already taken' });
+      }
+
+      // Check if email already exists
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      // Create password hash (simple implementation for now)
+      const passwordHash = Buffer.from(password).toString('base64');
+
+      // Create user
+      const user = await storage.createUser({
+        username,
+        email,
+        passwordHash,
+      });
+
+      // Auto-subscribe to email list
+      try {
+        await storage.createSubscription({ email });
+      } catch (error) {
+        // Don't fail signup if subscription fails
+        console.log('Failed to auto-subscribe user:', error);
+      }
+
+      res.json({ 
+        success: true, 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          email: user.email 
+        } 
+      });
+    } catch (error) {
+      console.error('Signup error:', error);
+      res.status(500).json({ message: 'Failed to create account' });
+    }
+  });
+
   // Admin authentication endpoint
   app.post("/api/admin/auth", async (req, res) => {
     try {
