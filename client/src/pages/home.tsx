@@ -522,10 +522,10 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 
                 {/* Submit Button - Right Side (only when paywall is disabled) */}
                 {!paywallEnabled && (
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 relative z-[60]">
                     <Button
                       onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap h-[50px] flex items-center"
+                      className="relative z-[60] bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap h-[50px] flex items-center"
                     >
                       <Lightbulb className="w-5 h-5 mr-2" />
                       Share My Idea
@@ -593,9 +593,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                       <SelectValue placeholder="📊 Sort by" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="votes">Sort by Upvotes</SelectItem>
-                      <SelectItem value="recent">Most Recent</SelectItem>
-                      <SelectItem value="comments">Most Comments</SelectItem>
+                      <SelectItem value="votes">🔥 Sort by Upvotes</SelectItem>
+                      <SelectItem value="recent">⏰ Most Recent</SelectItem>
+                      <SelectItem value="comments">💬 Most Comments</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
