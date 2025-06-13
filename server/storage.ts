@@ -5,6 +5,7 @@ import {
   votes,
   users,
   comments,
+  commentVotes,
   type Idea, 
   type InsertIdea,
   type Subscription,
@@ -16,7 +17,9 @@ import {
   type User,
   type UpsertUser,
   type Comment,
-  type InsertComment
+  type InsertComment,
+  type CommentVote,
+  type InsertCommentVote
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, isNull, sql } from "drizzle-orm";
@@ -433,6 +436,72 @@ export class DatabaseStorage implements IStorage {
     await db.delete(comments).where(
       and(eq(comments.id, id), eq(comments.userId, userId))
     );
+  }
+
+  // Comment voting methods
+  async voteOnComment(commentId: number, sessionId: string, ipAddress: string, voteType: 'up' | 'down'): Promise<void> {
+    // Check if user already voted on this comment
+    const existingVote = await db
+      .select()
+      .from(commentVotes)
+      .where(and(
+        eq(commentVotes.commentId, commentId),
+        eq(commentVotes.sessionId, sessionId)
+      ))
+      .limit(1);
+
+    if (existingVote.length > 0) {
+      // Update existing vote
+      await db
+        .update(commentVotes)
+        .set({ voteType, createdAt: new Date() })
+        .where(and(
+          eq(commentVotes.commentId, commentId),
+          eq(commentVotes.sessionId, sessionId)
+        ));
+    } else {
+      // Create new vote
+      await db.insert(commentVotes).values({
+        commentId,
+        sessionId,
+        ipAddress,
+        voteType,
+      });
+    }
+
+    // Recalculate and update comment vote count
+    const voteCount = await db
+      .select({
+        upvotes: sql<number>`count(case when ${commentVotes.voteType} = 'up' then 1 end)`,
+        downvotes: sql<number>`count(case when ${commentVotes.voteType} = 'down' then 1 end)`,
+      })
+      .from(commentVotes)
+      .where(eq(commentVotes.commentId, commentId));
+
+    const totalVotes = (voteCount[0]?.upvotes || 0) - (voteCount[0]?.downvotes || 0);
+    
+    await db
+      .update(comments)
+      .set({ votes: totalVotes })
+      .where(eq(comments.id, commentId));
+  }
+
+  async getCommentVote(commentId: number, sessionId: string): Promise<CommentVote | undefined> {
+    const [vote] = await db
+      .select()
+      .from(commentVotes)
+      .where(and(
+        eq(commentVotes.commentId, commentId),
+        eq(commentVotes.sessionId, sessionId)
+      ));
+    return vote;
+  }
+
+  async updateCommentVotes(commentId: number, votes: number): Promise<void> {
+    await db
+      .update(comments)
+      .set({ votes })
+      .where(eq(comments.id, commentId));
   }
 }
 

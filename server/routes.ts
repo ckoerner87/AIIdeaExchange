@@ -502,6 +502,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Comment voting endpoints
+  app.post("/api/comments/:id/vote", async (req: any, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      const { voteType } = req.body;
+      const sessionId = req.headers['x-session-id'];
+      const clientIP = getClientIP(req);
+
+      if (!sessionId) {
+        return res.status(400).json({ message: "Session ID required" });
+      }
+
+      if (!['up', 'down'].includes(voteType)) {
+        return res.status(400).json({ message: "Invalid vote type" });
+      }
+
+      await storage.voteOnComment(commentId, sessionId, clientIP, voteType);
+      res.json({ message: "Vote recorded" });
+    } catch (error) {
+      console.error('Comment vote error:', error);
+      res.status(500).json({ message: "Failed to record vote" });
+    }
+  });
+
+  app.get("/api/comments/:id/vote", async (req: any, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      const sessionId = req.headers['x-session-id'];
+
+      if (!sessionId) {
+        return res.status(400).json({ message: "Session ID required" });
+      }
+
+      const vote = await storage.getCommentVote(commentId, sessionId);
+      res.json({ vote: vote?.voteType || null });
+    } catch (error) {
+      console.error('Get comment vote error:', error);
+      res.status(500).json({ message: "Failed to get vote" });
+    }
+  });
+
   // Subscribe to weekly digest
   app.post("/api/subscribe", async (req, res) => {
     try {

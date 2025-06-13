@@ -6,7 +6,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Send, Trash2, User } from "lucide-react";
+import { MessageCircle, Send, Trash2, User, ChevronUp, ChevronDown } from "lucide-react";
 import type { Comment, User as UserType } from "@shared/schema";
 
 // Lazy load heavy components for better performance
@@ -21,13 +21,17 @@ interface CommentSectionProps {
 
 interface CommentWithUser extends Comment {
   user: UserType | null;
+  votes: number;
+  parentId: number | null;
 }
 
 // Memoized comment item for better performance
-const CommentItem = memo(({ comment, onDelete, currentUserId }: {
+const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId }: {
   comment: CommentWithUser;
   onDelete: (id: number) => void;
+  onVote: (commentId: number, voteType: 'up' | 'down') => void;
   currentUserId?: string;
+  sessionId?: string;
 }) => {
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
@@ -93,18 +97,45 @@ const CommentItem = memo(({ comment, onDelete, currentUserId }: {
           {comment.content}
         </p>
         
-        {currentUserId === comment.userId && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(comment.id)}
-            className="mt-2 h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-            aria-label="Delete comment"
-          >
-            <Trash2 className="w-3 h-3 mr-1" />
-            Delete
-          </Button>
-        )}
+        <div className="flex items-center gap-3 mt-2">
+          {/* Voting buttons */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onVote(comment.id, 'up')}
+              className="h-7 w-7 p-0 hover:bg-green-50 hover:text-green-600"
+              aria-label="Upvote comment"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </Button>
+            <span className="text-xs font-medium text-gray-600 min-w-[20px] text-center">
+              {comment.votes || 0}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onVote(comment.id, 'down')}
+              className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600"
+              aria-label="Downvote comment"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          {currentUserId === comment.userId && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete(comment.id)}
+              className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+              aria-label="Delete comment"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              Delete
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
