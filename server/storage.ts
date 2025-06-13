@@ -67,7 +67,7 @@ export interface IStorage {
   createComment(comment: InsertComment): Promise<Comment>;
   getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User | null })[]>;
   getCommentById(id: number): Promise<Comment | undefined>;
-  getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string | null } })[]>;
+  getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]>;
   deleteComment(id: number, userId: string): Promise<void>;
   adminDeleteComment(id: number): Promise<void>;
   bulkDeleteComments(ids: number[]): Promise<void>;
@@ -425,7 +425,7 @@ export class DatabaseStorage implements IStorage {
     return result.map(row => ({
       ...row,
       user: row.user?.id ? row.user : null,
-      idea: { useCase: row.idea?.useCase || null },
+      idea: { useCase: row.idea?.useCase || "" },
     }));
   }
 

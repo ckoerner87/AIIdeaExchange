@@ -18,11 +18,11 @@ interface EmailParams {
 }
 
 export async function sendEmail(
-  apiKey: string,
+  apiKey: string | undefined,
   params: EmailParams
 ): Promise<boolean> {
   try {
-    if (!process.env.SENDGRID_API_KEY) {
+    if (!apiKey || !process.env.SENDGRID_API_KEY) {
       console.warn("SendGrid not configured - email not sent");
       return false;
     }
