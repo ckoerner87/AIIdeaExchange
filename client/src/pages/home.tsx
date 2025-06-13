@@ -509,53 +509,95 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               </div>
             )}
 
-            {/* Filter Dropdowns - Sticky */}
-            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 py-4 mb-6 flex flex-col sm:flex-row gap-4 shadow-md border-b border-slate-200">
-              <div className="w-full sm:flex-1 sm:min-w-[200px] relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce">
-                    <SelectValue placeholder="🎯 Filter by Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="content-creation">Content Creation</SelectItem>
-                    <SelectItem value="marketing-ads">Marketing & Ads</SelectItem>
-                    <SelectItem value="sales-outreach">Sales & Outreach</SelectItem>
-                    <SelectItem value="automation-ai-agents">Automation & AI Agents</SelectItem>
-                    <SelectItem value="data-analysis-reporting">Data Analysis & Reporting</SelectItem>
-                    <SelectItem value="productivity-time-saving">Productivity & Time-Saving</SelectItem>
-                    <SelectItem value="customer-support">Customer Support</SelectItem>
-                    <SelectItem value="ecommerce-dropshipping">E-commerce & Dropshipping</SelectItem>
-                    <SelectItem value="personal-lifestyle">Personal Life & Lifestyle</SelectItem>
-                    <SelectItem value="real-estate">Real Estate</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Search and Filter Controls - Sticky */}
+            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 py-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
+              {/* Search Bar */}
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                <div className="relative flex items-center bg-white border-2 border-purple-200 hover:border-purple-400 focus-within:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200/50 rounded-lg">
+                  <Search className="absolute left-3 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="🔍 Search ideas, categories, tools..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-10 py-3 bg-transparent focus:outline-none text-gray-900 placeholder-gray-500"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
               
-              <div className="w-full sm:flex-1 sm:min-w-[200px] relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                <Select value={selectedTool} onValueChange={setSelectedTool}>
-                  <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-slow-bounce">
-                    <SelectValue placeholder="🛠️ Filter by Tool" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Tools</SelectItem>
-                    <SelectItem value="ChatGPT">ChatGPT</SelectItem>
-                    <SelectItem value="Claude">Claude</SelectItem>
-                    <SelectItem value="Midjourney">Midjourney</SelectItem>
-                    <SelectItem value="DALL-E">DALL-E</SelectItem>
-                    <SelectItem value="Stable Diffusion">Stable Diffusion</SelectItem>
-                    <SelectItem value="GitHub Copilot">GitHub Copilot</SelectItem>
-                    <SelectItem value="Cursor">Cursor</SelectItem>
-                    <SelectItem value="Notion AI">Notion AI</SelectItem>
-                    <SelectItem value="Zapier">Zapier</SelectItem>
-                    <SelectItem value="Make">Make</SelectItem>
-                    <SelectItem value="Custom API">Custom API</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Filter and Sort Controls - Three equal columns */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Category Filter */}
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce">
+                      <SelectValue placeholder="🎯 Filter by Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="content-creation">Content Creation</SelectItem>
+                      <SelectItem value="marketing-ads">Marketing & Ads</SelectItem>
+                      <SelectItem value="sales-outreach">Sales & Outreach</SelectItem>
+                      <SelectItem value="automation-ai-agents">Automation & AI Agents</SelectItem>
+                      <SelectItem value="data-analysis-reporting">Data Analysis & Reporting</SelectItem>
+                      <SelectItem value="productivity-time-saving">Productivity & Time-Saving</SelectItem>
+                      <SelectItem value="customer-support">Customer Support</SelectItem>
+                      <SelectItem value="ecommerce-dropshipping">E-commerce & Dropshipping</SelectItem>
+                      <SelectItem value="personal-lifestyle">Personal Life & Lifestyle</SelectItem>
+                      <SelectItem value="real-estate">Real Estate</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Tool Filter */}
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <Select value={selectedTool} onValueChange={setSelectedTool}>
+                    <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-slow-bounce">
+                      <SelectValue placeholder="🛠️ Filter by Tool" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Tools</SelectItem>
+                      <SelectItem value="ChatGPT">ChatGPT</SelectItem>
+                      <SelectItem value="Claude">Claude</SelectItem>
+                      <SelectItem value="Midjourney">Midjourney</SelectItem>
+                      <SelectItem value="DALL-E">DALL-E</SelectItem>
+                      <SelectItem value="Stable Diffusion">Stable Diffusion</SelectItem>
+                      <SelectItem value="GitHub Copilot">GitHub Copilot</SelectItem>
+                      <SelectItem value="Cursor">Cursor</SelectItem>
+                      <SelectItem value="Notion AI">Notion AI</SelectItem>
+                      <SelectItem value="Zapier">Zapier</SelectItem>
+                      <SelectItem value="Make">Make</SelectItem>
+                      <SelectItem value="Custom API">Custom API</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sort Dropdown */}
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
+                    <SelectTrigger className="relative w-full bg-white border-2 border-orange-200 hover:border-orange-400 focus:border-orange-500 transition-all duration-300 hover:shadow-lg hover:shadow-orange-200/50 animate-slow-bounce">
+                      <SelectValue placeholder="📊 Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="votes">Sort by Upvotes</SelectItem>
+                      <SelectItem value="recent">Most Recent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 

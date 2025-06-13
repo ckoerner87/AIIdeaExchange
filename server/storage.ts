@@ -22,7 +22,7 @@ import {
   type InsertCommentVote
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, isNull, sql } from "drizzle-orm";
+import { eq, desc, asc, and, or, isNull, sql, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // Ideas
@@ -435,8 +435,11 @@ export class DatabaseStorage implements IStorage {
 
   async bulkDeleteComments(ids: number[]): Promise<void> {
     if (ids.length === 0) return;
+    
+    // Use OR conditions for each ID
+    const conditions = ids.map(id => eq(comments.id, id));
     await db.delete(comments).where(
-      sql`${comments.id} = ANY(${ids})`
+      or(...conditions)
     );
   }
 
