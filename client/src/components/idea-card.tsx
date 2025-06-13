@@ -1,4 +1,4 @@
-import { ChevronUp, ChevronDown, Flag, ExternalLink, Copy } from "lucide-react";
+import { ChevronUp, ChevronDown, Flag, ExternalLink, Copy, Link2, Image, FileText, Play } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -130,6 +130,33 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
           </div>
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-3">
+              {/* Post type indicator */}
+              <Badge 
+                className={`text-xs rounded-full flex items-center gap-1 ${
+                  idea.postType === 'media' ? 'bg-purple-100 text-purple-800' :
+                  idea.postType === 'link' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}
+                variant="secondary"
+              >
+                {idea.postType === 'media' ? (
+                  <>
+                    {idea.mediaType === 'video' ? <Play className="w-3 h-3" /> : <Image className="w-3 h-3" />}
+                    {idea.mediaType === 'video' ? 'Video' : 'Image'}
+                  </>
+                ) : idea.postType === 'link' ? (
+                  <>
+                    <Link2 className="w-3 h-3" />
+                    Link
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-3 h-3" />
+                    Text
+                  </>
+                )}
+              </Badge>
+              
               {idea.category && (
                 <Badge 
                   className={`text-xs rounded-full ${categoryColors[idea.category] || categoryColors.other}`}
@@ -151,6 +178,44 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                 </button>
               )}
             </div>
+
+            {/* Media display for media posts */}
+            {idea.postType === 'media' && idea.mediaUrl && (
+              <div className="mb-4 rounded-lg overflow-hidden border border-gray-200">
+                {idea.mediaType === 'video' ? (
+                  <video 
+                    src={idea.mediaUrl} 
+                    className="w-full max-h-96 object-cover" 
+                    controls 
+                    preload="metadata"
+                  />
+                ) : (
+                  <img 
+                    src={idea.mediaUrl} 
+                    alt="User uploaded content" 
+                    className="w-full max-h-96 object-cover"
+                    loading="lazy"
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Link preview for link posts */}
+            {idea.postType === 'link' && idea.linkUrl && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-2 text-blue-700">
+                  <Link2 className="w-4 h-4" />
+                  <a 
+                    href={idea.linkUrl.startsWith('http') ? idea.linkUrl : `https://${idea.linkUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm truncate"
+                  >
+                    {idea.linkUrl}
+                  </a>
+                </div>
+              </div>
+            )}
 
             {/* Show link if idea has 10+ votes */}
             {idea.votes >= 10 && idea.linkUrl && (() => {

@@ -99,11 +99,31 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       return;
     }
     
+    // Validate required fields based on post type
+    if (selectedPostType === "link" && !data.linkUrl) {
+      toast({
+        title: "Error",
+        description: "Link URL is required for link posts",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (selectedPostType === "media" && !data.mediaUrl) {
+      toast({
+        title: "Error",
+        description: "Media upload is required for media posts",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Auto-default to "Other" if no category or tools selected
     const submissionData = {
       ...data,
       category: data.category || "Other",
-      tools: data.tools || "Other"
+      tools: data.tools || "Other",
+      postType: selectedPostType,
     };
     
     submitMutation.mutate(submissionData);
@@ -266,30 +286,99 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="linkUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-slate-700 break-words">
-                    <span className="block sm:inline">Link Your Stuff - </span>
-                    <span className="block sm:inline">Only Visible Once Your Idea Gets 10+ Upvotes</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://your-website.com or social media link"
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      name={field.name}
-                      value={field.value || ""}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Conditional fields based on post type */}
+            {selectedPostType === "link" && (
+              <FormField
+                control={form.control}
+                name="linkUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Link URL <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://example.com"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {selectedPostType === "media" && (
+              <FormField
+                control={form.control}
+                name="mediaUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Upload Media <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="space-y-3">
+                        <Input
+                          type="file"
+                          accept="image/*,video/*"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              // Create a preview URL for the file
+                              const url = URL.createObjectURL(file);
+                              field.onChange(url);
+                              // Determine media type
+                              const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
+                              form.setValue('mediaType', mediaType);
+                            }
+                          }}
+                        />
+                        {field.value && (
+                          <div className="border rounded-lg p-3 bg-gray-50">
+                            <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                            {form.watch('mediaType') === 'video' ? (
+                              <video src={field.value} className="max-w-full h-32 rounded" controls />
+                            ) : (
+                              <img src={field.value} alt="Preview" className="max-w-full h-32 object-cover rounded" />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Optional link field for all post types */}
+            {selectedPostType !== "link" && (
+              <FormField
+                control={form.control}
+                name="linkUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700 break-words">
+                      <span className="block sm:inline">Link Your Stuff - </span>
+                      <span className="block sm:inline">Only Visible Once Your Idea Gets 10+ Upvotes</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://your-website.com or social media link"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <Button
               type="submit"
