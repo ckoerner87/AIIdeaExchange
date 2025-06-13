@@ -236,7 +236,7 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
 
 CommentItem.displayName = 'CommentItem';
 
-export default function CommentSection({ ideaId, className = "" }: CommentSectionProps) {
+export default function CommentSection({ ideaId, className = "", commentCount: propCommentCount }: CommentSectionProps) {
   const [newComment, setNewComment] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
