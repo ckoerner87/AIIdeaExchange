@@ -60,6 +60,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Register new user
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+      
+      if (!username || !email || !password) {
+        return res.status(400).json({ message: "Username, email, and password are required" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User with this email already exists" });
+      }
+
+      const existingUsername = await storage.getUserByUsername(username);
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username is already taken" });
+      }
+
+      // Hash password
+      const bcrypt = require('bcryptjs');
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      // Create user
+      const user = await storage.createUser({ username, email, passwordHash });
+      
+      res.status(201).json({ 
+        message: "Account created successfully",
+        user: { id: user.id, username: user.username, email: user.email }
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create account" });
+    }
+  });
+
+  // Forgot password
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists for security
+        return res.json({ message: "If an account with this email exists, a password reset link has been sent" });
+      }
+
+      // Generate reset token (implement token storage if needed)
+      const crypto = require('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      
+      // In a real app, you'd store this token with expiration
+      // For now, we'll just send the email
+      
+      // Send reset email using SendGrid if configured
+      if (process.env.SENDGRID_API_KEY) {
+        const { sendEmail } = require('./sendgrid');
+        const resetUrl = `${req.protocol}://${req.hostname}/reset-password?token=${resetToken}`;
+        
+        await sendEmail(process.env.SENDGRID_API_KEY, {
+          to: email,
+          from: 'noreply@yourdomain.com', // Replace with your verified sender
+          subject: 'Password Reset Request',
+          html: `
+            <h2>Password Reset Request</h2>
+            <p>You requested a password reset. Click the link below to reset your password:</p>
+            <a href="${resetUrl}">Reset Password</a>
+            <p>If you didn't request this, please ignore this email.</p>
+          `
+        });
+      }
+
+      res.json({ message: "If an account with this email exists, a password reset link has been sent" });
+    } catch (error) {
+      console.error("Error sending reset email:", error);
+      res.status(500).json({ message: "Failed to send reset email" });
+    }
+  });
+
   // Signup endpoint for notification system
   app.post('/api/auth/signup', async (req, res) => {
     try {

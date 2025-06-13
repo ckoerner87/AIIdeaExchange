@@ -42,6 +42,7 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
   setReplyContent: (content: string) => void;
   onSubmitReply: (parentId: number, content: string) => void;
   onCancelReply: () => void;
+  expandedReplies: Set<number>;
 }) => {
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
@@ -538,6 +539,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     onDelete={handleDelete}
                     onVote={handleVote}
                     onReply={handleReply}
+                    onToggleReplies={toggleReplies}
                     currentUserId={user?.id}
                     sessionId={sessionId ?? undefined}
                     replyingTo={replyingTo}
@@ -545,6 +547,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     setReplyContent={setReplyContent}
                     onSubmitReply={handleSubmitReply}
                     onCancelReply={handleCancelReply}
+                    expandedReplies={expandedReplies}
                   />
                 ))}
               </div>
@@ -552,6 +555,14 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
           </div>
         </div>
       )}
+      
+      {/* Account Creation Popup */}
+      <Suspense fallback={null}>
+        <AccountCreationPopup 
+          isOpen={showSignupPopup} 
+          onClose={() => setShowSignupPopup(false)} 
+        />
+      </Suspense>
     </div>
   );
 }

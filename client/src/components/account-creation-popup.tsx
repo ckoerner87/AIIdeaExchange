@@ -27,10 +27,16 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
 
   const createAccountMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      await apiRequest("/api/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create account");
+      }
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -53,10 +59,16 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
 
   const forgotPasswordMutation = useMutation({
     mutationFn: async (email: string) => {
-      await apiRequest("/api/auth/forgot-password", {
+      const response = await fetch("/api/auth/forgot-password", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to send reset email");
+      }
+      return response.json();
     },
     onSuccess: () => {
       toast({
