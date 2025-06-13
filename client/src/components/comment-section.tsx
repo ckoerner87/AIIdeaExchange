@@ -261,12 +261,12 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
 
   // Vote on comment mutation
   const voteCommentMutation = useMutation({
-    mutationFn: async ({ commentId, voteType }: { commentId: number; voteType: 'up' | 'down' }) => {
+    mutationFn: async ({ commentId, voteType, sessionId: currentSessionId }: { commentId: number; voteType: 'up' | 'down'; sessionId: string }) => {
       const response = await fetch(`/api/comments/${commentId}/vote`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "x-session-id": sessionId || ""
+          "x-session-id": currentSessionId
         },
         body: JSON.stringify({ voteType }),
       });
@@ -289,7 +289,10 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   });
 
   const handleVote = (commentId: number, voteType: 'up' | 'down') => {
-    if (!sessionId) {
+    // Get session ID dynamically in case it wasn't available on initial render
+    const currentSessionId = localStorage.getItem('sessionId') || sessionId;
+    
+    if (!currentSessionId) {
       toast({
         title: "Error",
         description: "Session not found. Please refresh the page.",
@@ -297,7 +300,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       });
       return;
     }
-    voteCommentMutation.mutate({ commentId, voteType });
+    voteCommentMutation.mutate({ commentId, voteType, sessionId: currentSessionId });
   };
 
   const handleSubmit = (e: React.FormEvent) => {

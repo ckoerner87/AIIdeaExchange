@@ -75,6 +75,8 @@ export interface IStorage {
   voteOnComment(commentId: number, sessionId: string, ipAddress: string, voteType: 'up' | 'down'): Promise<void>;
   getCommentVote(commentId: number, sessionId: string): Promise<CommentVote | undefined>;
   updateCommentVotes(commentId: number, votes: number): Promise<void>;
+  getRecentCommentVotesBySession(sessionId: string, timeWindowMs: number): Promise<CommentVote[]>;
+  getRecentCommentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<CommentVote[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -502,6 +504,28 @@ export class DatabaseStorage implements IStorage {
       .update(comments)
       .set({ votes })
       .where(eq(comments.id, commentId));
+  }
+
+  async getRecentCommentVotesBySession(sessionId: string, timeWindowMs: number): Promise<CommentVote[]> {
+    const cutoffTime = new Date(Date.now() - timeWindowMs);
+    return await db
+      .select()
+      .from(commentVotes)
+      .where(and(
+        eq(commentVotes.sessionId, sessionId),
+        sql`${commentVotes.createdAt} > ${cutoffTime}`
+      ));
+  }
+
+  async getRecentCommentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<CommentVote[]> {
+    const cutoffTime = new Date(Date.now() - timeWindowMs);
+    return await db
+      .select()
+      .from(commentVotes)
+      .where(and(
+        eq(commentVotes.ipAddress, ipAddress),
+        sql`${commentVotes.createdAt} > ${cutoffTime}`
+      ));
   }
 }
 

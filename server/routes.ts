@@ -518,6 +518,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid vote type" });
       }
 
+      // Rate limiting: 2 seconds between comment votes
+      const recentCommentVotes = await storage.getRecentCommentVotesBySession(sessionId, 2000); // 2 seconds
+      if (recentCommentVotes.length > 0) {
+        return res.status(429).json({ message: "Please wait before voting again" });
+      }
+
+      // IP-based rate limiting for comment votes
+      const recentCommentVotesByIP = await storage.getRecentCommentVotesByIp(clientIP, 2000);
+      if (recentCommentVotesByIP.length > 0) {
+        return res.status(429).json({ message: "Please wait before voting again" });
+      }
+
       await storage.voteOnComment(commentId, sessionId, clientIP, voteType);
       res.json({ message: "Vote recorded" });
     } catch (error) {
