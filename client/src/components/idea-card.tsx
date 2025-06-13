@@ -129,7 +129,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               }`} />
             </Button>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-3 mb-3">
               {/* Post type indicator */}
               <Badge 
@@ -169,7 +169,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
             </div>
             
             <div className="mb-2">
-              <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{displayText}</p>
+              <p className="text-slate-800 leading-relaxed whitespace-pre-wrap break-words overflow-hidden">{displayText}</p>
               {shouldTruncate && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
