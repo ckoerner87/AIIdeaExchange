@@ -20,7 +20,7 @@ interface CommentSectionProps {
 }
 
 interface CommentWithUser extends Comment {
-  user: UserType;
+  user: UserType | null;
 }
 
 // Memoized comment item for better performance
@@ -39,7 +39,8 @@ const CommentItem = memo(({ comment, onDelete, currentUserId }: {
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   };
 
-  const getInitials = (user: UserType) => {
+  const getInitials = (user: UserType | null) => {
+    if (!user) return 'A';
     if (user.firstName && user.lastName) {
       return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     }
@@ -49,7 +50,8 @@ const CommentItem = memo(({ comment, onDelete, currentUserId }: {
     return 'U';
   };
 
-  const getDisplayName = (user: UserType) => {
+  const getDisplayName = (user: UserType | null) => {
+    if (!user) return 'Anonymous';
     if (user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }
@@ -63,7 +65,7 @@ const CommentItem = memo(({ comment, onDelete, currentUserId }: {
     <div className="flex gap-3 p-4 border-b border-gray-100 last:border-0">
       <Suspense fallback={<div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />}>
         <Avatar className="w-8 h-8 flex-shrink-0">
-          {comment.user.profileImageUrl && (
+          {comment.user?.profileImageUrl && (
             <AvatarImage 
               src={comment.user.profileImageUrl} 
               alt={`${getDisplayName(comment.user)}'s avatar`}

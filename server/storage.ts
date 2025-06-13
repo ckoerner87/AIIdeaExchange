@@ -58,7 +58,7 @@ export interface IStorage {
   
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
-  getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User })[]>;
+  getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User | null })[]>;
   deleteComment(id: number, userId: string): Promise<void>;
 }
 
@@ -301,7 +301,7 @@ export class DatabaseStorage implements IStorage {
     return comment;
   }
 
-  async getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User })[]> {
+  async getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User | null })[]> {
     const result = await db
       .select({
         id: comments.id,
@@ -332,7 +332,7 @@ export class DatabaseStorage implements IStorage {
       content: row.content,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
-      user: row.user!,
+      user: row.user,
     }));
   }
 
