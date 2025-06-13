@@ -200,6 +200,30 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
             </form>
           </div>
         )}
+
+        {/* Nested Replies */}
+        {expandedReplies.has(comment.id) && comment.replies && comment.replies.length > 0 && (
+          <div className="mt-4 pl-11 border-l-2 border-gray-200 space-y-4">
+            {comment.replies.map((reply) => (
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                onDelete={() => {}}
+                onVote={() => {}}
+                onReply={onReply}
+                onToggleReplies={onToggleReplies}
+                currentUserId={currentUserId}
+                sessionId={sessionId}
+                replyingTo={replyingTo}
+                replyContent={replyContent}
+                setReplyContent={setReplyContent}
+                onSubmitReply={onSubmitReply}
+                onCancelReply={onCancelReply}
+                expandedReplies={expandedReplies}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
