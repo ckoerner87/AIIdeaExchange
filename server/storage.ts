@@ -436,6 +436,15 @@ export class DatabaseStorage implements IStorage {
     return comment;
   }
 
+  async getCommentCountByIdeaId(ideaId: number): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(comments)
+      .where(eq(comments.ideaId, ideaId));
+    
+    return result?.count || 0;
+  }
+
   async getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]> {
     const result = await db
       .select({
