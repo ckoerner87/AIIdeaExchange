@@ -83,9 +83,13 @@ export default function AdminComments() {
         title: "Success",
         description: "Comment deleted successfully",
       });
-      // Only invalidate main site comment queries - admin page uses optimistic updates
+      // Invalidate all comment-related queries to update counts
       queryClient.invalidateQueries({ 
-        predicate: (query) => query.queryKey[0] === "/api/ideas" && query.queryKey[2] === "comments"
+        predicate: (query) => {
+          const key = query.queryKey;
+          return (key[0] === "/api/ideas" && key[2] === "comments") || // Individual idea comments
+                 (key[0] === "/api/ideas" && !key[2]); // Ideas list (includes comment counts)
+        }
       });
     },
   });
@@ -134,9 +138,13 @@ export default function AdminComments() {
         title: "Success",
         description: `Deleted ${commentIds.length} comments successfully`,
       });
-      // Only invalidate main site comment queries - admin page uses optimistic updates
+      // Invalidate all comment-related queries to update counts
       queryClient.invalidateQueries({ 
-        predicate: (query) => query.queryKey[0] === "/api/ideas" && query.queryKey[2] === "comments"
+        predicate: (query) => {
+          const key = query.queryKey;
+          return (key[0] === "/api/ideas" && key[2] === "comments") || // Individual idea comments
+                 (key[0] === "/api/ideas" && !key[2]); // Ideas list (includes comment counts)
+        }
       });
     },
   });
