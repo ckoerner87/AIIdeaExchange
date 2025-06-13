@@ -26,10 +26,11 @@ interface CommentWithUser extends Comment {
 }
 
 // Memoized comment item for better performance
-const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId }: {
+const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId, onReply }: {
   comment: CommentWithUser;
   onDelete: (id: number) => void;
   onVote: (commentId: number, voteType: 'up' | 'down') => void;
+  onReply: (parentId: number) => void;
   currentUserId?: string;
   sessionId?: string;
 }) => {
@@ -126,6 +127,7 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId 
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => onReply(comment.id)}
             className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
             aria-label="Reply to comment"
           >
@@ -157,6 +159,8 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   const [newComment, setNewComment] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyContent, setReplyContent] = useState("");
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -313,6 +317,16 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
     voteCommentMutation.mutate({ commentId, voteType, sessionId: currentSessionId });
   };
 
+  const handleReply = (parentId: number) => {
+    setReplyingTo(parentId);
+    setReplyContent("");
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+    setReplyContent("");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -421,6 +435,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     comment={comment}
                     onDelete={handleDelete}
                     onVote={handleVote}
+                    onReply={handleReply}
                     currentUserId={user?.id}
                     sessionId={sessionId ?? undefined}
                   />
