@@ -57,10 +57,10 @@ export const sessions = pgTable("sessions", {
 
 // Users table for authentication
 export const users = pgTable("users", {
-  id: text("id").primaryKey().notNull(),
-  username: text("username").unique(),
-  email: text("email").unique(),
-  passwordHash: text("password_hash"),
+  id: serial("id").primaryKey(),
+  username: text("username").unique().notNull(),
+  email: text("email").unique().notNull(),
+  passwordHash: text("password_hash").notNull(),
   firstName: text("first_name"),
   lastName: text("last_name"),
   profileImageUrl: text("profile_image_url"),
@@ -72,7 +72,7 @@ export const users = pgTable("users", {
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   ideaId: integer("idea_id").notNull(),
-  userId: text("user_id"), // Allow null for anonymous comments
+  userId: integer("user_id"), // Allow null for anonymous comments
   parentId: integer("parent_id"), // For nested comments
   content: text("content").notNull(),
   votes: integer("votes").default(1),
@@ -143,6 +143,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  passwordHash: true,
 }).extend({
   username: z.string()
     .min(3, "Username must be at least 3 characters")
@@ -150,6 +151,11 @@ export const insertUserSchema = createInsertSchema(users).omit({
     .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores, and hyphens"),
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export type InsertIdea = z.infer<typeof insertIdeaSchema>;
