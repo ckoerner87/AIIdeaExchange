@@ -321,6 +321,8 @@ export class DatabaseStorage implements IStorage {
         user: {
           id: users.id,
           email: users.email,
+          username: users.username,
+          passwordHash: users.passwordHash,
           firstName: users.firstName,
           lastName: users.lastName,
           profileImageUrl: users.profileImageUrl,
@@ -334,13 +336,8 @@ export class DatabaseStorage implements IStorage {
       .orderBy(asc(comments.createdAt));
 
     return result.map(row => ({
-      id: row.id,
-      ideaId: row.ideaId,
-      userId: row.userId,
-      content: row.content,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      user: row.user,
+      ...row,
+      user: row.user?.id ? row.user : null,
     }));
   }
 

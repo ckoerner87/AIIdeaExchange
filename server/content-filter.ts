@@ -85,4 +85,22 @@ export class ContentFilter {
 
     return { isValid: true };
   }
+
+  static validateUsername(username: string): { isValid: boolean; reason?: string } {
+    const lowercaseUsername = username.toLowerCase();
+    
+    // Check for banned words
+    for (const word of this.bannedWords) {
+      if (lowercaseUsername.includes(word)) {
+        return { isValid: false, reason: 'Username contains inappropriate content' };
+      }
+    }
+
+    // Check format (handled by zod in schema)
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return { isValid: false, reason: 'Username can only contain letters, numbers, underscores, and hyphens' };
+    }
+
+    return { isValid: true };
+  }
 }

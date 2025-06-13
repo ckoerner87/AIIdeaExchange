@@ -125,7 +125,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   const { data: comments = [], isLoading } = useQuery<CommentWithUser[]>({
     queryKey: ["/api/ideas", ideaId, "comments"],
     enabled: isExpanded, // Only fetch when expanded
-    staleTime: 30000, // Cache for 30 seconds
+    staleTime: 5000, // Cache for 5 seconds to see new comments
   });
 
   // Create comment mutation

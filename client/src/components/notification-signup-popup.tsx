@@ -27,10 +27,20 @@ export default function NotificationSignupPopup({
 
   const signupMutation = useMutation({
     mutationFn: async (data: { username: string; email: string; password: string }) => {
-      return await apiRequest('/api/auth/signup', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data),
       });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to create account');
+      }
+      
+      return res.json();
     },
     onSuccess: () => {
       toast({
