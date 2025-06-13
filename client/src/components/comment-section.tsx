@@ -599,6 +599,49 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
           onClose={() => setShowSignupPopup(false)} 
         />
       </Suspense>
+
+      {/* Username Collection Popup */}
+      <Suspense fallback={null}>
+        {showUsernamePopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+              <UsernameCollectionPopup
+                onClose={() => setShowUsernamePopup(false)}
+                onSubmit={async (username: string, email: string) => {
+                  try {
+                    const response = await fetch('/api/signup', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ username, email }),
+                    });
+                    
+                    if (response.ok) {
+                      setShowUsernamePopup(false);
+                      toast({
+                        title: "Account created!",
+                        description: "You can now receive reply notifications and build your reputation.",
+                      });
+                    } else {
+                      const data = await response.json();
+                      toast({
+                        title: "Error",
+                        description: data.message || "Failed to create account",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: "Failed to create account",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </Suspense>
     </div>
   );
 }
