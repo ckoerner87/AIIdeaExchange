@@ -409,9 +409,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Session ID required" });
       }
 
-      const session = await storage.getUserSession(sessionId);
-      if (!session || !session.hasSubmitted) {
-        return res.status(403).json({ message: "Must submit an idea first" });
+      // Create user session if it doesn't exist
+      let session = await storage.getUserSession(sessionId);
+      if (!session) {
+        await storage.createUserSession({ sessionId });
+        session = await storage.getUserSession(sessionId);
       }
 
       const ideaId = parseInt(req.params.id);
