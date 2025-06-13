@@ -26,13 +26,18 @@ interface CommentWithUser extends Comment {
 }
 
 // Memoized comment item for better performance
-const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId, onReply }: {
+const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId, onReply, replyingTo, replyContent, setReplyContent, onSubmitReply, onCancelReply }: {
   comment: CommentWithUser;
   onDelete: (id: number) => void;
   onVote: (commentId: number, voteType: 'up' | 'down') => void;
   onReply: (parentId: number) => void;
   currentUserId?: string;
   sessionId?: string;
+  replyingTo: number | null;
+  replyContent: string;
+  setReplyContent: (content: string) => void;
+  onSubmitReply: (parentId: number, content: string) => void;
+  onCancelReply: () => void;
 }) => {
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
@@ -148,6 +153,45 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
             </Button>
           )}
         </div>
+        
+        {/* Reply form */}
+        {replyingTo === comment.id && (
+          <div className="mt-3 pl-11 border-l-2 border-blue-200">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (replyContent.trim()) {
+                onSubmitReply(comment.id, replyContent.trim());
+              }
+            }}>
+              <Textarea
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                placeholder={`Reply to ${comment.user?.username || 'Anonymous'}...`}
+                className="min-h-[80px] resize-none border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                autoFocus
+              />
+              <div className="flex justify-end gap-2 mt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={onCancelReply}
+                  className="h-8 px-3 text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={!replyContent.trim()}
+                  className="h-8 px-3 text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  Reply
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -327,6 +371,13 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
     setReplyContent("");
   };
 
+  const handleSubmitReply = (parentId: number, content: string) => {
+    // For now, just create a regular comment (we can add nested structure later)
+    createCommentMutation.mutate(content);
+    setReplyingTo(null);
+    setReplyContent("");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -438,6 +489,11 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     onReply={handleReply}
                     currentUserId={user?.id}
                     sessionId={sessionId ?? undefined}
+                    replyingTo={replyingTo}
+                    replyContent={replyContent}
+                    setReplyContent={setReplyContent}
+                    onSubmitReply={handleSubmitReply}
+                    onCancelReply={handleCancelReply}
                   />
                 ))}
               </div>
