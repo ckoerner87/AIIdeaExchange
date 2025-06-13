@@ -14,6 +14,7 @@ const Avatar = lazy(() => import("@/components/ui/avatar").then(module => ({ def
 const AvatarImage = lazy(() => import("@/components/ui/avatar").then(module => ({ default: module.AvatarImage })));
 const AvatarFallback = lazy(() => import("@/components/ui/avatar").then(module => ({ default: module.AvatarFallback })));
 const AccountCreationPopup = lazy(() => import("./account-creation-popup"));
+const UsernameCollectionPopup = lazy(() => import("./username-collection-popup").then(module => ({ default: module.UsernameCollectionPopup })));
 
 interface CommentSectionProps {
   ideaId: number;
@@ -235,6 +236,8 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   const [newComment, setNewComment] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
+  const [showUsernamePopup, setShowUsernamePopup] = useState(false);
+  const [pendingComment, setPendingComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState("");
   const [expandedReplies, setExpandedReplies] = useState<Set<number>>(new Set());
@@ -278,6 +281,9 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       // Ensure section is expanded first
       setIsExpanded(true);
       
+      // Store the comment content for username collection
+      setPendingComment(newComment);
+      
       // Clear the form
       setNewComment("");
       
@@ -287,10 +293,15 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       // Also invalidate cache for future requests
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
       
-      toast({
-        title: "Success",
-        description: "Comment posted successfully",
-      });
+      // Show username collection popup for anonymous users
+      if (!isAuthenticated) {
+        setShowUsernamePopup(true);
+      } else {
+        toast({
+          title: "Success",
+          description: "Comment posted successfully",
+        });
+      }
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
