@@ -333,7 +333,7 @@ export default function Home() {
                       size="sm"
                       className="text-sm"
                     >
-                      Login
+                      Login / Sign Up
                     </Button>
                   </div>
                 )}
