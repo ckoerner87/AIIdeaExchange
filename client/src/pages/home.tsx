@@ -41,6 +41,8 @@ export default function Home() {
   const [submittedIdeaText, setSubmittedIdeaText] = useState<string>('');
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
   const [viewedIdeasCount, setViewedIdeasCount] = useState(0);
+  const [showAccountCreationPopup, setShowAccountCreationPopup] = useState(false);
+  const [interactionCount, setInteractionCount] = useState(0);
 
   // Check paywall status
   const { data: paywallStatus } = useQuery({
@@ -265,6 +267,18 @@ export default function Home() {
 
   const handleVote = (ideaId: number, voteType: 'up' | 'down') => {
     voteMutation.mutate({ ideaId, voteType });
+    
+    // Track interactions for non-authenticated users
+    if (!isAuthenticated) {
+      const newCount = interactionCount + 1;
+      setInteractionCount(newCount);
+      
+      // Show account creation popup after 3 interactions
+      if (newCount >= 3) {
+        setShowAccountCreationPopup(true);
+        setInteractionCount(0); // Reset counter
+      }
+    }
   };
 
   return (

@@ -351,6 +351,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments", "count"] });
       toast({
         title: "Success",
         description: "Comment deleted successfully",
