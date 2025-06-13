@@ -451,11 +451,13 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                 </div>
                 {!isAuthenticated && newComment.trim() && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-700 mb-2">
-                      <strong>Almost there!</strong> To publish your comment, you'll need to create a quick account.
-                    </p>
-                    <p className="text-xs text-blue-600">
-                      Don't worry - your comment will be saved and posted once you sign in.
+                    <p className="text-sm text-blue-700">
+                      Wanna know when people reply? <button 
+                        onClick={() => setShowSignupPopup(true)}
+                        className="text-blue-700 underline hover:text-blue-800 font-medium"
+                      >
+                        Create a free account real fast here
+                      </button>.
                     </p>
                   </div>
                 )}
