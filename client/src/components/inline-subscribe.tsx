@@ -14,7 +14,7 @@ export default function InlineSubscribe() {
 
   const subscribeMutation = useMutation({
     mutationFn: async (data: InsertSubscription) => {
-      return apiRequest("/api/subscriptions", "POST", data);
+      return apiRequest("POST", "/api/subscribe", { ...data, source: 'inline' });
     },
     onSuccess: () => {
       setIsSubscribed(true);

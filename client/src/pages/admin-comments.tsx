@@ -117,6 +117,8 @@ export default function AdminComments() {
     onError: (err, commentIds, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData(["/api/admin/comments"], context?.previousComments);
+      // Refetch admin comments on error to get correct state
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
       toast({
         title: "Error",
         description: "Failed to bulk delete comments",
@@ -132,17 +134,6 @@ export default function AdminComments() {
       // Only invalidate main site comment queries - admin page uses optimistic updates
       queryClient.invalidateQueries({ 
         predicate: (query) => query.queryKey[0] === "/api/ideas" && query.queryKey[2] === "comments"
-      });
-    },
-    onError: (err, commentIds, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      queryClient.setQueryData(["/api/admin/comments"], context?.previousComments);
-      // Refetch admin comments on error to get correct state
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
-      toast({
-        title: "Error",
-        description: "Failed to bulk delete comments",
-        variant: "destructive",
       });
     },
   });
