@@ -341,6 +341,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const tool = req.query.tool as string;
         const ideas = await storage.getIdeas(sortBy, category, tool);
         
+        // For shared access, no recently submitted ideas (since it's not their session)
+        const ideasWithFlags = ideas.map(idea => ({
+          ...idea,
+          userVote: null,
+          isRecentlySubmitted: false
+        }));
+        
         // Add cache-busting headers to ensure fresh data
         res.set({
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -348,7 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'Expires': '0'
         });
         
-        return res.json(ideas);
+        return res.json(ideasWithFlags);
       }
 
       // Check paywall setting (default to false - DISABLED)
@@ -365,6 +372,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tool = req.query.tool as string;
       const ideas = await storage.getIdeas(sortBy, category, tool);
       
+      // Get user's votes
+      const userVotes = await storage.getAllVotesBySession(sessionId);
+      const voteMap = userVotes.reduce((acc, vote) => {
+        acc[vote.ideaId] = vote.voteType;
+        return acc;
+      }, {} as Record<number, string>);
+
+      // Check for recently submitted idea by this session (within last 30 seconds)
+      const recentlySubmittedIdea = await storage.getRecentlySubmittedIdea(sessionId);
+
+      const ideasWithVotes = ideas.map(idea => ({
+        ...idea,
+        userVote: voteMap[idea.id] || null,
+        isRecentlySubmitted: recentlySubmittedIdea?.id === idea.id
+      }));
+      
       // Add cache-busting headers to ensure fresh data
       res.set({
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -372,7 +395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Expires': '0'
       });
       
-      res.json(ideas);
+      res.json(ideasWithVotes);
     } catch (error) {
       res.status(500).json({ message: "Failed to get ideas" });
     }

@@ -520,18 +520,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                   </div>
                 </div>
                 
-                {/* Submit Button - Right Side (only when paywall is disabled) */}
-                {!paywallEnabled && (
-                  <div className="flex-shrink-0">
-                    <Button
-                      onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap h-[50px] flex items-center"
-                    >
-                      <Lightbulb className="w-5 h-5 mr-2" />
-                      Share My Idea
-                    </Button>
-                  </div>
-                )}
+
               </div>
               
               {/* Filter and Sort Controls - Three equal columns */}
@@ -631,9 +620,14 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               </div>
             ) : ideas && ideas.length > 0 ? (
               <div className="space-y-6">
-                {/* Sort ideas to put highlighted/newly submitted one first */}
+                {/* Sort ideas to put recently submitted ones first for the submitter */}
                 {ideas
                   .sort((a: any, b: any) => {
+                    // Recently submitted ideas go to the top for the submitter
+                    if (a.isRecentlySubmitted && !b.isRecentlySubmitted) return -1;
+                    if (b.isRecentlySubmitted && !a.isRecentlySubmitted) return 1;
+                    
+                    // Highlighted ideas (shared links)
                     if (highlightedIdeaId) {
                       if (a.id === highlightedIdeaId) return -1;
                       if (b.id === highlightedIdeaId) return 1;
@@ -752,6 +746,23 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           </div>
         </div>
       </main>
+
+      {/* Floating Share My Idea Button - Fixed position at bottom center */}
+      {!paywallEnabled && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+          <Button
+            onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-bold rounded-full shadow-2xl transition-all hover:scale-105 whitespace-nowrap flex items-center"
+            style={{ 
+              background: 'linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%)',
+              boxShadow: '0 10px 25px rgba(79, 70, 229, 0.3)'
+            }}
+          >
+            <Lightbulb className="w-5 h-5 mr-2" />
+            Share My Idea
+          </Button>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 mt-16">
