@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, insertCommentSchema, userSessions, votes, ideas } from "@shared/schema";
+import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, insertCommentSchema, userSessions, votes, ideas, users } from "@shared/schema";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { db } from "./db";
 import { nanoid } from "nanoid";
@@ -1213,15 +1213,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const ideas = await storage.getIdeas('recent');
       const subscriptions = await storage.getAllSubscriptions();
+      const authenticatedUsers = await storage.getAllUsers();
       
       console.log("CSV Export Debug:");
       console.log("Ideas count:", ideas.length);
       console.log("Subscriptions count:", subscriptions.length);
-      console.log("Sample idea sessionIds:", ideas.slice(0, 3).map(i => ({ id: i.id, sessionId: i.sessionId })));
-      console.log("Sample subscription sessionIds:", subscriptions.slice(0, 3).map(s => ({ email: s.email, sessionId: s.sessionId })));
+      console.log("Authenticated users count:", authenticatedUsers.length);
       
-      // Create CSV content with proper email linking
-      let csvContent = "Email,Source,SessionId,IdeaText,Category,Tools,Votes,SubmittedAt\n";
+      // Create CSV content with comprehensive user data
+      let csvContent = "Email,Username,Source,SessionId,IdeaText,Category,Tools,Votes,SubmittedAt,UserType\n";
       
       // Create a comprehensive map of all session IDs and their associated data
       const sessionMap = new Map();
@@ -1231,7 +1231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sessionMap.set(idea.sessionId, { idea });
       });
       
-      // Then add subscription data to existing sessions or create new entries
+      // Add subscription data to existing sessions or create new entries
       subscriptions.forEach(sub => {
         if (sessionMap.has(sub.sessionId)) {
           sessionMap.get(sub.sessionId).subscription = sub;
@@ -1240,28 +1240,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
+      // Add authenticated user data - these are users who logged in via Replit Auth
+      authenticatedUsers.forEach(user => {
+        // For authenticated users, we need to find their session data by matching their activity
+        // Since we don't have a direct sessionId->userId mapping, we'll add them as separate entries
+        if (!sessionMap.has(`auth-${user.id}`)) {
+          sessionMap.set(`auth-${user.id}`, { authenticatedUser: user });
+        }
+      });
+      
       // Generate CSV rows from the session map
-      sessionMap.forEach(({ idea, subscription }, sessionId) => {
+      sessionMap.forEach(({ idea, subscription, authenticatedUser }, sessionId) => {
         // Skip legacy ideas without matching subscriptions for cleaner export
-        if (sessionId === 'legacy' && !subscription) {
+        if (sessionId === 'legacy' && !subscription && !authenticatedUser) {
           return;
         }
         
-        const email = subscription ? subscription.email : "No email";
-        const source = subscription ? (subscription.source || 'homepage') : "idea_only";
+        let email = "No email";
+        let username = "No username";
+        let source = "idea_only";
+        let userType = "anonymous";
+        
+        if (authenticatedUser) {
+          email = authenticatedUser.email || "No email";
+          username = authenticatedUser.firstName && authenticatedUser.lastName 
+            ? `${authenticatedUser.firstName} ${authenticatedUser.lastName}`.trim()
+            : "No name";
+          source = "authenticated";
+          userType = "authenticated";
+        } else if (subscription) {
+          email = subscription.email;
+          source = subscription.source || 'homepage';
+          userType = "subscriber";
+        }
+        
         const ideaText = idea ? (idea.useCase || '').replace(/"/g, '""') : "No idea submitted";
         const category = idea ? (idea.category || 'Other') : "";
         const tools = idea ? (idea.tools || '') : "";
         const votes = idea ? idea.votes : "";
-        const submittedAt = idea ? idea.submittedAt : (subscription ? subscription.subscribedAt : "");
+        const submittedAt = idea ? idea.submittedAt : (subscription ? subscription.subscribedAt : (authenticatedUser ? authenticatedUser.createdAt : ""));
         
-        csvContent += `"${email}","${source}","${sessionId}","${ideaText}","${category}","${tools}","${votes}","${submittedAt}"\n`;
+        csvContent += `"${email}","${username}","${source}","${sessionId}","${ideaText}","${category}","${tools}","${votes}","${submittedAt}","${userType}"\n`;
       });
       
       // Also add subscribers without ideas as separate entries
       subscriptions.forEach(sub => {
         if (!sessionMap.has(sub.sessionId || 'null')) {
-          csvContent += `"${sub.email}","${sub.source || 'homepage'}","${sub.sessionId || 'no-session'}","No idea submitted","","","","${sub.subscribedAt}"\n`;
+          csvContent += `"${sub.email}","No username","${sub.source || 'homepage'}","${sub.sessionId || 'no-session'}","No idea submitted","","","","${sub.subscribedAt}","subscriber"\n`;
         }
       });
       
