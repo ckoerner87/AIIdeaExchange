@@ -334,6 +334,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid comment data", errors: result.error.errors });
       }
 
+      // Filter comment content
+      const contentValidation = ContentFilter.validateComment(result.data.content);
+      if (!contentValidation.isValid) {
+        return res.status(400).json({ message: contentValidation.reason });
+      }
+
       const comment = await storage.createComment(result.data);
       
       // Return comment with user data

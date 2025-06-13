@@ -14,6 +14,10 @@ export const ideas = pgTable("ideas", {
   votes: integer("votes").notNull().default(1),
   aiGrade: text("ai_grade"), // Store as decimal string like "7.3"
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+  // Reddit-style post types
+  postType: text("post_type").default("text"), // "text", "link", "media"
+  mediaUrl: text("media_url"), // For images/videos
+  mediaType: text("media_type"), // "image" or "video"
 });
 
 export const subscriptions = pgTable("subscriptions", {

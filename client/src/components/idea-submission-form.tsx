@@ -10,9 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
-import { Rocket } from "lucide-react";
+import { Rocket, FileText, Link2, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
+import { useState } from "react";
 import type { InsertIdea } from "@shared/schema";
 
 interface IdeaSubmissionFormProps {
@@ -22,6 +23,7 @@ interface IdeaSubmissionFormProps {
 
 export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmissionFormProps) {
   const { toast } = useToast();
+  const [selectedPostType, setSelectedPostType] = useState<"text" | "link" | "media">("text");
   
   const form = useForm<InsertIdea>({
     resolver: zodResolver(insertIdeaSchema),
@@ -32,6 +34,9 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       category: "",
       tools: "",
       linkUrl: "",
+      postType: "text",
+      mediaUrl: "",
+      mediaType: "",
     },
   });
 
