@@ -460,21 +460,6 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               )}
             </div>
 
-            {/* Submit Your Own Idea Button - Top (only when paywall is disabled) - Sticky */}
-            {!paywallEnabled && (
-              <div className="sticky top-0 z-20 bg-slate-50 py-3 mb-3 flex items-center justify-center">
-                <div className="text-center">
-                  <Button
-                    onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-6 text-xl font-bold rounded-xl shadow-lg transition-all hover:scale-105"
-                  >
-                    <Lightbulb className="w-6 h-6 mr-3" />
-                    Submit Your Own Idea
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {/* Submission Form (when toggled) */}
             {!paywallEnabled && showSubmissionForm && (
               <div className="mb-8">
@@ -498,27 +483,43 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
             {/* Search and Filter Controls - Sticky */}
             <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 pb-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
-              {/* Search Bar */}
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                <div className="relative flex items-center bg-white border-2 border-purple-200 hover:border-purple-400 focus-within:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200/50 rounded-lg">
-                  <Search className="absolute left-3 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="🔍 Search ideas, categories, tools..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-10 py-3 bg-transparent focus:outline-none text-gray-900 placeholder-gray-500"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
+              {/* Search Bar and Submit Button Row */}
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
+                {/* Search Bar - Left Side */}
+                <div className="relative flex-1 w-full">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <div className="relative flex items-center bg-white border-2 border-purple-200 hover:border-purple-400 focus-within:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200/50 rounded-lg">
+                    <Search className="absolute left-3 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="🔍 Search ideas, categories, tools..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-10 py-3 bg-transparent focus:outline-none text-gray-900 placeholder-gray-500"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
+                
+                {/* Submit Button - Right Side (only when paywall is disabled) */}
+                {!paywallEnabled && (
+                  <div className="flex-shrink-0">
+                    <Button
+                      onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap"
+                    >
+                      <Lightbulb className="w-5 h-5 mr-2" />
+                      Submit Your Own Idea
+                    </Button>
+                  </div>
+                )}
               </div>
               
               {/* Filter and Sort Controls - Three equal columns */}
