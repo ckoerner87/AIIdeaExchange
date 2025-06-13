@@ -94,6 +94,9 @@ export const insertIdeaSchema = createInsertSchema(ideas).omit({
   }, {
     message: "Please enter a valid URL (e.g., https://example.com, www.example.com, or example.com)"
   }),
+  postType: z.enum(["text", "link", "media"]).optional(),
+  mediaUrl: z.string().optional(),
+  mediaType: z.enum(["image", "video"]).optional(),
 });
 
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
