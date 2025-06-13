@@ -173,7 +173,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               {shouldTruncate && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-1"
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-0.5"
                 >
                   {isExpanded ? "Show less" : "Read more"}
                 </button>
