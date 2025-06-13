@@ -168,12 +168,12 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               )}
             </div>
             
-            <div className="mb-4">
+            <div className="mb-2">
               <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{displayText}</p>
               {shouldTruncate && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2"
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-1"
                 >
                   {isExpanded ? "Show less" : "Read more"}
                 </button>
@@ -182,7 +182,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
 
             {/* Media display for media posts */}
             {idea.postType === 'media' && idea.mediaUrl && (
-              <div className="mb-4 rounded-lg overflow-hidden border border-gray-200">
+              <div className="mb-2 rounded-lg overflow-hidden border border-gray-200">
                 {idea.mediaType === 'video' ? (
                   <video 
                     src={idea.mediaUrl} 
