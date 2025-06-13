@@ -58,7 +58,9 @@ export const sessions = pgTable("sessions", {
 // Users table for authentication
 export const users = pgTable("users", {
   id: text("id").primaryKey().notNull(),
+  username: text("username").unique(),
   email: text("email").unique(),
+  passwordHash: text("password_hash"),
   firstName: text("first_name"),
   lastName: text("last_name"),
   profileImageUrl: text("profile_image_url"),
@@ -117,6 +119,16 @@ export const insertCommentSchema = createInsertSchema(comments).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  username: z.string().min(3, "Username must be at least 3 characters").max(20, "Username must be less than 20 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export type InsertIdea = z.infer<typeof insertIdeaSchema>;
