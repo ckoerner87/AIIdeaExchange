@@ -444,7 +444,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 {paywallEnabled ? "AI Use Case Ideas" : "AI + Ideas = Life Changing. Start here 👇"}
               </h1>
               {!paywallEnabled && (
-                <p className="text-lg text-slate-600 text-center mt-2">
+                <p className="text-lg text-slate-600 text-center">
                   100s of free, real world AI use case ideas
                 </p>
               )}
@@ -497,7 +497,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             )}
 
             {/* Search and Filter Controls - Sticky */}
-            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 py-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
+            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 pb-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
               {/* Search Bar */}
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse"></div>
