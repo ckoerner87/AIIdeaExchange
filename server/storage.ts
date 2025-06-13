@@ -49,6 +49,7 @@ export interface IStorage {
   getUserVoteForIdea(sessionId: string, ideaId: number): Promise<Vote | undefined>;
   getVoteByIpAndIdea(ipAddress: string, ideaId: number): Promise<Vote | undefined>;
   getRecentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<Vote[]>;
+  getRecentVotesBySession(sessionId: string, timeWindowMs: number): Promise<Vote[]>;
   getAllVotesBySession(sessionId: string): Promise<Vote[]>;
   deleteVote(sessionId: string, ideaId: number): Promise<void>;
   
@@ -216,6 +217,13 @@ export class DatabaseStorage implements IStorage {
     const cutoffTime = new Date(Date.now() - timeWindowMs);
     // Simple implementation - get all votes from this IP and filter in memory
     const allVotes = await db.select().from(votes).where(eq(votes.ipAddress, ipAddress));
+    return allVotes.filter(vote => vote.createdAt >= cutoffTime);
+  }
+
+  async getRecentVotesBySession(sessionId: string, timeWindowMs: number): Promise<Vote[]> {
+    const cutoffTime = new Date(Date.now() - timeWindowMs);
+    // Get all votes from this session and filter in memory
+    const allVotes = await db.select().from(votes).where(eq(votes.sessionId, sessionId));
     return allVotes.filter(vote => vote.createdAt >= cutoffTime);
   }
 

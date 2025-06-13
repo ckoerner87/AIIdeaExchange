@@ -10,8 +10,10 @@ import GiftCardPopup from "@/components/gift-card-popup";
 import InlineSubscribe from "@/components/inline-subscribe";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
+  const { toast } = useToast();
   const [sessionId, setSessionId] = useState<string>(() => {
     // Initialize from localStorage on mount
     if (typeof window !== 'undefined') {
@@ -150,6 +152,22 @@ export default function Home() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/ideas'] });
+    },
+    onError: (error: any) => {
+      // Check if it's a rate limiting error (429 status)
+      if (error.message.includes("Please actually read the ideas")) {
+        toast({
+          title: "Please actually read the ideas you're upvoting. :)",
+          description: "Take a moment to read each idea before voting to help maintain quality discussions.",
+          duration: 4000,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to vote",
+          variant: "destructive",
+        });
+      }
     },
   });
 

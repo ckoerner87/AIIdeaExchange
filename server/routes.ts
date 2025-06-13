@@ -257,6 +257,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get client IP address for tracking only
       const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
       
+      // Rate limiting: Check if user is voting too quickly (5 second minimum between votes)
+      const recentVotes = await storage.getRecentVotesBySession(sessionId, 5000); // 5 seconds
+      if (recentVotes.length > 0) {
+        const lastVoteTime = new Date(recentVotes[0].createdAt).getTime();
+        const currentTime = Date.now();
+        const timeDiff = currentTime - lastVoteTime;
+        
+        if (timeDiff < 5000) { // Less than 5 seconds
+          return res.status(429).json({ 
+            message: "Please actually read the ideas you're upvoting. :)",
+            remainingTime: Math.ceil((5000 - timeDiff) / 1000)
+          });
+        }
+      }
+      
       // Check if user already voted with this session
       const existingVote = await storage.getUserVoteForIdea(sessionId, ideaId);
       
