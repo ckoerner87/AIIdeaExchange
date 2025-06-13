@@ -150,6 +150,9 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Get session ID from storage
+  const sessionId = localStorage.getItem('sessionId');
 
   // No pending comment logic needed for anonymous comments
 
@@ -255,6 +258,47 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       });
     },
   });
+
+  // Vote on comment mutation
+  const voteCommentMutation = useMutation({
+    mutationFn: async ({ commentId, voteType }: { commentId: number; voteType: 'up' | 'down' }) => {
+      const response = await fetch(`/api/comments/${commentId}/vote`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-session-id": sessionId || ""
+        },
+        body: JSON.stringify({ voteType }),
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch comments to update vote counts
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to record vote",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleVote = (commentId: number, voteType: 'up' | 'down') => {
+    if (!sessionId) {
+      toast({
+        title: "Error",
+        description: "Session not found. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    voteCommentMutation.mutate({ commentId, voteType });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -363,7 +407,9 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     key={comment.id}
                     comment={comment}
                     onDelete={handleDelete}
+                    onVote={handleVote}
                     currentUserId={user?.id}
+                    sessionId={sessionId}
                   />
                 ))}
               </div>
