@@ -81,7 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Hash password
-      const bcrypt = require('bcryptjs');
+      const bcrypt = await import('bcryptjs');
       const passwordHash = await bcrypt.hash(password, 10);
 
       // Create user
@@ -113,7 +113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate reset token (implement token storage if needed)
-      const crypto = require('crypto');
+      const crypto = await import('crypto');
       const resetToken = crypto.randomBytes(32).toString('hex');
       
       // In a real app, you'd store this token with expiration
@@ -178,8 +178,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Email already registered' });
       }
 
-      // Create password hash (simple implementation for now)
-      const passwordHash = Buffer.from(password).toString('base64');
+      // Hash password
+      const bcrypt = await import('bcryptjs');
+      const passwordHash = await bcrypt.hash(password, 10);
 
       // Create user
       const user = await storage.createUser({
