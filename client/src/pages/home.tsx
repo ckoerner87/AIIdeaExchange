@@ -31,6 +31,7 @@ export default function Home() {
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
   const [visibleIdeasCount, setVisibleIdeasCount] = useState(20);
   const [newlySubmittedIdeaId, setNewlySubmittedIdeaId] = useState<number | null>(null);
+  const [isSharedLink, setIsSharedLink] = useState(false);
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
   const [paywallEnabled, setPaywallEnabled] = useState(true);
   const [submittedIdeaText, setSubmittedIdeaText] = useState<string>('');
@@ -207,6 +208,7 @@ export default function Home() {
       setSharedIdeaAccess(true);
       setHasSubmitted(true); // Grant access to all ideas
       setHighlightedIdeaId(parseInt(sharedIdeaId));
+      setIsSharedLink(true); // Mark this as a shared link
       // Store the bypass in localStorage for session persistence
       localStorage.setItem('shared-idea-access', 'true');
     } else {

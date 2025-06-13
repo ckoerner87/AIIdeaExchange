@@ -35,8 +35,8 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
       tools: "",
       linkUrl: "",
       postType: "text",
-      mediaUrl: "",
-      mediaType: "",
+      mediaUrl: undefined,
+      mediaType: undefined,
     },
   });
 
