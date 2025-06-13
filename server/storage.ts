@@ -63,10 +63,15 @@ export interface IStorage {
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
   getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User | null })[]>;
-  getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]>;
+  getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string | null } })[]>;
   deleteComment(id: number, userId: string): Promise<void>;
   adminDeleteComment(id: number): Promise<void>;
   bulkDeleteComments(ids: number[]): Promise<void>;
+  
+  // Comment voting
+  voteOnComment(commentId: number, sessionId: string, ipAddress: string, voteType: 'up' | 'down'): Promise<void>;
+  getCommentVote(commentId: number, sessionId: string): Promise<CommentVote | undefined>;
+  updateCommentVotes(commentId: number, votes: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -409,7 +414,7 @@ export class DatabaseStorage implements IStorage {
     return result.map(row => ({
       ...row,
       user: row.user?.id ? row.user : null,
-      idea: row.idea,
+      idea: { useCase: row.idea?.useCase || null },
     }));
   }
 

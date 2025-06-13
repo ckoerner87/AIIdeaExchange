@@ -336,12 +336,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                   />
                 ))}
               </div>
-            ) : (
-              <div className="p-8 text-center text-gray-500">
-                <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm">No comments yet. Be the first to share your thoughts!</p>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       )}

@@ -447,6 +447,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin comment management endpoints
+  app.get("/api/admin/comments", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const comments = await storage.getAllComments();
+      res.json(comments);
+    } catch (error) {
+      console.error('Get admin comments error:', error);
+      res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
+  app.delete("/api/admin/comments/:id", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const commentId = parseInt(req.params.id);
+      await storage.adminDeleteComment(commentId);
+      res.json({ message: "Comment deleted" });
+    } catch (error) {
+      console.error('Admin delete comment error:', error);
+      res.status(500).json({ message: "Failed to delete comment" });
+    }
+  });
+
+  app.post("/api/admin/comments/bulk-delete", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { commentIds } = req.body;
+      if (!Array.isArray(commentIds)) {
+        return res.status(400).json({ message: "commentIds must be an array" });
+      }
+
+      await storage.bulkDeleteComments(commentIds);
+      res.json({ message: `Deleted ${commentIds.length} comments` });
+    } catch (error) {
+      console.error('Bulk delete comments error:', error);
+      res.status(500).json({ message: "Failed to bulk delete comments" });
+    }
+  });
+
   // Subscribe to weekly digest
   app.post("/api/subscribe", async (req, res) => {
     try {
