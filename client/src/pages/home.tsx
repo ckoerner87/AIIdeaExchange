@@ -261,10 +261,12 @@ export default function Home() {
                 </div>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold text-slate-900">
-                    How Do You<br/>Use AI?
+                    <span className="sm:hidden">How Do You<br/>Use AI?</span>
+                    <span className="hidden sm:inline">How Do You Use AI?</span>
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-600">
-                    Real World Use Cases<br/>for AI and ChatGPT
+                    <span className="sm:hidden">Real World Use Cases<br/>for AI and ChatGPT</span>
+                    <span className="hidden sm:inline">Real World Use Cases for AI and ChatGPT</span>
                   </p>
                 </div>
               </div>
