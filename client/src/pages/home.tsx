@@ -269,6 +269,16 @@ export default function Home() {
 
   return (
     <div className="bg-slate-50 min-h-screen font-inter">
+      {/* Floating Share My Idea Button - Fixed Position */}
+      {!paywallEnabled && (
+        <button
+          onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+          className="fixed top-4 right-4 z-[999] bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-base font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap flex items-center"
+        >
+          <Lightbulb className="w-4 h-4 mr-2" />
+          Share My Idea
+        </button>
+      )}
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
@@ -494,10 +504,10 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             )}
 
             {/* Search and Filter Controls - Sticky */}
-            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 pb-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
-              {/* Search Bar and Submit Button Row */}
+            <div className="sticky top-0 sm:top-20 z-40 bg-slate-50 pb-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
+              {/* Search Bar Row */}
               <div className="flex flex-col sm:flex-row gap-4 items-center">
-                {/* Search Bar - Left Side */}
+                {/* Search Bar - Full Width */}
                 <div className="relative flex-1 w-full">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse"></div>
                   <div className="relative flex items-center bg-white border-2 border-purple-200 hover:border-purple-400 focus-within:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200/50 rounded-lg">
@@ -519,19 +529,6 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                     )}
                   </div>
                 </div>
-                
-                {/* Submit Button - Right Side (only when paywall is disabled) */}
-                {!paywallEnabled && (
-                  <div className="flex-shrink-0">
-                    <Button
-                      onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap h-[50px] flex items-center"
-                    >
-                      <Lightbulb className="w-5 h-5 mr-2" />
-                      Share My Idea
-                    </Button>
-                  </div>
-                )}
               </div>
               
               {/* Filter and Sort Controls - Three equal columns */}

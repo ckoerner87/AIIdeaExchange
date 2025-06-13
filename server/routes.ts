@@ -378,6 +378,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get recently submitted idea for current session (for highlighting)
+  app.get("/api/recently-submitted", async (req, res) => {
+    try {
+      const sessionId = req.headers['x-session-id'] as string;
+      if (!sessionId) {
+        return res.status(401).json({ message: "Session ID required" });
+      }
+
+      const recentIdea = await storage.getRecentlySubmittedIdea(sessionId);
+      res.json(recentIdea || null);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get recent submission" });
+    }
+  });
+
   // Vote on an idea
   app.post("/api/ideas/:id/vote", async (req, res) => {
     try {
