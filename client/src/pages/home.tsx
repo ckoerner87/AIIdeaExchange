@@ -8,12 +8,15 @@ import SubscriptionForm from "@/components/subscription-form";
 import UnlockMessage from "@/components/unlock-message";
 import GiftCardPopup from "@/components/gift-card-popup";
 import InlineSubscribe from "@/components/inline-subscribe";
+import { UserDropdown } from "@/components/user-dropdown";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const { toast } = useToast();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [sessionId, setSessionId] = useState<string>(() => {
     // Initialize from localStorage on mount
     if (typeof window !== 'undefined') {
@@ -286,7 +289,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="hidden sm:flex sm:items-center">
+            <div className="hidden sm:flex sm:items-center sm:space-x-4">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
                 <div className="relative bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce px-5 py-3 rounded-lg">
@@ -300,6 +303,14 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              {isAuthenticated && user && (
+                <UserDropdown 
+                  user={user} 
+                  onLogout={() => {
+                    window.location.href = '/api/logout';
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

@@ -87,9 +87,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create user
       const user = await storage.createUser({ username, email, passwordHash });
       
+      // Auto-login the user by creating a session
+      req.session.userId = user.id;
+      req.session.isAuthenticated = true;
+      
       res.status(201).json({ 
         message: "Account created successfully",
-        user: { id: user.id, username: user.username, email: user.email }
+        user: { id: user.id, username: user.username, email: user.email },
+        authenticated: true
       });
     } catch (error) {
       console.error("Error creating user:", error);
