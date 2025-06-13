@@ -290,33 +290,27 @@ export default function Home() {
                 </div>
               </div>
               <div className="sm:hidden">
-                <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                  <div className="relative bg-white px-3 py-2 rounded-lg">
-                    <div className="flex flex-col text-center">
-                      <span className="font-bold text-base text-slate-900">
-                        {(stats as any)?.totalIdeas || 0}
-                      </span>
-                      <span className="text-xs font-medium text-slate-700 mt-0.5">
-                        ideas shared
-                      </span>
-                    </div>
+                <div className="bg-white px-3 py-2 rounded-lg">
+                  <div className="flex flex-col text-center">
+                    <span className="font-bold text-base text-slate-900">
+                      {(stats as any)?.totalIdeas || 0}
+                    </span>
+                    <span className="text-xs font-medium text-slate-700 mt-0.5">
+                      ideas shared
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
             <div className="hidden sm:flex sm:items-center sm:space-x-4">
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                <div className="relative bg-white px-5 py-3 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-bold text-lg text-slate-900">
-                      {(stats as any)?.totalIdeas || 0}
-                    </span>
-                    <span className="text-sm font-medium text-slate-700">
-                      ideas shared
-                    </span>
-                  </div>
+              <div className="bg-white px-5 py-3 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <span className="font-bold text-lg text-slate-900">
+                    {(stats as any)?.totalIdeas || 0}
+                  </span>
+                  <span className="text-sm font-medium text-slate-700">
+                    ideas shared
+                  </span>
                 </div>
               </div>
               

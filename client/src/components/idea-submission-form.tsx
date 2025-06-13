@@ -134,7 +134,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
   };
 
   return (
-    <Card className="shadow-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
+    <Card className="shadow-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden z-60">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
       <CardContent className="p-8 relative z-10">
         {/* Prize announcement */}
