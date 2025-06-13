@@ -40,10 +40,15 @@ export default function AdminComments() {
     mutationFn: async (commentId: number) => {
       const response = await fetch(`/api/admin/comments/${commentId}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
-        throw new Error("Failed to delete comment");
+        const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+        throw new Error(errorData.message || "Failed to delete comment");
       }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
@@ -69,8 +74,10 @@ export default function AdminComments() {
         body: JSON.stringify({ commentIds }),
       });
       if (!response.ok) {
-        throw new Error("Failed to bulk delete comments");
+        const errorData = await response.json().catch(() => ({ message: "Unknown error" }));
+        throw new Error(errorData.message || "Failed to bulk delete comments");
       }
+      return response.json();
     },
     onSuccess: (_, commentIds) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
@@ -208,7 +215,12 @@ export default function AdminComments() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => deleteCommentMutation.mutate(comment.id)}
+                        onClick={() => {
+                          const preview = comment.content.substring(0, 100) + (comment.content.length > 100 ? '...' : '');
+                          if (confirm(`Are you sure you want to delete this comment?\n\n${preview}`)) {
+                            deleteCommentMutation.mutate(comment.id);
+                          }
+                        }}
                         disabled={deleteCommentMutation.isPending}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
