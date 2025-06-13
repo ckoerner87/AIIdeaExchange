@@ -258,7 +258,8 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       if (!response.ok) {
         throw new Error(`Failed to fetch comment count: ${response.status}`);
       }
-      return response.json();
+      const data = await response.json();
+      return typeof data === 'string' ? parseInt(data, 10) : data;
     },
     staleTime: 1000,
   });

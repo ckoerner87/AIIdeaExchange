@@ -243,7 +243,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               };
 
               return isValidUrl(idea.linkUrl) ? (
-                <div className="mb-3">
+                <div className="mb-1">
                   <a
                     href={formatUrl(idea.linkUrl)}
                     target="_blank"
@@ -255,7 +255,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                   </a>
                 </div>
               ) : (
-                <div className="mb-3">
+                <div className="mb-1">
                   <div className="flex items-center space-x-2 text-slate-500 text-sm">
                     <ExternalLink className="h-4 w-4" />
                     <span>{idea.linkUrl}</span>
@@ -263,7 +263,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                 </div>
               );
             })()}
-            <div className="flex items-center justify-between text-sm text-slate-500 mt-2">
+            <div className="flex items-center justify-between text-sm text-slate-500 mt-1">
               <div className="flex items-center space-x-4">
                 {idea.tools && <span>Tools: {idea.tools}</span>}
                 <span>{formatTimeAgo(idea.submittedAt)}</span>
@@ -283,7 +283,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
             </div>
             
             {/* Comment Section */}
-            <div className="mt-3 pt-3 border-t border-gray-100">
+            <div className="mt-1 pt-1 border-t border-gray-100">
               <Suspense fallback={
                 <div className="p-4 bg-gray-50 rounded-lg animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
