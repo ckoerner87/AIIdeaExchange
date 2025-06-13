@@ -626,8 +626,9 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                 isOpen={showUsernamePopup}
                 onClose={() => setShowUsernamePopup(false)}
                 onUsernameSubmit={(username: string) => {
-                  // Just close the popup for now - username is already associated with the comment
+                  // Close the popup and refresh comments to show updated username
                   setShowUsernamePopup(false);
+                  queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
                   toast({
                     title: "Username saved!",
                     description: "Your comment is now associated with your username.",
@@ -643,6 +644,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     
                     if (response.ok) {
                       setShowUsernamePopup(false);
+                      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
                       toast({
                         title: "Account created!",
                         description: "You can now receive reply notifications and build your reputation.",
