@@ -44,6 +44,34 @@ export const votes = pgTable("votes", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Session storage table for auth
+export const sessions = pgTable("sessions", {
+  sid: text("sid").primaryKey(),
+  sess: text("sess").notNull(), // JSON session data
+  expire: timestamp("expire").notNull(),
+});
+
+// Users table for authentication
+export const users = pgTable("users", {
+  id: text("id").primaryKey().notNull(),
+  email: text("email").unique(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  profileImageUrl: text("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Comments table
+export const comments = pgTable("comments", {
+  id: serial("id").primaryKey(),
+  ideaId: integer("idea_id").notNull(),
+  userId: text("user_id").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const insertIdeaSchema = createInsertSchema(ideas).omit({
   id: true,
   votes: true,
@@ -78,8 +106,18 @@ export const insertVoteSchema = createInsertSchema(votes).omit({
   id: true,
 });
 
+export const insertCommentSchema = createInsertSchema(comments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertIdea = z.infer<typeof insertIdeaSchema>;
 export type Idea = typeof ideas.$inferSelect;
+export type InsertComment = z.infer<typeof insertCommentSchema>;
+export type Comment = typeof comments.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type UpsertUser = typeof users.$inferInsert;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;

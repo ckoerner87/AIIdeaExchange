@@ -3,6 +3,8 @@ import {
   subscriptions, 
   userSessions, 
   votes,
+  users,
+  comments,
   type Idea, 
   type InsertIdea,
   type Subscription,
@@ -10,7 +12,11 @@ import {
   type UserSession,
   type InsertUserSession,
   type Vote,
-  type InsertVote
+  type InsertVote,
+  type User,
+  type UpsertUser,
+  type Comment,
+  type InsertComment
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, isNull, sql } from "drizzle-orm";
@@ -45,6 +51,15 @@ export interface IStorage {
   getRecentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<Vote[]>;
   getAllVotesBySession(sessionId: string): Promise<Vote[]>;
   deleteVote(sessionId: string, ideaId: number): Promise<void>;
+  
+  // Users
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
+  // Comments
+  createComment(comment: InsertComment): Promise<Comment>;
+  getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User })[]>;
+  deleteComment(id: number, userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
