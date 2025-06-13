@@ -278,14 +278,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                   <Copy className="h-3 w-3" />
                   <span>Share</span>
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center space-x-1 text-slate-400 hover:text-slate-600"
-                >
-                  <Flag className="h-3 w-3" />
-                  <span>Report</span>
-                </Button>
+
               </div>
             </div>
             

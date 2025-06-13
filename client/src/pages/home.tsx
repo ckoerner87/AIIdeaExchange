@@ -27,7 +27,7 @@ export default function Home() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showUnlockMessage, setShowUnlockMessage] = useState(false);
   const [showGiftCardPopup, setShowGiftCardPopup] = useState(false);
-  const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
+  const [sortBy, setSortBy] = useState<'votes' | 'recent' | 'comments'>('votes');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedTool, setSelectedTool] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -462,9 +462,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
 
 
-            {/* Submit Your Own Idea Button and Sort - Top (only when paywall is disabled) - Sticky */}
+            {/* Submit Your Own Idea Button - Top (only when paywall is disabled) - Sticky */}
             {!paywallEnabled && (
-              <div className="sticky top-0 z-20 bg-slate-50 py-4 mb-8 flex flex-col sm:flex-row items-center justify-center gap-4 shadow-sm border-b border-slate-200">
+              <div className="sticky top-0 z-20 bg-slate-50 py-3 mb-4 flex items-center justify-center shadow-sm border-b border-slate-200">
                 <div className="text-center">
                   <Button
                     onClick={() => setShowSubmissionForm(!showSubmissionForm)}
@@ -473,17 +473,6 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                     <Lightbulb className="w-6 h-6 mr-3" />
                     Submit Your Own Idea
                   </Button>
-                </div>
-                <div className="flex-shrink-0">
-                  <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="votes">Sort by upvotes</SelectItem>
-                      <SelectItem value="recent">Most recent</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
             )}
@@ -588,13 +577,14 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 {/* Sort Dropdown */}
                 <div className="relative">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                  <Select value={sortBy} onValueChange={(value: 'votes' | 'recent') => setSortBy(value)}>
+                  <Select value={sortBy} onValueChange={(value: 'votes' | 'recent' | 'comments') => setSortBy(value)}>
                     <SelectTrigger className="relative w-full bg-white border-2 border-orange-200 hover:border-orange-400 focus:border-orange-500 transition-all duration-300 hover:shadow-lg hover:shadow-orange-200/50 animate-slow-bounce">
                       <SelectValue placeholder="📊 Sort by" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="votes">Sort by Upvotes</SelectItem>
                       <SelectItem value="recent">Most Recent</SelectItem>
+                      <SelectItem value="comments">Most Comments</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
