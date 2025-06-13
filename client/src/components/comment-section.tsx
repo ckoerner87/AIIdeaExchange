@@ -1,4 +1,4 @@
-import { useState, memo, lazy, Suspense } from "react";
+import { useState, memo, lazy, Suspense, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -117,6 +117,8 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // No pending comment logic needed for anonymous comments
+
   // Fetch comments with performance optimizations
   const { data: comments = [], isLoading } = useQuery<CommentWithUser[]>({
     queryKey: ["/api/ideas", ideaId, "comments"],
@@ -207,17 +209,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
     e.preventDefault();
     if (!newComment.trim()) return;
     
-    if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to post a comment",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-
+    // Allow anonymous comments, but show notification about reply alerts
     createCommentMutation.mutate(newComment.trim());
   };
 
@@ -257,53 +249,47 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
           {/* Comment Form */}
           {!authLoading && (
             <div className="p-4 border-b border-gray-100">
-              {isAuthenticated ? (
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  <Textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Share your thoughts..."
-                    className="min-h-20 resize-none focus:ring-2 focus:ring-blue-500"
-                    maxLength={500}
-                    aria-label="Write a comment"
-                  />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {newComment.length}/500 characters
-                    </span>
-                    <Button
-                      type="submit"
-                      disabled={!newComment.trim() || createCommentMutation.isPending}
-                      size="sm"
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 min-h-9"
-                      aria-label="Post comment"
-                    >
-                      {createCommentMutation.isPending ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 mr-2" />
-                          Post
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              ) : (
-                <div className="text-center py-6">
-                  <User className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-3">
-                    Join the conversation! Log in to share your thoughts.
-                  </p>
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Share your thoughts..."
+                  className="min-h-20 resize-none focus:ring-2 focus:ring-blue-500"
+                  maxLength={500}
+                  aria-label="Write a comment"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">
+                    {newComment.length}/500 characters
+                  </span>
                   <Button
-                    onClick={() => window.location.href = "/api/login"}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    aria-label="Log in to comment"
+                    type="submit"
+                    disabled={!newComment.trim() || createCommentMutation.isPending}
+                    size="sm"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 min-h-9"
+                    aria-label="Post comment"
                   >
-                    Log In to Comment
+                    {createCommentMutation.isPending ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        {isAuthenticated ? "Post" : "Post Comment"}
+                      </>
+                    )}
                   </Button>
                 </div>
-              )}
+                {!isAuthenticated && newComment.trim() && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-700 mb-2">
+                      <strong>Almost there!</strong> To publish your comment, you'll need to create a quick account.
+                    </p>
+                    <p className="text-xs text-blue-600">
+                      Don't worry - your comment will be saved and posted once you sign in.
+                    </p>
+                  </div>
+                )}
+              </form>
             </div>
           )}
 

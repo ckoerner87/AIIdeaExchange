@@ -314,10 +314,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/ideas/:id/comments", isAuthenticated, async (req: any, res) => {
+  app.post("/api/ideas/:id/comments", async (req: any, res) => {
     try {
       const ideaId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      let userId = null;
+      
+      // Check if user is authenticated
+      if (req.isAuthenticated() && req.user?.claims?.sub) {
+        userId = req.user.claims.sub;
+      }
       
       const result = insertCommentSchema.safeParse({
         ...req.body,

@@ -66,7 +66,7 @@ export const users = pgTable("users", {
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   ideaId: integer("idea_id").notNull(),
-  userId: text("user_id").notNull(),
+  userId: text("user_id"), // Allow null for anonymous comments
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
