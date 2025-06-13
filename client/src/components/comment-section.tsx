@@ -122,10 +122,10 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   // No pending comment logic needed for anonymous comments
 
   // Fetch comments with performance optimizations
-  const { data: comments = [], isLoading } = useQuery<CommentWithUser[]>({
+  const { data: comments = [], isLoading, refetch } = useQuery<CommentWithUser[]>({
     queryKey: ["/api/ideas", ideaId, "comments"],
     enabled: isExpanded, // Only fetch when expanded
-    staleTime: 5000, // Cache for 5 seconds to see new comments
+    staleTime: 1000, // Cache for 1 second to see new comments quickly
   });
 
   // Create comment mutation
@@ -141,12 +141,19 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       }
       return response.json();
     },
-    onSuccess: () => {
-      // Force refetch comments and ensure section stays expanded
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
-      queryClient.refetchQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+    onSuccess: async (newComment) => {
+      // Ensure section is expanded first
+      setIsExpanded(true);
+      
+      // Clear the form
       setNewComment("");
-      setIsExpanded(true); // Ensure section stays expanded to show new comment
+      
+      // Force immediate refetch
+      await refetch();
+      
+      // Also invalidate cache for future requests
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      
       toast({
         title: "Success",
         description: "Comment posted successfully",
