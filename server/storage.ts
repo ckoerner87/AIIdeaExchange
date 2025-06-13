@@ -357,7 +357,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User operations
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
@@ -373,16 +373,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: { username: string; email: string; passwordHash: string }): Promise<User> {
-    const userId = Math.random().toString(36).substring(2, 15);
     const [user] = await db
       .insert(users)
       .values({
-        id: userId,
         username: userData.username,
         email: userData.email,
         passwordHash: userData.passwordHash,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       })
       .returning();
     return user;

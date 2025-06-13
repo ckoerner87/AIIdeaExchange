@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, insertCommentSchema, userSessions, votes, ideas, users } from "@shared/schema";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { db } from "./db";
 import { nanoid } from "nanoid";
 import { count, countDistinct, eq, and, sql } from "drizzle-orm";
