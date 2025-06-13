@@ -462,7 +462,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
             {/* Submit Your Own Idea Button - Top (only when paywall is disabled) - Sticky */}
             {!paywallEnabled && (
-              <div className="sticky top-0 z-20 bg-slate-50 py-4 mb-4 flex items-center justify-center">
+              <div className="sticky top-0 z-20 bg-slate-50 py-3 mb-3 flex items-center justify-center">
                 <div className="text-center">
                   <Button
                     onClick={() => setShowSubmissionForm(!showSubmissionForm)}
