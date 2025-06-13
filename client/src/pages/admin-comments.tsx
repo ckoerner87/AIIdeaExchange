@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Trash2, MessageCircle, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,6 +23,8 @@ interface AdminComment {
 
 export default function AdminComments() {
   const [selectedComments, setSelectedComments] = useState<Set<number>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<AdminComment | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -158,9 +161,25 @@ export default function AdminComments() {
 
   const handleBulkDelete = () => {
     if (selectedComments.size === 0) return;
-    if (confirm(`Are you sure you want to delete ${selectedComments.size} comments?`)) {
-      bulkDeleteMutation.mutate(Array.from(selectedComments));
+    bulkDeleteMutation.mutate(Array.from(selectedComments));
+  };
+
+  const handleDeleteClick = (comment: AdminComment) => {
+    setCommentToDelete(comment);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (commentToDelete) {
+      deleteCommentMutation.mutate(commentToDelete.id);
+      setDeleteDialogOpen(false);
+      setCommentToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setCommentToDelete(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -257,12 +276,7 @@ export default function AdminComments() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          const preview = comment.content.substring(0, 100) + (comment.content.length > 100 ? '...' : '');
-                          if (confirm(`Are you sure you want to delete this comment?\n\n${preview}`)) {
-                            deleteCommentMutation.mutate(comment.id);
-                          }
-                        }}
+                        onClick={() => handleDeleteClick(comment)}
                         disabled={deleteCommentMutation.isPending}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
@@ -293,6 +307,34 @@ export default function AdminComments() {
           ))
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Comment</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this comment? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {commentToDelete && (
+            <div className="bg-gray-50 rounded-lg p-3 my-4">
+              <p className="text-sm text-gray-700">
+                {commentToDelete.content.substring(0, 200)}
+                {commentToDelete.content.length > 200 && "..."}
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelDelete}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete Comment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
