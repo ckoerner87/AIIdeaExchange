@@ -537,6 +537,12 @@ export default function Admin() {
               >
                 Go to Homepage
               </Button>
+              <Button 
+                onClick={() => window.location.href = '/admin/comments'}
+                className="bg-purple-600 hover:bg-purple-700 text-sm"
+              >
+                Manage Comments
+              </Button>
               <Button onClick={handleExportEmails} className="bg-green-600 hover:bg-green-700 text-sm">
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
@@ -965,33 +971,7 @@ export default function Admin() {
             )}
           </div>
 
-          {/* Subscribers List */}
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Email Subscribers</h2>
-            {subscribers && subscribers.length > 0 ? (
-              <div className="bg-slate-50 rounded-lg p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {subscribers.map((subscriber: any, index: number) => (
-                    <div key={index} className="bg-white p-4 rounded-lg border border-slate-200">
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm font-medium text-slate-900">{subscriber.email}</span>
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {new Date(subscriber.subscribedAt).toLocaleDateString()} • {subscriber.source || 'homepage'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <Mail className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">No subscribers</h3>
-                <p className="text-slate-600">No email subscribers have signed up yet.</p>
-              </div>
-            )}
-          </div>
+
         </div>
       </div>
     </div>
