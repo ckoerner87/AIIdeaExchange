@@ -345,7 +345,7 @@ export default function Home() {
                 ) : (
                   <div className="flex items-center space-x-2">
                     <Button
-                      onClick={() => window.location.href = '/api/login'}
+                      onClick={() => window.location.href = '/auth'}
                       variant="outline"
                       size="sm"
                       className="text-sm"
