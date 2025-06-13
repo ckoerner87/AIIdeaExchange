@@ -122,6 +122,54 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Post Type Selection */}
+            <div className="space-y-3">
+              <FormLabel className="text-sm font-medium text-slate-700">
+                Post Type <span className="text-red-500">*</span>
+              </FormLabel>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={selectedPostType === "text" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setSelectedPostType("text");
+                    form.setValue("postType", "text");
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  Text
+                </Button>
+                <Button
+                  type="button"
+                  variant={selectedPostType === "link" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setSelectedPostType("link");
+                    form.setValue("postType", "link");
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Link2 className="w-4 h-4" />
+                  Link
+                </Button>
+                <Button
+                  type="button"
+                  variant={selectedPostType === "media" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setSelectedPostType("media");
+                    form.setValue("postType", "media");
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Image className="w-4 h-4" />
+                  Media
+                </Button>
+              </div>
+            </div>
+
             <FormField
               control={form.control}
               name="useCase"
