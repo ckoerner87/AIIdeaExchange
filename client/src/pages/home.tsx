@@ -40,6 +40,7 @@ export default function Home() {
   const [paywallEnabled, setPaywallEnabled] = useState(true);
   const [submittedIdeaText, setSubmittedIdeaText] = useState<string>('');
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
+  const [viewedIdeasCount, setViewedIdeasCount] = useState(0);
 
   // Check paywall status
   const { data: paywallStatus } = useQuery({
@@ -645,8 +646,8 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                       />
                     ];
                     
-                    // Add subscription component every 9th idea (but not after the first few)
-                    if ((index + 1) % 9 === 0 && index > 5) {
+                    // Add subscription component after 3rd, 11th, and 18th ideas
+                    if (index + 1 === 3 || index + 1 === 11 || index + 1 === 18) {
                       elements.push(
                         <InlineSubscribe key={`subscribe-${selectedCategory}-${selectedTool}-${sortBy}-${index}`} />
                       );
