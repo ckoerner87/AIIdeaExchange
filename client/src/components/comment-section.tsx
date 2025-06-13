@@ -124,6 +124,13 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   // Fetch comments with performance optimizations
   const { data: comments = [], isLoading, refetch } = useQuery<CommentWithUser[]>({
     queryKey: ["/api/ideas", ideaId, "comments"],
+    queryFn: async () => {
+      const response = await fetch(`/api/ideas/${ideaId}/comments`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch comments: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: isExpanded, // Only fetch when expanded
     staleTime: 1000, // Cache for 1 second to see new comments quickly
   });
