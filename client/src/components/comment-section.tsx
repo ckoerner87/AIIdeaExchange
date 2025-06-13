@@ -308,12 +308,20 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       // Clear the form
       setNewComment("");
       
-      // Force immediate refetch
-      await refetch();
+      // Immediately update local cache with optimistic update
+      queryClient.setQueryData(["/api/ideas", ideaId, "comments"], (oldComments: any) => {
+        if (!oldComments) return [newComment];
+        return [...oldComments, newComment];
+      });
       
-      // Also invalidate cache for future requests
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments", "count"] });
+      // Update comment count immediately
+      queryClient.setQueryData(["/api/ideas", ideaId, "comments", "count"], (oldCount: number) => (oldCount || 0) + 1);
+      
+      // Also invalidate the main ideas list to update comment count there
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas"] });
+      
+      // Force immediate refetch for accuracy
+      await refetch();
       
       // Show username collection popup for anonymous users
       if (!isAuthenticated) {
@@ -356,9 +364,19 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments", "count"] });
+    onSuccess: (_, deletedCommentId) => {
+      // Immediately update local cache by removing the deleted comment
+      queryClient.setQueryData(["/api/ideas", ideaId, "comments"], (oldComments: any) => {
+        if (!oldComments) return [];
+        return oldComments.filter((comment: any) => comment.id !== deletedCommentId);
+      });
+      
+      // Update comment count immediately
+      queryClient.setQueryData(["/api/ideas", ideaId, "comments", "count"], (oldCount: number) => Math.max(0, (oldCount || 0) - 1));
+      
+      // Also invalidate the main ideas list to update comment count there
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas"] });
+      
       toast({
         title: "Success",
         description: "Comment deleted successfully",
@@ -632,14 +650,35 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
               <UsernameCollectionPopup
                 isOpen={showUsernamePopup}
                 onClose={() => setShowUsernamePopup(false)}
-                onUsernameSubmit={(username: string) => {
-                  // Close the popup and refresh comments to show updated username
-                  setShowUsernamePopup(false);
-                  queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
-                  toast({
-                    title: "Username saved!",
-                    description: "Your comment is now associated with your username.",
-                  });
+                onUsernameSubmit={async (username: string) => {
+                  // Update the username for the most recent comment
+                  if (pendingComment && sessionId) {
+                    try {
+                      await fetch(`/api/comments/${pendingComment.id}/username`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, sessionId }),
+                      });
+                      
+                      // Close the popup and refresh comments to show updated username
+                      setShowUsernamePopup(false);
+                      setPendingComment("");
+                      
+                      // Force refresh to show new username
+                      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+                      
+                      toast({
+                        title: "Username saved!",
+                        description: "Your comment is now associated with your username.",
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: "Failed to update username. Please try again.",
+                        variant: "destructive",
+                      });
+                    }
+                  }
                 }}
                 onAccountCreate={async (data: { username: string; email: string; password: string }) => {
                   try {

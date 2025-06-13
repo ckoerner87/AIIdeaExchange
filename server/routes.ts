@@ -635,6 +635,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update comment username for anonymous comments
+  app.patch("/api/comments/:id/username", async (req, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      const { username, sessionId } = req.body;
+      
+      if (!sessionId) {
+        return res.status(400).json({ message: "Session ID required" });
+      }
+      
+      if (!username || username.trim().length < 2) {
+        return res.status(400).json({ message: "Valid username required" });
+      }
+      
+      await storage.updateCommentUsername(commentId, sessionId, username.trim());
+      res.json({ message: "Username updated" });
+    } catch (error) {
+      console.error('Update comment username error:', error);
+      res.status(500).json({ message: "Failed to update username" });
+    }
+  });
+
   app.delete("/api/comments/:id", isAuthenticated, async (req: any, res) => {
     try {
       const commentId = parseInt(req.params.id);

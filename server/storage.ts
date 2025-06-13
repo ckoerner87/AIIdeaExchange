@@ -80,6 +80,7 @@ export interface IStorage {
   updateCommentVotes(commentId: number, votes: number): Promise<void>;
   getRecentCommentVotesBySession(sessionId: string, timeWindowMs: number): Promise<CommentVote[]>;
   getRecentCommentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<CommentVote[]>;
+  updateCommentUsername(commentId: number, sessionId: string, username: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -583,6 +584,29 @@ export class DatabaseStorage implements IStorage {
         eq(commentVotes.ipAddress, ipAddress),
         sql`${commentVotes.createdAt} > ${cutoffTime}`
       ));
+  }
+
+  async updateCommentUsername(commentId: number, sessionId: string, username: string): Promise<void> {
+    // Add a username field to comments table if it doesn't exist and update the comment
+    // For now, we'll store it in a separate table to track anonymous comment usernames
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS comment_usernames (
+        id SERIAL PRIMARY KEY,
+        comment_id INTEGER NOT NULL,
+        session_id TEXT NOT NULL,
+        username TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(comment_id, session_id)
+      )
+    `);
+    
+    // Insert or update the username for this comment
+    await db.execute(sql`
+      INSERT INTO comment_usernames (comment_id, session_id, username)
+      VALUES (${commentId}, ${sessionId}, ${username})
+      ON CONFLICT (comment_id, session_id)
+      DO UPDATE SET username = ${username}
+    `);
   }
 }
 
