@@ -106,56 +106,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getIdeas(sortBy: 'votes' | 'recent' | 'comments' = 'votes', category?: string, tool?: string): Promise<Idea[]> {
-    if (sortBy === 'comments') {
-      // Special query for sorting by comment count
-      const query = db
-        .select({
-          id: ideas.id,
-          title: ideas.title,
-          description: ideas.description,
-          useCase: ideas.useCase,
-          category: ideas.category,
-          tools: ideas.tools,
-          votes: ideas.votes,
-          submittedAt: ideas.submittedAt,
-          commentCount: sql<number>`COALESCE(COUNT(${comments.id}), 0)`.as('commentCount')
-        })
-        .from(ideas)
-        .leftJoin(comments, eq(ideas.id, comments.ideaId))
-        .groupBy(ideas.id);
+    // Always include comment count for all queries
+    const query = db
+      .select({
+        id: ideas.id,
+        sessionId: ideas.sessionId,
+        title: ideas.title,
+        description: ideas.description,
+        useCase: ideas.useCase,
+        category: ideas.category,
+        tools: ideas.tools,
+        linkUrl: ideas.linkUrl,
+        aiGrade: ideas.aiGrade,
+        votes: ideas.votes,
+        submittedAt: ideas.submittedAt,
+        commentCount: sql<number>`COALESCE(COUNT(${comments.id}), 0)`.as('commentCount')
+      })
+      .from(ideas)
+      .leftJoin(comments, eq(ideas.id, comments.ideaId))
+      .groupBy(ideas.id);
 
-      const conditions = [];
-      
-      if (category && category !== 'All') {
-        if (category.toLowerCase() === 'other') {
-          conditions.push(or(eq(ideas.category, 'Other'), eq(ideas.category, 'other'), isNull(ideas.category)));
-        } else {
-          conditions.push(eq(ideas.category, category));
-        }
-      }
-      
-      if (tool && tool !== 'All') {
-        if (tool.toLowerCase() === 'other') {
-          conditions.push(or(eq(ideas.tools, 'Other'), eq(ideas.tools, 'other'), isNull(ideas.tools)));
-        } else {
-          conditions.push(sql`LOWER(${ideas.tools}) = LOWER(${tool})`);
-        }
-      }
-      
-      let finalQuery = query;
-      if (conditions.length > 0) {
-        finalQuery = query.where(and(...conditions)) as any;
-      }
-      
-      const results = await finalQuery.orderBy(sql`commentCount DESC`);
-      
-      // Convert results back to Idea format (remove commentCount)
-      return results.map(({ commentCount, ...idea }) => idea as Idea);
-    }
-
-    // Regular queries for votes and recent sorting
-    let query = db.select().from(ideas);
-    
     const conditions = [];
     
     if (category && category !== 'All') {
@@ -174,14 +144,23 @@ export class DatabaseStorage implements IStorage {
       }
     }
     
+    let finalQuery = query;
     if (conditions.length > 0) {
-      query = query.where(and(...conditions)) as any;
+      finalQuery = query.where(and(...conditions)) as any;
     }
     
-    if (sortBy === 'votes') {
-      return await query.orderBy(desc(ideas.votes));
+    if (sortBy === 'comments') {
+      const results = await finalQuery.orderBy(sql`commentCount DESC`);
+      // Convert results back to Idea format (remove commentCount)
+      return results.map(({ commentCount, ...idea }) => idea as Idea);
+    } else if (sortBy === 'votes') {
+      const results = await finalQuery.orderBy(desc(ideas.votes));
+      // Convert results back to Idea format (remove commentCount)
+      return results.map(({ commentCount, ...idea }) => idea as Idea);
     } else {
-      return await query.orderBy(desc(ideas.submittedAt));
+      const results = await finalQuery.orderBy(desc(ideas.submittedAt));
+      // Convert results back to Idea format (remove commentCount)
+      return results.map(({ commentCount, ...idea }) => idea as Idea);
     }
   }
 

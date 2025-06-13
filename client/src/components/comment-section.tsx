@@ -175,7 +175,7 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
               <Textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
-                placeholder={`Reply to ${comment.user?.username || 'Anonymous'}...`}
+                placeholder={`Reply to ${comment.user?.username || "Chris's New Friend"}...`}
                 className="min-h-[80px] resize-none border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 autoFocus
               />
