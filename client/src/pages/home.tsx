@@ -647,6 +647,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                         onVote={handleVote}
                         isVoting={voteMutation.isPending}
                         isHighlighted={highlightedIdeaId === idea.id || newlySubmittedIdeaId === idea.id}
+                        isRecentlySubmitted={idea.isRecentlySubmitted}
                         isSharedLink={isSharedLink && highlightedIdeaId === idea.id}
                       />
                     ];
@@ -751,7 +752,11 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
       {!paywallEnabled && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
           <Button
-            onClick={() => setShowSubmissionForm(!showSubmissionForm)}
+            onClick={() => {
+              setShowSubmissionForm(!showSubmissionForm);
+              // Scroll to top to show the submission form
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-bold rounded-full shadow-2xl transition-all hover:scale-105 whitespace-nowrap flex items-center"
             style={{ 
               background: 'linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%)',
