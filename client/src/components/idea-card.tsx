@@ -2,9 +2,12 @@ import { ChevronUp, ChevronDown, Flag, ExternalLink, Copy } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, memo, lazy, Suspense } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Idea } from "@shared/schema";
+
+// Lazy load comment section for better performance
+const CommentSection = lazy(() => import("@/components/comment-section"));
 
 interface IdeaCardProps {
   idea: Idea;

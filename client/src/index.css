@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Performance optimizations for mobile */
+/* Critical performance optimizations */
 * {
   box-sizing: border-box;
 }
@@ -18,28 +18,65 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
+  font-display: swap;
 }
 
-/* Optimize button interactions */
+/* Critical Resource Hints */
+.critical-resource {
+  font-display: swap;
+}
+
+/* Optimize button interactions and accessibility */
 button, [role="button"] {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+  min-width: 44px;
 }
 
-/* Reduce paint complexity */
+/* Ensure proper button contrast */
+button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Image optimization */
 img {
   height: auto;
   max-width: 100%;
   object-fit: cover;
+  loading: lazy;
+  decoding: async;
 }
 
-/* Optimize animations */
+/* Critical images should load immediately */
+img.critical {
+  loading: eager;
+}
+
+/* Reduce layout shift */
+.aspect-ratio-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+}
+
+/* Optimize animations and reduce motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Performance-critical utility classes */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
 }
 
 :root {
