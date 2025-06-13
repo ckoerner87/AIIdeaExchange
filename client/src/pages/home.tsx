@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Lightbulb, Bell, ChevronDown, ChevronUp } from "lucide-react";
+import { Lightbulb, Bell, ChevronDown, ChevronUp, Search, X } from "lucide-react";
 import IdeaSubmissionForm from "@/components/idea-submission-form";
 import IdeaCard from "@/components/idea-card";
 import SubscriptionForm from "@/components/subscription-form";
@@ -30,6 +30,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<'votes' | 'recent'>('votes');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedTool, setSelectedTool] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
   const [visibleIdeasCount, setVisibleIdeasCount] = useState(20);
@@ -117,7 +118,7 @@ export default function Home() {
   });
 
   // Get ideas (show when paywall disabled OR user has submitted OR has shared access)
-  const { data: ideas, isLoading: ideasLoading } = useQuery({
+  const { data: allIdeas, isLoading: ideasLoading } = useQuery({
     queryKey: ['/api/ideas', sortBy, selectedCategory, selectedTool],
     queryFn: async () => {
       const categoryParam = selectedCategory && selectedCategory !== 'all' ? `&category=${selectedCategory}` : '';
@@ -136,6 +137,20 @@ export default function Home() {
     },
     enabled: !!sessionId && (!paywallEnabled || hasSubmitted || sharedIdeaAccess),
   });
+
+  // Filter ideas based on search query
+  const ideas = allIdeas?.filter((idea: any) => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    return (
+      idea.useCase?.toLowerCase().includes(query) ||
+      idea.title?.toLowerCase().includes(query) ||
+      idea.description?.toLowerCase().includes(query) ||
+      idea.category?.toLowerCase().includes(query) ||
+      idea.tool?.toLowerCase().includes(query)
+    );
+  }) || [];
 
   // Vote mutation
   const voteMutation = useMutation({
