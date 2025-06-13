@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash2, MessageCircle, ExternalLink } from "lucide-react";
+import { Trash2, MessageCircle, ExternalLink, ArrowLeft, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AdminComment {
@@ -214,6 +214,26 @@ export default function AdminComments() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      {/* Navigation buttons */}
+      <div className="mb-6 flex gap-3">
+        <Button 
+          variant="outline" 
+          onClick={() => window.location.href = '/admin'}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Admin
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={() => window.location.href = '/'}
+          className="flex items-center gap-2"
+        >
+          <Home className="h-4 w-4" />
+          Homepage
+        </Button>
+      </div>
+      
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Comment Management</h1>
         <p className="text-gray-600">Manage and moderate user comments</p>

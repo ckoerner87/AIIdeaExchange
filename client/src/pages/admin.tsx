@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, AlertTriangle, Lock, Download, Mail, Edit, Save, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
@@ -22,6 +23,7 @@ export default function Admin() {
   const [paywallEnabled, setPaywallEnabled] = useState(true);
   const [authToken, setAuthToken] = useState<string>('');
   const [selectedMetric, setSelectedMetric] = useState<'userStats' | 'sessionMetrics'>('userStats');
+  const [selectedIdeas, setSelectedIdeas] = useState<Set<number>>(new Set());
   const itemsPerPage = 50;
 
   // Load saved password and auth state on mount
@@ -237,6 +239,50 @@ export default function Admin() {
       toast({
         title: "Error",
         description: error.message || "Failed to delete idea",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Bulk delete ideas mutation
+  const bulkDeleteIdeasMutation = useMutation({
+    mutationFn: async (ideaIds: number[]) => {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      
+      const res = await fetch('/api/admin/ideas/bulk-delete', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ ideaIds }),
+      });
+      if (!res.ok) {
+        throw new Error('Failed to bulk delete ideas');
+      }
+      return res.json();
+    },
+    onSuccess: (data, ideaIds) => {
+      // Update the query cache immediately by removing the deleted items
+      queryClient.setQueryData(['/api/admin/ideas', sortBy], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.filter((idea: any) => !ideaIds.includes(idea.id));
+      });
+      
+      setSelectedIdeas(new Set());
+      toast({
+        title: "Ideas deleted",
+        description: `Successfully deleted ${ideaIds.length} ideas.`,
+      });
+      
+      // Also invalidate to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/ideas'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/user-stats'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to bulk delete ideas",
         variant: "destructive",
       });
     },

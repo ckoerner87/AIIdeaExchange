@@ -725,6 +725,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk delete ideas endpoint
+  app.post("/api/admin/ideas/bulk-delete", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { ideaIds } = req.body;
+      if (!Array.isArray(ideaIds)) {
+        return res.status(400).json({ message: "ideaIds must be an array" });
+      }
+
+      // Delete each idea individually
+      for (const ideaId of ideaIds) {
+        await storage.deleteIdea(ideaId);
+      }
+      
+      res.json({ message: `Deleted ${ideaIds.length} ideas` });
+    } catch (error) {
+      console.error('Bulk delete ideas error:', error);
+      res.status(500).json({ message: "Failed to bulk delete ideas" });
+    }
+  });
+
   // Comment voting endpoints
   app.post("/api/comments/:id/vote", async (req: any, res) => {
     try {
