@@ -27,7 +27,7 @@ import { eq, desc, asc, and, or, isNull, sql, inArray } from "drizzle-orm";
 export interface IStorage {
   // Ideas
   createIdea(idea: InsertIdea & { sessionId: string }): Promise<Idea>;
-  getIdeas(sortBy?: 'votes' | 'recent', category?: string, tool?: string): Promise<Idea[]>;
+  getIdeas(sortBy?: 'votes' | 'recent' | 'comments', category?: string, tool?: string): Promise<Idea[]>;
   getIdeaById(id: number): Promise<Idea | undefined>;
   updateIdea(id: number, updates: Partial<Idea>): Promise<Idea>;
   updateIdeaVotes(id: number, votes: number): Promise<void>;
@@ -103,14 +103,61 @@ export class DatabaseStorage implements IStorage {
     return idea;
   }
 
-  async getIdeas(sortBy: 'votes' | 'recent' = 'votes', category?: string, tool?: string): Promise<Idea[]> {
+  async getIdeas(sortBy: 'votes' | 'recent' | 'comments' = 'votes', category?: string, tool?: string): Promise<Idea[]> {
+    if (sortBy === 'comments') {
+      // Special query for sorting by comment count
+      const query = db
+        .select({
+          id: ideas.id,
+          title: ideas.title,
+          description: ideas.description,
+          useCase: ideas.useCase,
+          category: ideas.category,
+          tools: ideas.tools,
+          votes: ideas.votes,
+          submittedAt: ideas.submittedAt,
+          commentCount: sql<number>`COALESCE(COUNT(${comments.id}), 0)`.as('commentCount')
+        })
+        .from(ideas)
+        .leftJoin(comments, eq(ideas.id, comments.ideaId))
+        .groupBy(ideas.id);
+
+      const conditions = [];
+      
+      if (category && category !== 'All') {
+        if (category.toLowerCase() === 'other') {
+          conditions.push(or(eq(ideas.category, 'Other'), eq(ideas.category, 'other'), isNull(ideas.category)));
+        } else {
+          conditions.push(eq(ideas.category, category));
+        }
+      }
+      
+      if (tool && tool !== 'All') {
+        if (tool.toLowerCase() === 'other') {
+          conditions.push(or(eq(ideas.tools, 'Other'), eq(ideas.tools, 'other'), isNull(ideas.tools)));
+        } else {
+          conditions.push(sql`LOWER(${ideas.tools}) = LOWER(${tool})`);
+        }
+      }
+      
+      let finalQuery = query;
+      if (conditions.length > 0) {
+        finalQuery = query.where(and(...conditions)) as any;
+      }
+      
+      const results = await finalQuery.orderBy(sql`commentCount DESC`);
+      
+      // Convert results back to Idea format (remove commentCount)
+      return results.map(({ commentCount, ...idea }) => idea as Idea);
+    }
+
+    // Regular queries for votes and recent sorting
     let query = db.select().from(ideas);
     
     const conditions = [];
     
     if (category && category !== 'All') {
       if (category.toLowerCase() === 'other') {
-        // For "other" category, include both null and "other" values (case insensitive)
         conditions.push(or(eq(ideas.category, 'Other'), eq(ideas.category, 'other'), isNull(ideas.category)));
       } else {
         conditions.push(eq(ideas.category, category));
@@ -119,10 +166,8 @@ export class DatabaseStorage implements IStorage {
     
     if (tool && tool !== 'All') {
       if (tool.toLowerCase() === 'other') {
-        // For "other" tool, include both null and "other" values (case insensitive)
         conditions.push(or(eq(ideas.tools, 'Other'), eq(ideas.tools, 'other'), isNull(ideas.tools)));
       } else {
-        // Case-insensitive tool matching
         conditions.push(sql`LOWER(${ideas.tools}) = LOWER(${tool})`);
       }
     }
