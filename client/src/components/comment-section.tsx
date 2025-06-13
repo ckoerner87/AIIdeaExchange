@@ -404,6 +404,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      refetch(); // Force immediate refetch to update reply counts
       toast({
         title: "Reply posted!",
         description: "Your reply has been added to the conversation.",

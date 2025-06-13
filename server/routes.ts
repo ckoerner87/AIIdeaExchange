@@ -564,7 +564,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const reply = await storage.createComment(result.data);
-      res.json(reply);
+      
+      // Return the reply with updated parent comment data
+      const updatedComments = await storage.getCommentsByIdeaId(parentComment.ideaId);
+      const parentWithReplies = updatedComments.find(c => c.id === parentId);
+      
+      res.json({
+        ...reply,
+        parentUpdated: parentWithReplies
+      });
     } catch (error) {
       console.error('Create reply error:', error);
       res.status(500).json({ message: "Failed to create reply" });
