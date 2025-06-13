@@ -69,24 +69,24 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
   return (
     <div className="flex gap-3 p-4 border-b border-gray-100 last:border-0">
       {/* Voting buttons on the left */}
-      <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
+      <div className="flex flex-col items-center flex-shrink-0 -mt-1">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onVote(comment.id, 'up')}
-          className="h-5 w-5 p-0 hover:bg-green-50 hover:text-green-600"
+          className="h-4 w-4 p-0 hover:bg-green-50 hover:text-green-600"
           aria-label="Upvote comment"
         >
           <ChevronUp className="w-3 h-3" />
         </Button>
-        <span className="text-xs font-medium text-gray-600 min-w-[16px] text-center leading-none">
+        <span className="text-xs font-medium text-gray-600 min-w-[14px] text-center leading-[1] py-0.5">
           {comment.votes || 0}
         </span>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onVote(comment.id, 'down')}
-          className="h-5 w-5 p-0 hover:bg-red-50 hover:text-red-600"
+          className="h-4 w-4 p-0 hover:bg-red-50 hover:text-red-600"
           aria-label="Downvote comment"
         >
           <ChevronDown className="w-3 h-3" />
