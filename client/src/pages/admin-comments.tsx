@@ -50,18 +50,41 @@ export default function AdminComments() {
       }
       return response.json();
     },
+    onMutate: async (commentId) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/admin/comments"] });
+      
+      // Snapshot the previous value
+      const previousComments = queryClient.getQueryData(["/api/admin/comments"]);
+      
+      // Optimistically update to remove the comment
+      queryClient.setQueryData(["/api/admin/comments"], (old: AdminComment[] | undefined) => {
+        return old?.filter(comment => comment.id !== commentId) || [];
+      });
+      
+      return { previousComments };
+    },
+    onError: (err, commentId, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData(["/api/admin/comments"], context?.previousComments);
+      toast({
+        title: "Error",
+        description: "Failed to delete comment",
+        variant: "destructive",
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
       toast({
         title: "Success",
         description: "Comment deleted successfully",
       });
     },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete comment",
-        variant: "destructive",
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
+      // Also invalidate all comment queries to update the main site
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === "/api/ideas" && query.queryKey[2] === "comments"
       });
     },
   });
@@ -79,20 +102,39 @@ export default function AdminComments() {
       }
       return response.json();
     },
+    onMutate: async (commentIds) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/admin/comments"] });
+      
+      // Snapshot the previous value
+      const previousComments = queryClient.getQueryData(["/api/admin/comments"]);
+      
+      // Optimistically update to remove the comments
+      queryClient.setQueryData(["/api/admin/comments"], (old: AdminComment[] | undefined) => {
+        return old?.filter(comment => !commentIds.includes(comment.id)) || [];
+      });
+      
+      return { previousComments };
+    },
+    onError: (err, commentIds, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData(["/api/admin/comments"], context?.previousComments);
+      toast({
+        title: "Error",
+        description: "Failed to bulk delete comments",
+        variant: "destructive",
+      });
+    },
     onSuccess: (_, commentIds) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
       setSelectedComments(new Set());
       toast({
         title: "Success",
         description: `Deleted ${commentIds.length} comments successfully`,
       });
     },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to bulk delete comments",
-        variant: "destructive",
-      });
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
     },
   });
 
