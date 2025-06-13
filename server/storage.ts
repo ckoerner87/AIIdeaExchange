@@ -46,6 +46,7 @@ export interface IStorage {
   getUserIdeasBySession(sessionId: string): Promise<Idea[]>;
   updateUserSessionActivity(sessionId: string): Promise<void>;
   getSessionMetricsByDay(): Promise<Array<{ date: string; avgTimeOnSiteMinutes: number; totalSessions: number }>>;
+  getRecentlySubmittedIdea(sessionId: string): Promise<Idea | undefined>;
   
   // Votes
   createVote(vote: InsertVote): Promise<Vote>;
@@ -250,6 +251,19 @@ export class DatabaseStorage implements IStorage {
   async getUserIdeasBySession(sessionId: string): Promise<Idea[]> {
     const userIdeas = await db.select().from(ideas).where(eq(ideas.sessionId, sessionId));
     return userIdeas;
+  }
+
+  async getRecentlySubmittedIdea(sessionId: string): Promise<Idea | undefined> {
+    // Get the most recent idea submitted by this session (within last 30 seconds)
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
+    const [recentIdea] = await db.select().from(ideas)
+      .where(and(
+        eq(ideas.sessionId, sessionId),
+        sql`${ideas.submittedAt} > ${thirtySecondsAgo}`
+      ))
+      .orderBy(desc(ideas.submittedAt))
+      .limit(1);
+    return recentIdea || undefined;
   }
 
   // Votes
