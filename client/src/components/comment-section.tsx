@@ -250,7 +250,20 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
 
   // No pending comment logic needed for anonymous comments
 
-  // Fetch comments with performance optimizations
+  // Fetch comment count first (always)
+  const { data: commentCount = 0 } = useQuery<number>({
+    queryKey: ["/api/ideas", ideaId, "comments", "count"],
+    queryFn: async () => {
+      const response = await fetch(`/api/ideas/${ideaId}/comments/count`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch comment count: ${response.status}`);
+      }
+      return response.json();
+    },
+    staleTime: 1000,
+  });
+
+  // Fetch full comments with performance optimizations
   const { data: comments = [], isLoading, refetch } = useQuery<CommentWithUser[]>({
     queryKey: ["/api/ideas", ideaId, "comments"],
     queryFn: async () => {
@@ -292,6 +305,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       
       // Also invalidate cache for future requests
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments", "count"] });
       
       // Show username collection popup for anonymous users
       if (!isAuthenticated) {
@@ -439,6 +453,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments", "count"] });
       refetch(); // Force immediate refetch to update reply counts
       toast({
         title: "Reply posted!",
@@ -491,7 +506,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       >
         <MessageCircle className="w-5 h-5 text-gray-600" />
         <span className="text-sm font-medium text-gray-900">
-          Comments {comments.length > 0 && `(${comments.length})`}
+          Comments {commentCount > 0 && `(${commentCount})`}
         </span>
         <div className="ml-auto">
           <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
@@ -606,13 +621,22 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
               <UsernameCollectionPopup
+                isOpen={showUsernamePopup}
                 onClose={() => setShowUsernamePopup(false)}
-                onSubmit={async (username: string, email: string) => {
+                onUsernameSubmit={(username: string) => {
+                  // Just close the popup for now - username is already associated with the comment
+                  setShowUsernamePopup(false);
+                  toast({
+                    title: "Username saved!",
+                    description: "Your comment is now associated with your username.",
+                  });
+                }}
+                onAccountCreate={async (data: { username: string; email: string; password: string }) => {
                   try {
                     const response = await fetch('/api/signup', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ username, email }),
+                      body: JSON.stringify(data),
                     });
                     
                     if (response.ok) {
@@ -622,10 +646,10 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                         description: "You can now receive reply notifications and build your reputation.",
                       });
                     } else {
-                      const data = await response.json();
+                      const responseData = await response.json();
                       toast({
                         title: "Error",
-                        description: data.message || "Failed to create account",
+                        description: responseData.message || "Failed to create account",
                         variant: "destructive",
                       });
                     }
