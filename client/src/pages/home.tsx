@@ -233,28 +233,46 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Lightbulb className="text-white text-base sm:text-lg" />
+          <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+            <div className="flex items-center justify-between sm:justify-start sm:space-x-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                  <Lightbulb className="text-white text-base sm:text-lg" />
+                </div>
+                <div>
+                  <h1 className="text-lg sm:text-xl font-bold text-slate-900">How Do You Use AI?</h1>
+                  <p className="text-xs sm:text-sm text-slate-600">Real World Use Cases for AI and ChatGPT</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-lg sm:text-xl font-bold text-slate-900">How Do You Use AI?</h1>
-                <p className="text-xs sm:text-sm text-slate-600">Real World Use Cases for AI and ChatGPT</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-end">
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
-                <div className="relative bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce px-3 py-2 sm:px-5 sm:py-3 rounded-lg">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-right sm:text-left">
-                    <div className="flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      <span className="font-bold text-base sm:text-lg text-slate-900">
-                        {(stats as any)?.totalIdeas || 0}
+              <div className="sm:hidden">
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <div className="relative bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce px-3 py-2 rounded-lg">
+                    <div className="flex flex-col text-center">
+                      <div className="flex items-center justify-center space-x-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <span className="font-bold text-base text-slate-900">
+                          {(stats as any)?.totalIdeas || 0}
+                        </span>
+                      </div>
+                      <span className="text-xs font-medium text-slate-700 mt-0.5">
+                        ideas shared
                       </span>
                     </div>
-                    <span className="text-xs sm:text-sm font-medium text-slate-700 mt-0.5 sm:mt-0">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="hidden sm:flex sm:items-center">
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                <div className="relative bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce px-5 py-3 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span className="font-bold text-lg text-slate-900">
+                      {(stats as any)?.totalIdeas || 0}
+                    </span>
+                    <span className="text-sm font-medium text-slate-700">
                       ideas shared
                     </span>
                   </div>
