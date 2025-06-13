@@ -565,8 +565,8 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                       />
                     ];
                     
-                    // Add subscription component every 7th idea (but not after the first few)
-                    if ((index + 1) % 7 === 0 && index > 5) {
+                    // Add subscription component every 9th idea (but not after the first few)
+                    if ((index + 1) % 9 === 0 && index > 5) {
                       elements.push(
                         <InlineSubscribe key={`subscribe-${selectedCategory}-${selectedTool}-${sortBy}-${index}`} />
                       );

@@ -127,10 +127,15 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   // Create comment mutation
   const createCommentMutation = useMutation({
     mutationFn: async (content: string) => {
-      return apiRequest(`/api/ideas/${ideaId}/comments`, {
+      const response = await fetch(`/api/ideas/${ideaId}/comments`, {
         method: "POST",
-        body: { content },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
       });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
@@ -163,9 +168,13 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   // Delete comment mutation
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: number) => {
-      return apiRequest(`/api/comments/${commentId}`, {
+      const response = await fetch(`/api/comments/${commentId}`, {
         method: "DELETE",
       });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
@@ -320,7 +329,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     key={comment.id}
                     comment={comment}
                     onDelete={handleDelete}
-                    currentUserId={user?.id}
+                    currentUserId={(user as any)?.id}
                   />
                 ))}
               </div>
