@@ -401,10 +401,7 @@ export default function IdeaSubmissionForm({ sessionId, onSubmitted }: IdeaSubmi
                 </>
               ) : (
                 <>
-                  <Rocket className="mr-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                  <span className="hidden md:inline">Share My Idea & Show Me Everyone Else's!</span>
-                  <span className="hidden sm:inline md:hidden">Share My Idea & View Others!</span>
-                  <span className="sm:hidden">Submit Idea</span>
+                  🚀&nbsp;&nbsp;Share My Idea
                 </>
               )}
             </Button>
