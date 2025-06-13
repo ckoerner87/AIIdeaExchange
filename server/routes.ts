@@ -496,6 +496,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get comment count for an idea
+  app.get("/api/ideas/:id/comments/count", async (req, res) => {
+    try {
+      const ideaId = parseInt(req.params.id);
+      const count = await storage.getCommentCountByIdeaId(ideaId);
+      res.json(count);
+    } catch (error) {
+      console.error('Get comment count error:', error);
+      res.status(500).json({ message: "Failed to fetch comment count" });
+    }
+  });
+
   app.post("/api/ideas/:id/comments", async (req: any, res) => {
     try {
       const ideaId = parseInt(req.params.id);
