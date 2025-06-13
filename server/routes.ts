@@ -304,6 +304,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ideaData = { ...result.data, sessionId };
       const idea = await storage.createIdea(ideaData);
       await storage.updateUserSessionSubmitted(sessionId);
+
+      // Automatically create first comment from the author
+      try {
+        await storage.createComment({
+          ideaId: idea.id,
+          content: `Here's my use case: ${idea.useCase}`,
+          userId: null // Anonymous comment initially
+        });
+      } catch (commentError) {
+        console.error('Failed to create initial comment:', commentError);
+      }
       
       // If this is a test submission, auto-delete it after 10 seconds
       if (contentValidation.isTestSubmission) {
