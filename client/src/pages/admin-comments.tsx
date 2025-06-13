@@ -270,7 +270,7 @@ export default function AdminComments() {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <span className="font-medium">
-                          {comment.user?.username || comment.user?.email || "Anonymous"}
+                          {comment.user?.username || comment.user?.email || "Chris's New Friend"}
                         </span>
                         <span>•</span>
                         <span>{formatDate(comment.createdAt)}</span>

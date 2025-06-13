@@ -95,7 +95,7 @@ export class DatabaseStorage implements IStorage {
       tools: insertIdea.tools || null,
       linkUrl: insertIdea.linkUrl || null,
       aiGrade: insertIdea.aiGrade || null,
-      votes: 0
+      votes: 1
     };
     
     const [idea] = await db

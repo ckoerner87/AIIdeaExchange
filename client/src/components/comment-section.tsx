@@ -19,6 +19,7 @@ const UsernameCollectionPopup = lazy(() => import("./username-collection-popup")
 interface CommentSectionProps {
   ideaId: number;
   className?: string;
+  commentCount?: number;
 }
 
 interface CommentWithUser extends Comment {
@@ -67,14 +68,17 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
   };
 
   const getDisplayName = (user: UserType | null) => {
-    if (!user) return 'Anonymous';
+    if (!user) return "Chris's New Friend";
     if (user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }
     if (user.firstName) {
       return user.firstName;
     }
-    return user.email?.split('@')[0] || 'Anonymous';
+    if (user.username) {
+      return user.username;
+    }
+    return user.email?.split('@')[0] || "Chris's New Friend";
   };
 
   return (

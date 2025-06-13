@@ -385,7 +385,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ideasWithVotes = ideas.map(idea => ({
         ...idea,
         userVote: voteMap[idea.id] || null,
-        isRecentlySubmitted: recentlySubmittedIdea?.id === idea.id
+        isRecentlySubmitted: recentlySubmittedIdea?.id === idea.id,
+        commentCount: (idea as any).commentCount || 0
       }));
       
       // Add cache-busting headers to ensure fresh data
