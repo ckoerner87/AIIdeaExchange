@@ -506,7 +506,19 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                   maxLength={500}
                   aria-label="Write a comment"
                 />
-                <div className="flex items-center justify-end">
+                <div className="flex items-center justify-between">
+                  {!isAuthenticated && newComment.trim() && (
+                    <div className="flex-1 mr-4">
+                      <p className="text-sm text-blue-700">
+                        Wanna know when people reply? <button 
+                          onClick={() => setShowSignupPopup(true)}
+                          className="text-blue-700 underline hover:text-blue-800 font-medium"
+                        >
+                          Create a free account real fast here
+                        </button>.
+                      </p>
+                    </div>
+                  )}
                   <Button
                     type="submit"
                     disabled={!newComment.trim() || createCommentMutation.isPending}
@@ -524,18 +536,6 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     )}
                   </Button>
                 </div>
-                {!isAuthenticated && newComment.trim() && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-700">
-                      Wanna know when people reply? <button 
-                        onClick={() => setShowSignupPopup(true)}
-                        className="text-blue-700 underline hover:text-blue-800 font-medium"
-                      >
-                        Create a free account real fast here
-                      </button>.
-                    </p>
-                  </div>
-                )}
               </form>
             </div>
           )}
