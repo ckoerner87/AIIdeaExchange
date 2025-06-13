@@ -115,6 +115,7 @@ CommentItem.displayName = 'CommentItem';
 export default function CommentSection({ ideaId, className = "" }: CommentSectionProps) {
   const [newComment, setNewComment] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showSignupPopup, setShowSignupPopup] = useState(false);
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -277,10 +278,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                   maxLength={500}
                   aria-label="Write a comment"
                 />
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
-                    {newComment.length}/500 characters
-                  </span>
+                <div className="flex items-center justify-end">
                   <Button
                     type="submit"
                     disabled={!newComment.trim() || createCommentMutation.isPending}

@@ -63,7 +63,10 @@ export interface IStorage {
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
   getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User | null })[]>;
+  getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]>;
   deleteComment(id: number, userId: string): Promise<void>;
+  adminDeleteComment(id: number): Promise<void>;
+  bulkDeleteComments(ids: number[]): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -344,7 +347,9 @@ export class DatabaseStorage implements IStorage {
         id: comments.id,
         ideaId: comments.ideaId,
         userId: comments.userId,
+        parentId: comments.parentId,
         content: comments.content,
+        votes: comments.votes,
         createdAt: comments.createdAt,
         updatedAt: comments.updatedAt,
         user: {
@@ -368,6 +373,55 @@ export class DatabaseStorage implements IStorage {
       ...row,
       user: row.user?.id ? row.user : null,
     }));
+  }
+
+  async getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]> {
+    const result = await db
+      .select({
+        id: comments.id,
+        ideaId: comments.ideaId,
+        userId: comments.userId,
+        parentId: comments.parentId,
+        content: comments.content,
+        votes: comments.votes,
+        createdAt: comments.createdAt,
+        updatedAt: comments.updatedAt,
+        user: {
+          id: users.id,
+          email: users.email,
+          username: users.username,
+          passwordHash: users.passwordHash,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+        idea: {
+          useCase: ideas.useCase,
+        },
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
+      .leftJoin(ideas, eq(comments.ideaId, ideas.id))
+      .orderBy(desc(comments.createdAt));
+
+    return result.map(row => ({
+      ...row,
+      user: row.user?.id ? row.user : null,
+      idea: row.idea,
+    }));
+  }
+
+  async adminDeleteComment(id: number): Promise<void> {
+    await db.delete(comments).where(eq(comments.id, id));
+  }
+
+  async bulkDeleteComments(ids: number[]): Promise<void> {
+    if (ids.length === 0) return;
+    await db.delete(comments).where(
+      sql`${comments.id} = ANY(${ids})`
+    );
   }
 
   async deleteComment(id: number, userId: string): Promise<void> {

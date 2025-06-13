@@ -73,9 +73,21 @@ export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   ideaId: integer("idea_id").notNull(),
   userId: text("user_id"), // Allow null for anonymous comments
+  parentId: integer("parent_id"), // For nested comments
   content: text("content").notNull(),
+  votes: integer("votes").default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Comment votes table
+export const commentVotes = pgTable("comment_votes", {
+  id: serial("id").primaryKey(),
+  commentId: integer("comment_id").notNull(),
+  sessionId: text("session_id").notNull(),
+  ipAddress: text("ip_address").notNull(),
+  voteType: text("vote_type").notNull(), // 'up' or 'down'
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const insertIdeaSchema = createInsertSchema(ideas).omit({
@@ -117,8 +129,14 @@ export const insertVoteSchema = createInsertSchema(votes).omit({
 
 export const insertCommentSchema = createInsertSchema(comments).omit({
   id: true,
+  votes: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const insertCommentVoteSchema = createInsertSchema(commentVotes).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -138,6 +156,8 @@ export type InsertIdea = z.infer<typeof insertIdeaSchema>;
 export type Idea = typeof ideas.$inferSelect;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type Comment = typeof comments.$inferSelect;
+export type InsertCommentVote = z.infer<typeof insertCommentVoteSchema>;
+export type CommentVote = typeof commentVotes.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
 export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
