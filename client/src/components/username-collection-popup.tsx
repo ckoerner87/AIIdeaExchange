@@ -27,7 +27,7 @@ export function UsernameCollectionPopup({
 
   if (!isOpen) return null;
 
-  const handleUsernameSubmit = () => {
+  const handleUsernameSubmit = async () => {
     if (!username.trim()) {
       toast({
         title: "Username required",
@@ -46,8 +46,37 @@ export function UsernameCollectionPopup({
       return;
     }
 
-    onUsernameSubmit(username.trim());
-    setStep('account');
+    setIsSubmitting(true);
+    
+    try {
+      // Check if username is already taken by an existing account
+      const response = await fetch(`/api/check-username/${encodeURIComponent(username.trim())}`);
+      if (!response.ok) {
+        throw new Error('Failed to check username availability');
+      }
+      
+      const data = await response.json();
+      if (!data.available) {
+        toast({
+          title: "Username taken",
+          description: "This username is already taken by an existing account. Please choose a different one.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      onUsernameSubmit(username.trim());
+      setStep('account');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to validate username. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleAccountCreate = async () => {
@@ -164,26 +193,14 @@ export function UsernameCollectionPopup({
           <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                Create an account so you know when someone replies?
+                Create an account to get notified?
               </h2>
               <p className="text-sm text-gray-600">
-                Get notified about replies and keep track of your comments
+                Get email alerts when someone replies to your comments
               </p>
             </div>
 
             <div className="space-y-3">
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="pl-10 bg-gray-50"
-                  disabled
-                />
-              </div>
-
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
@@ -222,17 +239,17 @@ export function UsernameCollectionPopup({
                 onClick={handleSkipAccount}
                 className="flex-1"
               >
-                Just use username
+                Skip
               </Button>
               <Button
                 onClick={handleAccountCreate}
-                disabled={!email.trim() || !password.trim() || isSubmitting}
+                disabled={isSubmitting}
                 className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 {isSubmitting ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  'Create Account'
+                  'Continue'
                 )}
               </Button>
             </div>

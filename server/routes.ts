@@ -508,6 +508,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check username availability
+  app.get("/api/check-username/:username", async (req, res) => {
+    try {
+      const { username } = req.params;
+      const existingUser = await storage.getUserByUsername(username);
+      res.json({ available: !existingUser });
+    } catch (error) {
+      console.error('Check username error:', error);
+      res.status(500).json({ message: "Failed to check username" });
+    }
+  });
+
   app.post("/api/ideas/:id/comments", async (req: any, res) => {
     try {
       const ideaId = parseInt(req.params.id);
