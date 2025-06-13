@@ -254,8 +254,8 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
 
   // No pending comment logic needed for anonymous comments
 
-  // Fetch comment count first (always)
-  const { data: commentCount = 0 } = useQuery<number>({
+  // Use comment count from props or fetch if not provided
+  const { data: fetchedCommentCount = 0 } = useQuery<number>({
     queryKey: ["/api/ideas", ideaId, "comments", "count"],
     queryFn: async () => {
       const response = await fetch(`/api/ideas/${ideaId}/comments/count`);
@@ -266,7 +266,10 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
       return typeof data === 'string' ? parseInt(data, 10) : data;
     },
     staleTime: 1000,
+    enabled: propCommentCount === undefined, // Only fetch if not provided via props
   });
+
+  const commentCount = propCommentCount ?? fetchedCommentCount;
 
   // Fetch full comments with performance optimizations
   const { data: comments = [], isLoading, refetch } = useQuery<CommentWithUser[]>({
