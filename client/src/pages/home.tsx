@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Lightbulb, Bell, ChevronDown, ChevronUp, Search, X } from "lucide-react";
 import IdeaSubmissionForm from "@/components/idea-submission-form";
@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+
+// Lazy load account creation popup
+const AccountCreationPopup = lazy(() => import("@/components/account-creation-popup"));
 
 export default function Home() {
   const { toast } = useToast();
@@ -777,7 +780,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               boxShadow: '0 10px 25px rgba(79, 70, 229, 0.3)'
             }}
           >
-            🚀 Share My Idea
+            🚀&nbsp;&nbsp;Share My Idea
           </Button>
         </div>
       )}
@@ -810,6 +813,14 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
         submittedIdeaId={newlySubmittedIdeaId || undefined}
         submittedIdeaText={submittedIdeaText}
       />
+
+      {/* Account Creation Popup */}
+      <Suspense fallback={null}>
+        <AccountCreationPopup
+          isOpen={showAccountCreationPopup}
+          onClose={() => setShowAccountCreationPopup(false)}
+        />
+      </Suspense>
     </div>
   );
 }
