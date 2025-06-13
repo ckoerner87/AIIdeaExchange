@@ -135,6 +135,10 @@ export default function AdminComments() {
     onSettled: () => {
       // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: ["/api/admin/comments"] });
+      // Also invalidate all comment queries to update the main site
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === "/api/ideas" && query.queryKey[2] === "comments"
+      });
     },
   });
 
