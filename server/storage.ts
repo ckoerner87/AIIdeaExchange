@@ -89,7 +89,8 @@ export class DatabaseStorage implements IStorage {
         // For "other" tool, include both null and "other" values (case insensitive)
         conditions.push(or(eq(ideas.tools, 'Other'), eq(ideas.tools, 'other'), isNull(ideas.tools)));
       } else {
-        conditions.push(eq(ideas.tools, tool));
+        // Case-insensitive tool matching
+        conditions.push(sql`LOWER(${ideas.tools}) = LOWER(${tool})`);
       }
     }
     
