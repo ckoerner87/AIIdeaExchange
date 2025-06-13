@@ -399,6 +399,30 @@ export default function Admin() {
     setEditVoteValue(idea.votes.toString());
   };
 
+  const handleSelectIdea = (ideaId: number) => {
+    const newSelected = new Set(selectedIdeas);
+    if (newSelected.has(ideaId)) {
+      newSelected.delete(ideaId);
+    } else {
+      newSelected.add(ideaId);
+    }
+    setSelectedIdeas(newSelected);
+  };
+
+  const handleSelectAllIdeas = () => {
+    const currentIdeas = ideas?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) || [];
+    if (selectedIdeas.size === currentIdeas.length) {
+      setSelectedIdeas(new Set());
+    } else {
+      setSelectedIdeas(new Set(currentIdeas.map((idea: any) => idea.id)));
+    }
+  };
+
+  const handleBulkDeleteIdeas = () => {
+    if (selectedIdeas.size === 0) return;
+    bulkDeleteIdeasMutation.mutate(Array.from(selectedIdeas));
+  };
+
   const handleSaveVotes = () => {
     if (editingVotes && editVoteValue.trim()) {
       const votes = parseInt(editVoteValue);
@@ -836,6 +860,37 @@ export default function Admin() {
               </div>
             ) : ideas && ideas.length > 0 ? (
               <>
+                {/* Bulk Actions */}
+                {ideas.length > 0 && (
+                  <div className="mb-4 flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="select-all-ideas"
+                        checked={(() => {
+                          const currentIdeas = ideas?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) || [];
+                          return selectedIdeas.size === currentIdeas.length && currentIdeas.length > 0;
+                        })()}
+                        onCheckedChange={handleSelectAllIdeas}
+                      />
+                      <label htmlFor="select-all-ideas" className="text-sm font-medium">
+                        Select All ({selectedIdeas.size} selected)
+                      </label>
+                    </div>
+                    {selectedIdeas.size > 0 && (
+                      <Button
+                        onClick={handleBulkDeleteIdeas}
+                        disabled={bulkDeleteIdeasMutation.isPending}
+                        variant="destructive"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {bulkDeleteIdeasMutation.isPending ? "Deleting..." : `Delete ${selectedIdeas.size} Ideas`}
+                      </Button>
+                    )}
+                  </div>
+                )}
+
                 {/* Pagination Info */}
                 <div className="flex justify-between items-center mb-4">
                   <div className="text-sm text-gray-600">
@@ -851,8 +906,16 @@ export default function Admin() {
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                     .map((idea: any) => (
                       <div key={idea.id} className="border border-slate-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-4 sm:space-y-0">
-                          <div className="flex-1 min-w-0">
+                        <div className="flex items-start gap-3">
+                          <Checkbox
+                            id={`select-idea-${idea.id}`}
+                            checked={selectedIdeas.has(idea.id)}
+                            onCheckedChange={() => handleSelectIdea(idea.id)}
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-4 sm:space-y-0">
+                              <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2 text-xs sm:text-sm">
                               <span className="text-sm font-medium text-slate-500">ID: {idea.id}</span>
                               <span className="text-sm text-slate-500">•</span>
@@ -982,7 +1045,9 @@ export default function Admin() {
                       )}
                     </div>
                   </div>
-                ))}
+                          </div>
+                        </div>
+                      ))}
                 </div>
 
                 {/* Pagination Controls */}
