@@ -329,7 +329,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
                     key={comment.id}
                     comment={comment}
                     onDelete={handleDelete}
-                    currentUserId={(user as any)?.id}
+                    currentUserId={user?.id}
                   />
                 ))}
               </div>

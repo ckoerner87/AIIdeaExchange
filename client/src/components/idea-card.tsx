@@ -222,6 +222,18 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                 </Button>
               </div>
             </div>
+            
+            {/* Comment Section */}
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <Suspense fallback={
+                <div className="p-4 bg-gray-50 rounded-lg animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              }>
+                <CommentSection ideaId={idea.id} />
+              </Suspense>
+            </div>
           </div>
         </div>
       </CardContent>
