@@ -17,7 +17,12 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Home() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const [sessionId, setSessionId] = useState<string>('');
+  const [sessionId, setSessionId] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('session-id') || '';
+    }
+    return '';
+  });
   
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [paywallEnabled, setPaywallEnabled] = useState(false);
@@ -36,31 +41,13 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
-  // Get session data first
-  const { data: sessionData } = useQuery({
-    queryKey: ['/api/session'],
-    queryFn: async () => {
-      const res = await fetch('/api/session');
-      if (!res.ok) throw new Error('Failed to get session');
-      return res.json();
-    },
-  });
-
-  // Initialize session ID when sessionData is available
-  useEffect(() => {
-    if (sessionData?.sessionId && !sessionId) {
-      setSessionId(sessionData.sessionId);
-      setHasSubmitted(sessionData.hasSubmitted || false);
-    }
-  }, [sessionData, sessionId]);
-
   // Check paywall status
   const { data: paywallStatus } = useQuery({
     queryKey: ['/api/paywall-status'],
   });
 
   useEffect(() => {
-    if (paywallStatus?.enabled !== undefined) {
+    if (paywallStatus) {
       setPaywallEnabled(paywallStatus.enabled);
     }
   }, [paywallStatus]);
