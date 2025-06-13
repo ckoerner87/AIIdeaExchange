@@ -763,8 +763,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               boxShadow: '0 10px 25px rgba(79, 70, 229, 0.3)'
             }}
           >
-            <Lightbulb className="w-5 h-5 mr-2" />
-            Share My Idea
+            🚀 Share My Idea
           </Button>
         </div>
       )}
