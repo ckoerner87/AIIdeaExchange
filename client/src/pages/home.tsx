@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Lightbulb, Bell, ChevronDown, ChevronUp, Search, X } from "lucide-react";
 import IdeaSubmissionForm from "@/components/idea-submission-form";
@@ -118,6 +118,22 @@ export default function Home() {
     queryKey: ['/api/stats'],
   });
 
+  // Get recently submitted idea for highlighting (only for current user)
+  const { data: recentlySubmittedIdea } = useQuery({
+    queryKey: ['/api/recently-submitted'],
+    queryFn: async () => {
+      const res = await fetch('/api/recently-submitted', {
+        headers: {
+          'x-session-id': sessionId,
+        },
+      });
+      if (!res.ok) return null;
+      return res.json();
+    },
+    enabled: !!sessionId,
+    refetchInterval: 5000, // Check every 5 seconds for recently submitted ideas
+  });
+
   // Get ideas (show when paywall disabled OR user has submitted OR has shared access)
   const { data: allIdeas, isLoading: ideasLoading } = useQuery({
     queryKey: ['/api/ideas', sortBy, selectedCategory, selectedTool],
@@ -139,19 +155,39 @@ export default function Home() {
     enabled: !!sessionId && (!paywallEnabled || hasSubmitted || sharedIdeaAccess),
   });
 
-  // Filter ideas based on search query
-  const ideas = allIdeas?.filter((idea: any) => {
-    if (!searchQuery.trim()) return true;
+  // Process and order ideas with recently submitted at top
+  const processedIdeas = React.useMemo(() => {
+    if (!allIdeas) return [];
     
-    const query = searchQuery.toLowerCase();
-    return (
-      idea.useCase?.toLowerCase().includes(query) ||
-      idea.title?.toLowerCase().includes(query) ||
-      idea.description?.toLowerCase().includes(query) ||
-      idea.category?.toLowerCase().includes(query) ||
-      idea.tool?.toLowerCase().includes(query)
-    );
-  }) || [];
+    // Filter based on search query
+    const filteredIdeas = allIdeas.filter((idea: any) => {
+      if (!searchQuery.trim()) return true;
+      
+      const query = searchQuery.toLowerCase();
+      return (
+        idea.useCase?.toLowerCase().includes(query) ||
+        idea.title?.toLowerCase().includes(query) ||
+        idea.description?.toLowerCase().includes(query) ||
+        idea.category?.toLowerCase().includes(query) ||
+        idea.tools?.toLowerCase().includes(query)
+      );
+    });
+
+    // Separate recently submitted idea from others
+    const recentlySubmittedId = recentlySubmittedIdea?.id;
+    const recentIdea = recentlySubmittedId ? filteredIdeas.find(idea => idea.id === recentlySubmittedId) : null;
+    const otherIdeas = filteredIdeas.filter(idea => idea.id !== recentlySubmittedId);
+
+    // If there's a recently submitted idea, put it at the top
+    if (recentIdea) {
+      return [{ ...recentIdea, isRecentlySubmitted: true }, ...otherIdeas];
+    }
+
+    return filteredIdeas;
+  }, [allIdeas, searchQuery, recentlySubmittedIdea]);
+
+  // Use processedIdeas instead of ideas
+  const ideas = processedIdeas;
 
   // Vote mutation
   const voteMutation = useMutation({
@@ -269,16 +305,6 @@ export default function Home() {
 
   return (
     <div className="bg-slate-50 min-h-screen font-inter">
-      {/* Floating Share My Idea Button - Fixed Position */}
-      {!paywallEnabled && (
-        <button
-          onClick={() => setShowSubmissionForm(!showSubmissionForm)}
-          className="fixed top-4 right-4 z-[999] bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-base font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap flex items-center"
-        >
-          <Lightbulb className="w-4 h-4 mr-2" />
-          Share My Idea
-        </button>
-      )}
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
@@ -505,9 +531,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
             {/* Search and Filter Controls - Sticky */}
             <div className="sticky top-0 sm:top-20 z-40 bg-slate-50 pb-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
-              {/* Search Bar Row */}
+              {/* Search Bar and Submit Button Row */}
               <div className="flex flex-col sm:flex-row gap-4 items-center">
-                {/* Search Bar - Full Width */}
+                {/* Search Bar - Left Side */}
                 <div className="relative flex-1 w-full">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse"></div>
                   <div className="relative flex items-center bg-white border-2 border-purple-200 hover:border-purple-400 focus-within:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200/50 rounded-lg">
@@ -529,6 +555,24 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                     )}
                   </div>
                 </div>
+                
+                {/* Submit Button - Right Side (only when paywall is disabled) */}
+                {!paywallEnabled && (
+                  <div className="flex-shrink-0">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowSubmissionForm(!showSubmissionForm);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg transition-all hover:scale-105 whitespace-nowrap h-[50px] flex items-center cursor-pointer touch-manipulation"
+                      style={{ touchAction: 'manipulation' }}
+                    >
+                      <Lightbulb className="w-5 h-5 mr-2" />
+                      Share My Idea
+                    </button>
+                  </div>
+                )}
               </div>
               
               {/* Filter and Sort Controls - Three equal columns */}
