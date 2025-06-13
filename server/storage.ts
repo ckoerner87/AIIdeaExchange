@@ -270,6 +270,77 @@ export class DatabaseStorage implements IStorage {
 
     return result;
   }
+
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  // Comment operations
+  async createComment(insertComment: InsertComment): Promise<Comment> {
+    const [comment] = await db
+      .insert(comments)
+      .values(insertComment)
+      .returning();
+    return comment;
+  }
+
+  async getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User })[]> {
+    const result = await db
+      .select({
+        id: comments.id,
+        ideaId: comments.ideaId,
+        userId: comments.userId,
+        content: comments.content,
+        createdAt: comments.createdAt,
+        updatedAt: comments.updatedAt,
+        user: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
+      .where(eq(comments.ideaId, ideaId))
+      .orderBy(asc(comments.createdAt));
+
+    return result.map(row => ({
+      id: row.id,
+      ideaId: row.ideaId,
+      userId: row.userId,
+      content: row.content,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      user: row.user!,
+    }));
+  }
+
+  async deleteComment(id: number, userId: string): Promise<void> {
+    await db.delete(comments).where(
+      and(eq(comments.id, id), eq(comments.userId, userId))
+    );
+  }
 }
 
 export const storage = new DatabaseStorage();

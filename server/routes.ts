@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, userSessions, votes, ideas } from "@shared/schema";
+import { insertIdeaSchema, insertSubscriptionSchema, insertUserSessionSchema, insertVoteSchema, insertCommentSchema, userSessions, votes, ideas } from "@shared/schema";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { db } from "./db";
 import { nanoid } from "nanoid";
 import { count, countDistinct, eq, and, sql } from "drizzle-orm";
@@ -41,8 +42,24 @@ function isAdminIP(ip: string): boolean {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth middleware
+  await setupAuth(app);
+
   // Initialize paywall as disabled by default
   (global as any).paywallEnabled = false;
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
   // Admin authentication endpoint
   app.post("/api/admin/auth", async (req, res) => {
     try {
@@ -282,6 +299,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       res.status(500).json({ message: "Failed to vote" });
+    }
+  });
+
+  // Comment endpoints
+  app.get("/api/ideas/:id/comments", async (req, res) => {
+    try {
+      const ideaId = parseInt(req.params.id);
+      const comments = await storage.getCommentsByIdeaId(ideaId);
+      res.json(comments);
+    } catch (error) {
+      console.error('Get comments error:', error);
+      res.status(500).json({ message: "Failed to fetch comments" });
+    }
+  });
+
+  app.post("/api/ideas/:id/comments", isAuthenticated, async (req: any, res) => {
+    try {
+      const ideaId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      const result = insertCommentSchema.safeParse({
+        ...req.body,
+        ideaId,
+        userId
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid comment data", errors: result.error.errors });
+      }
+
+      const comment = await storage.createComment(result.data);
+      
+      // Return comment with user data
+      const commentWithUser = await storage.getCommentsByIdeaId(ideaId);
+      const newComment = commentWithUser.find(c => c.id === comment.id);
+      
+      res.json(newComment);
+    } catch (error) {
+      console.error('Create comment error:', error);
+      res.status(500).json({ message: "Failed to create comment" });
+    }
+  });
+
+  app.delete("/api/comments/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      await storage.deleteComment(commentId, userId);
+      res.json({ message: "Comment deleted" });
+    } catch (error) {
+      console.error('Delete comment error:', error);
+      res.status(500).json({ message: "Failed to delete comment" });
     }
   });
 
