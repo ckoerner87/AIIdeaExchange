@@ -203,7 +203,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
 
             {/* Link preview for link posts */}
             {idea.postType === 'link' && idea.linkUrl && (
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="mb-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center gap-2 text-blue-700">
                   <Link2 className="w-4 h-4" />
                   <a 
