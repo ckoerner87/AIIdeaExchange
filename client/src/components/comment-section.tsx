@@ -13,6 +13,7 @@ import type { Comment, User as UserType } from "@shared/schema";
 const Avatar = lazy(() => import("@/components/ui/avatar").then(module => ({ default: module.Avatar })));
 const AvatarImage = lazy(() => import("@/components/ui/avatar").then(module => ({ default: module.AvatarImage })));
 const AvatarFallback = lazy(() => import("@/components/ui/avatar").then(module => ({ default: module.AvatarFallback })));
+const AccountCreationPopup = lazy(() => import("./account-creation-popup"));
 
 interface CommentSectionProps {
   ideaId: number;
@@ -23,14 +24,17 @@ interface CommentWithUser extends Comment {
   user: UserType | null;
   votes: number;
   parentId: number | null;
+  replies?: CommentWithUser[];
+  replyCount?: number;
 }
 
 // Memoized comment item for better performance
-const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId, onReply, replyingTo, replyContent, setReplyContent, onSubmitReply, onCancelReply }: {
+const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId, onReply, onToggleReplies, replyingTo, replyContent, setReplyContent, onSubmitReply, onCancelReply, expandedReplies }: {
   comment: CommentWithUser;
   onDelete: (id: number) => void;
   onVote: (commentId: number, voteType: 'up' | 'down') => void;
   onReply: (parentId: number) => void;
+  onToggleReplies: (commentId: number) => void;
   currentUserId?: string;
   sessionId?: string;
   replyingTo: number | null;
@@ -132,12 +136,15 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onReply(comment.id)}
+            onClick={() => comment.replyCount && comment.replyCount > 0 ? onToggleReplies(comment.id) : onReply(comment.id)}
             className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-            aria-label="Reply to comment"
+            aria-label={comment.replyCount && comment.replyCount > 0 ? "View replies" : "Reply to comment"}
           >
             <MessageCircle className="w-3 h-3 mr-1" />
-            Reply
+            {comment.replyCount && comment.replyCount > 0 
+              ? `${comment.replyCount} ${comment.replyCount === 1 ? 'Reply' : 'Replies'}`
+              : 'Reply'
+            }
           </Button>
           
           {currentUserId === comment.userId && (
@@ -205,6 +212,7 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   const [showSignupPopup, setShowSignupPopup] = useState(false);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState("");
+  const [expandedReplies, setExpandedReplies] = useState<Set<number>>(new Set());
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -372,10 +380,51 @@ export default function CommentSection({ ideaId, className = "" }: CommentSectio
   };
 
   const handleSubmitReply = (parentId: number, content: string) => {
-    // For now, just create a regular comment (we can add nested structure later)
-    createCommentMutation.mutate(content);
+    createReplyMutation.mutate({ parentId, content });
     setReplyingTo(null);
     setReplyContent("");
+  };
+
+  const createReplyMutation = useMutation({
+    mutationFn: async ({ parentId, content }: { parentId: number; content: string }) => {
+      const currentSessionId = localStorage.getItem('sessionId') || sessionId;
+      const response = await fetch(`/api/comments/${parentId}/replies`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-session-id": currentSessionId || ""
+        },
+        body: JSON.stringify({ content }),
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      toast({
+        title: "Reply posted!",
+        description: "Your reply has been added to the conversation.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to post reply",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const toggleReplies = (commentId: number) => {
+    const newExpanded = new Set(expandedReplies);
+    if (newExpanded.has(commentId)) {
+      newExpanded.delete(commentId);
+    } else {
+      newExpanded.add(commentId);
+    }
+    setExpandedReplies(newExpanded);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
