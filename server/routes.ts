@@ -472,7 +472,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const ideaId = parseInt(req.params.id);
       const comments = await storage.getCommentsByIdeaId(ideaId);
-      res.json(comments);
+      
+      // Transform comments to include reply counts and organize by hierarchy
+      const commentsWithReplies = comments.map(comment => ({
+        ...comment,
+        replyCount: comments.filter(c => c.parentId === comment.id).length,
+        replies: comments.filter(c => c.parentId === comment.id)
+      }));
+      
+      // Return only top-level comments (parentId is null)
+      const topLevelComments = commentsWithReplies.filter(comment => !comment.parentId);
+      
+      res.json(topLevelComments);
     } catch (error) {
       console.error('Get comments error:', error);
       res.status(500).json({ message: "Failed to fetch comments" });
@@ -515,6 +526,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Create comment error:', error);
       res.status(500).json({ message: "Failed to create comment" });
+    }
+  });
+
+  // Reply to comment endpoint
+  app.post("/api/comments/:parentId/replies", async (req: any, res) => {
+    try {
+      const parentId = parseInt(req.params.parentId);
+      let userId = null;
+      
+      // Check if user is authenticated
+      if (req.isAuthenticated() && req.user?.claims?.sub) {
+        userId = req.user.claims.sub;
+      }
+
+      // Get parent comment to find the ideaId
+      const parentComment = await storage.getCommentById?.(parentId);
+      if (!parentComment) {
+        return res.status(404).json({ message: "Parent comment not found" });
+      }
+      
+      const result = insertCommentSchema.safeParse({
+        ...req.body,
+        ideaId: parentComment.ideaId,
+        userId,
+        parentId
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid reply data", errors: result.error.errors });
+      }
+
+      // Filter comment content
+      const contentValidation = ContentFilter.validateComment(result.data.content);
+      if (!contentValidation.isValid) {
+        return res.status(400).json({ message: contentValidation.reason });
+      }
+
+      const reply = await storage.createComment(result.data);
+      res.json(reply);
+    } catch (error) {
+      console.error('Create reply error:', error);
+      res.status(500).json({ message: "Failed to create reply" });
     }
   });
 

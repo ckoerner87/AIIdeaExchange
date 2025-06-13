@@ -66,6 +66,7 @@ export interface IStorage {
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
   getCommentsByIdeaId(ideaId: number): Promise<(Comment & { user: User | null })[]>;
+  getCommentById(id: number): Promise<Comment | undefined>;
   getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string | null } })[]>;
   deleteComment(id: number, userId: string): Promise<void>;
   adminDeleteComment(id: number): Promise<void>;
@@ -383,6 +384,11 @@ export class DatabaseStorage implements IStorage {
       ...row,
       user: row.user?.id ? row.user : null,
     }));
+  }
+
+  async getCommentById(id: number): Promise<Comment | undefined> {
+    const [comment] = await db.select().from(comments).where(eq(comments.id, id));
+    return comment;
   }
 
   async getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]> {
