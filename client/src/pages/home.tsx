@@ -52,6 +52,7 @@ export default function Home() {
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
+      console.log('Screen width:', window.innerWidth, 'isMobile:', window.innerWidth < 768);
     };
     
     checkScreenSize();
