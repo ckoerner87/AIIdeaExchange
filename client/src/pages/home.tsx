@@ -52,7 +52,6 @@ export default function Home() {
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
-      console.log('Screen width:', window.innerWidth, 'isMobile:', window.innerWidth < 768);
     };
     
     checkScreenSize();
@@ -612,9 +611,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                       <SelectValue placeholder={isMobile ? "Sort" : "📊 Sort by"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="votes">🔥 Sort by Upvotes</SelectItem>
-                      <SelectItem value="recent">⏰ Most Recent</SelectItem>
-                      <SelectItem value="comments">💬 Most Comments</SelectItem>
+                      <SelectItem value="votes">{isMobile ? "Upvotes" : "🔥 Sort by Upvotes"}</SelectItem>
+                      <SelectItem value="recent">{isMobile ? "Recent" : "⏰ Most Recent"}</SelectItem>
+                      <SelectItem value="comments">{isMobile ? "Comments" : "💬 Most Comments"}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
