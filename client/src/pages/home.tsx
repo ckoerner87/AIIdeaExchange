@@ -511,12 +511,12 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             )}
 
             {/* Search and Filter Controls - Sticky */}
-            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 pb-4 mb-6 space-y-4 shadow-md border-b border-slate-200">
+            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 pb-2 md:pb-4 mb-4 md:mb-6 space-y-2 md:space-y-4 shadow-md border-b border-slate-200">
               {/* Search Bar and Submit Button Row */}
-              <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <div className="flex flex-col sm:flex-row gap-2 md:gap-4 items-center">
                 {/* Search Bar - Left Side */}
                 <div className="relative flex-1 w-full">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg blur opacity-75 animate-pulse hidden md:block"></div>
                   <div className="relative flex items-center bg-white border-2 border-purple-200 hover:border-purple-400 focus-within:border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200/50 rounded-lg">
                     <Search className="absolute left-3 text-gray-400 w-4 h-4" />
                     <input
@@ -524,7 +524,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                       placeholder="🔍 Search ideas, categories, tools..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-10 py-3 bg-transparent focus:outline-none text-gray-900 placeholder-gray-500"
+                      className="w-full pl-10 pr-10 py-2 md:py-3 bg-transparent focus:outline-none text-gray-900 placeholder-gray-500 text-sm md:text-base"
                     />
                     {searchQuery && (
                       <button
@@ -540,14 +540,15 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
               </div>
               
-              {/* Filter and Sort Controls - Three equal columns */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Filter and Sort Controls - Mobile compact, Desktop full */}
+              <div className="grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-4">
                 {/* Category Filter */}
                 <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse hidden md:block"></div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce">
-                      <SelectValue placeholder="🎯 Filter by Category" />
+                    <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce py-2 md:py-3 text-xs md:text-sm">
+                      <SelectValue placeholder="🎯 Category" className="md:hidden" />
+                      <SelectValue placeholder="🎯 Filter by Category" className="hidden md:block" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
@@ -568,10 +569,11 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 
                 {/* Tool Filter */}
                 <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg blur opacity-75 animate-pulse hidden md:block"></div>
                   <Select value={selectedTool} onValueChange={setSelectedTool}>
-                    <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-slow-bounce">
-                      <SelectValue placeholder="🛠️ Filter by Tool" />
+                    <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-slow-bounce py-2 md:py-3 text-xs md:text-sm">
+                      <SelectValue placeholder="🛠️ Tool" className="md:hidden" />
+                      <SelectValue placeholder="🛠️ Filter by Tool" className="hidden md:block" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Tools</SelectItem>
@@ -593,10 +595,11 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
                 {/* Sort Dropdown */}
                 <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg blur opacity-75 animate-pulse"></div>
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg blur opacity-75 animate-pulse hidden md:block"></div>
                   <Select value={sortBy} onValueChange={(value: 'votes' | 'recent' | 'comments') => setSortBy(value)}>
-                    <SelectTrigger className="relative w-full bg-white border-2 border-orange-200 hover:border-orange-400 focus:border-orange-500 transition-all duration-300 hover:shadow-lg hover:shadow-orange-200/50 animate-slow-bounce">
-                      <SelectValue placeholder="📊 Sort by" />
+                    <SelectTrigger className="relative w-full bg-white border-2 border-orange-200 hover:border-orange-400 focus:border-orange-500 transition-all duration-300 hover:shadow-lg hover:shadow-orange-200/50 animate-slow-bounce py-2 md:py-3 text-xs md:text-sm">
+                      <SelectValue placeholder="📊 Sort" className="md:hidden" />
+                      <SelectValue placeholder="📊 Sort by" className="hidden md:block" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="votes">🔥 Sort by Upvotes</SelectItem>
