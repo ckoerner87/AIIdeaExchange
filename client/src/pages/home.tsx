@@ -46,6 +46,18 @@ export default function Home() {
   const [viewedIdeasCount, setViewedIdeasCount] = useState(0);
   const [showAccountCreationPopup, setShowAccountCreationPopup] = useState(false);
   const [interactionCount, setInteractionCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check screen size for mobile optimization
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // Check paywall status
   const { data: paywallStatus } = useQuery({
@@ -547,8 +559,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur opacity-75 animate-pulse hidden md:block"></div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                     <SelectTrigger className="relative w-full bg-white border-2 border-blue-200 hover:border-blue-400 focus:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 animate-slow-bounce py-2 md:py-3 text-xs md:text-sm">
-                      <SelectValue placeholder="Category" className="md:hidden" />
-                      <SelectValue placeholder="🎯 Filter by Category" className="hidden md:block" />
+                      <SelectValue placeholder={isMobile ? "Category" : "🎯 Filter by Category"} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
@@ -572,8 +583,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg blur opacity-75 animate-pulse hidden md:block"></div>
                   <Select value={selectedTool} onValueChange={setSelectedTool}>
                     <SelectTrigger className="relative w-full bg-white border-2 border-green-200 hover:border-green-400 focus:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-200/50 animate-slow-bounce py-2 md:py-3 text-xs md:text-sm">
-                      <SelectValue placeholder="Tools" className="md:hidden" />
-                      <SelectValue placeholder="🛠️ Filter by Tool" className="hidden md:block" />
+                      <SelectValue placeholder={isMobile ? "Tool" : "🛠️ Filter by Tool"} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Tools</SelectItem>
@@ -598,8 +608,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg blur opacity-75 animate-pulse hidden md:block"></div>
                   <Select value={sortBy} onValueChange={(value: 'votes' | 'recent' | 'comments') => setSortBy(value)}>
                     <SelectTrigger className="relative w-full bg-white border-2 border-orange-200 hover:border-orange-400 focus:border-orange-500 transition-all duration-300 hover:shadow-lg hover:shadow-orange-200/50 animate-slow-bounce py-2 md:py-3 text-xs md:text-sm">
-                      <SelectValue placeholder="Sort" className="md:hidden" />
-                      <SelectValue placeholder="📊 Sort by" className="hidden md:block" />
+                      <SelectValue placeholder={isMobile ? "Sort" : "📊 Sort by"} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="votes">🔥 Sort by Upvotes</SelectItem>
