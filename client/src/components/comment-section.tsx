@@ -476,7 +476,7 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
 
   const handleVote = (commentId: number, voteType: 'up' | 'down') => {
     // Get session ID dynamically from the correct localStorage key
-    const currentSessionId = localStorage.getItem('ai-ideas-session') || sessionId;
+    const currentSessionId = localStorage.getItem('sessionId') || sessionId;
     
     if (!currentSessionId) {
       toast({

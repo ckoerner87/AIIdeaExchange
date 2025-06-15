@@ -20,7 +20,20 @@ interface IdeaCardProps {
 
 // Function to format category names properly
 const formatCategoryName = (category: string): string => {
-  return category
+  const categoryMap: Record<string, string> = {
+    'marketing-ads': 'Marketing & Ads',
+    'automation-ai-agents': 'Automation AI Agents',
+    'data-analysis-reporting': 'Data Analysis & Reporting',
+    'sales-outreach': 'Sales & Outreach',
+    'content-creation': 'Content Creation',
+    'productivity-time-saving': 'Productivity & Time-Saving',
+    'customer-support': 'Customer Support',
+    'ecommerce-dropshipping': 'E-commerce & Dropshipping',
+    'personal-lifestyle': 'Personal & Lifestyle',
+    'real-estate': 'Real Estate',
+  };
+
+  return categoryMap[category] || category
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
