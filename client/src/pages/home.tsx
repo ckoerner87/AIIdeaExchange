@@ -726,7 +726,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
         {/* Subscription Section */}
         <div id="subscription-section" className="mt-12">
-          <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
+          <SubscriptionForm subscriberCount={statsData?.totalSubscribers || 0} />
         </div>
 
         {/* Feature Request Section */}
