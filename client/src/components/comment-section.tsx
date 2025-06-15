@@ -434,12 +434,32 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       }
       return response.json();
     },
-    onSuccess: async () => {
-      // Invalidate and refetch comments to update vote counts
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+    onSuccess: async (data: { voteCount: number }) => {
+      // Update the specific comment's vote count in the cache
+      queryClient.setQueryData(["/api/ideas", ideaId, "comments"], (oldData: any) => {
+        if (!oldData) return oldData;
+        
+        return oldData.map((comment: any) => {
+          if (comment.id === voteCommentMutation.variables?.commentId) {
+            return { ...comment, votes: data.voteCount };
+          }
+          // Also update in replies
+          if (comment.replies) {
+            return {
+              ...comment,
+              replies: comment.replies.map((reply: any) => 
+                reply.id === voteCommentMutation.variables?.commentId 
+                  ? { ...reply, votes: data.voteCount }
+                  : reply
+              )
+            };
+          }
+          return comment;
+        });
+      });
       
-      // Force immediate refetch to update vote counts
-      await refetch();
+      // Invalidate to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
     },
     onError: (error) => {
       const errorMessage = error.message.includes("429") 

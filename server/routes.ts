@@ -821,7 +821,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       await storage.voteOnComment(commentId, sessionId, clientIP, voteType);
-      res.json({ message: "Vote recorded" });
+      
+      // Get updated vote count to return to frontend
+      const updatedComment = await storage.getCommentById(commentId);
+      res.json({ 
+        message: "Vote recorded", 
+        voteCount: updatedComment?.votes || 0 
+      });
     } catch (error) {
       console.error('Comment vote error:', error);
       res.status(500).json({ message: "Failed to record vote" });
