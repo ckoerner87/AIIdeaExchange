@@ -403,7 +403,7 @@ export default function Home() {
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 max-w-3xl mx-auto">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h3 className="text-lg font-semibold text-green-900">Need Ideas? Ask ChatGPT!</h3>
+                  <h2 className="text-lg font-semibold text-green-900">Need Ideas? Ask ChatGPT!</h2>
                 </div>
                 <p className="text-sm text-green-800 mb-3">
                   Copy this prompt to ChatGPT, then paste the best responses into the form below:
@@ -430,7 +430,8 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                   {/* Expand/Collapse button */}
                   <button
                     onClick={() => setIsPromptExpanded(!isPromptExpanded)}
-                    className="absolute bottom-2 left-2 text-green-600 hover:text-green-800 text-xs flex items-center gap-1 transition-colors"
+                    className="absolute bottom-2 left-2 text-green-700 hover:text-green-900 text-xs flex items-center gap-1 transition-colors font-medium"
+                    aria-label={isPromptExpanded ? "Collapse ChatGPT prompt" : "Expand ChatGPT prompt"}
                   >
                     {isPromptExpanded ? (
                       <>
@@ -469,7 +470,8 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                         btn.classList.remove("bg-green-600");
                       }, 2000);
                     }}
-                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-md transition-colors"
+                    className="absolute top-2 right-2 bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded-md transition-colors font-medium"
+                    aria-label="Copy ChatGPT prompt to clipboard"
                   >
                     Copy
                   </button>

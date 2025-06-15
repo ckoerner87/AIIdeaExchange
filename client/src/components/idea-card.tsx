@@ -209,7 +209,8 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
               {shouldTruncate && (
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-0.5"
+                  className="text-blue-700 hover:text-blue-900 text-sm font-medium mt-0.5"
+                  aria-label={`${isExpanded ? "Collapse" : "Expand"} idea description: ${idea.useCase?.substring(0, 50) || idea.title || 'this idea'}...`}
                 >
                   {isExpanded ? "Show less" : "Read more"}
                 </button>
