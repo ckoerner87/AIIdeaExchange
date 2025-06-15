@@ -434,11 +434,48 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       }
       return response.json();
     },
-    onSuccess: async (data: any) => {
-      const newVoteCount = data.voteCount || data.votes || 0;
-      const commentId = voteCommentMutation.variables?.commentId;
+    onMutate: async ({ commentId, voteType }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
       
-      // Update the specific comment's vote count in the cache
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(["/api/ideas", ideaId, "comments"]);
+      
+      // Optimistically update the vote count
+      queryClient.setQueryData(["/api/ideas", ideaId, "comments"], (oldData: any) => {
+        if (!oldData) return oldData;
+        
+        return oldData.map((comment: any) => {
+          if (comment.id === commentId) {
+            const currentVotes = comment.votes || 0;
+            const newVotes = voteType === 'up' ? currentVotes + 1 : Math.max(0, currentVotes - 1);
+            return { ...comment, votes: newVotes };
+          }
+          // Also update in replies
+          if (comment.replies) {
+            return {
+              ...comment,
+              replies: comment.replies.map((reply: any) => {
+                if (reply.id === commentId) {
+                  const currentVotes = reply.votes || 0;
+                  const newVotes = voteType === 'up' ? currentVotes + 1 : Math.max(0, currentVotes - 1);
+                  return { ...reply, votes: newVotes };
+                }
+                return reply;
+              })
+            };
+          }
+          return comment;
+        });
+      });
+      
+      return { previousData };
+    },
+    onSuccess: (data: any, variables) => {
+      const newVoteCount = data.voteCount || data.votes || 0;
+      const commentId = variables.commentId;
+      
+      // Update with actual server response
       queryClient.setQueryData(["/api/ideas", ideaId, "comments"], (oldData: any) => {
         if (!oldData) return oldData;
         
@@ -460,16 +497,13 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
           return comment;
         });
       });
-      
-      // Force immediate refetch to ensure accuracy
-      await queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
-      
-      toast({
-        title: "Vote recorded",
-        description: "Your vote has been recorded successfully",
-      });
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
+      // Rollback optimistic update on error
+      if (context?.previousData) {
+        queryClient.setQueryData(["/api/ideas", ideaId, "comments"], context.previousData);
+      }
+      
       const errorMessage = error.message.includes("429") 
         ? "Please wait before voting again" 
         : "Failed to record vote";

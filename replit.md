@@ -106,4 +106,7 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
-- June 14, 2025. Initial setup
+- June 15, 2025: Fixed comment voting UI with optimistic updates for instant feedback
+- June 15, 2025: Enhanced accessibility for PageSpeed - added aria-labels, improved contrast, fixed heading hierarchy
+- June 15, 2025: Added CSV logging system for user registration data capture
+- June 14, 2025: Initial setup
