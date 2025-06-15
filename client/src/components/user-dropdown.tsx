@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 
 interface UserDropdownProps {
   user: {
-    id: string;
-    username?: string;
-    email?: string;
-    firstName?: string;
-    lastName?: string;
+    id: string | number;
+    username?: string | null;
+    email?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
   };
   onLogout: () => void;
 }
@@ -54,6 +54,17 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
 
             {/* Menu Items */}
             <div className="py-1">
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  window.location.href = '/admin';
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+              >
+                <Settings className="w-4 h-4 mr-3" />
+                Admin Dashboard
+              </button>
+
               <button
                 onClick={() => {
                   setIsOpen(false);

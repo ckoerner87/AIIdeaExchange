@@ -345,7 +345,7 @@ export default function Home() {
               
               {/* Authentication Area */}
               <div className="flex items-center space-x-3">
-                {isAuthenticated && user ? (
+                {!authLoading && user ? (
                   <div className="flex items-center space-x-3">
                     <UserDropdown 
                       user={user} 
@@ -353,6 +353,10 @@ export default function Home() {
                         window.location.href = '/api/logout';
                       }}
                     />
+                  </div>
+                ) : authLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">

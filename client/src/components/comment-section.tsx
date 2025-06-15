@@ -328,6 +328,11 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       // Update comment count immediately
       queryClient.setQueryData(["/api/ideas", ideaId, "comments", "count"], (oldCount: number) => (oldCount || 0) + 1);
       
+      // Invalidate all comment count queries for this idea
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/ideas", ideaId, "comments", "count"]
+      });
+      
       // Also invalidate the main ideas list to update comment count there
       queryClient.invalidateQueries({ queryKey: ["/api/ideas"] });
       
