@@ -724,9 +724,6 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           </div>
         )}
 
-        </div>
-      )}
-
         {/* Subscription Section */}
         <div id="subscription-section" className="mt-12">
           <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
@@ -806,13 +803,15 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
       </footer>
 
       {/* Gift Card Popup */}
-      <GiftCardPopup
-        isOpen={showGiftCardPopup}
-        onClose={handleGiftCardPopupClose}
-        sessionId={sessionId}
-        submittedIdeaId={newlySubmittedIdeaId || undefined}
-        submittedIdeaText={submittedIdeaText}
-      />
+      <Suspense fallback={null}>
+        <GiftCardPopup
+          isOpen={showGiftCardPopup}
+          onClose={handleGiftCardPopupClose}
+          sessionId={sessionId}
+          submittedIdeaId={newlySubmittedIdeaId || undefined}
+          submittedIdeaText={submittedIdeaText}
+        />
+      </Suspense>
 
       {/* Account Creation Popup */}
       <Suspense fallback={null}>
