@@ -13,7 +13,7 @@
     <!-- Critical CSS inline -->
     <style>
       html { font-family: system-ui, -apple-system, sans-serif; }
-      body { margin: 0; background: #f8fafc; font-display: swap; }
+      body { margin: 0; background: #f8fafc; font-display: swap; -webkit-font-smoothing: antialiased; }
       .loading-spinner { 
         border: 2px solid #f3f3f3; 
         border-top: 2px solid #3498db; 
@@ -22,6 +22,7 @@
         height: 20px; 
         animation: spin 1s linear infinite; 
         margin: 20px auto;
+        will-change: transform;
       }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
       /* Critical above-the-fold styles */
@@ -31,6 +32,16 @@
       .text-center { text-align: center; }
       .mb-4 { margin-bottom: 1rem; }
       .mb-8 { margin-bottom: 2rem; }
+      /* Mobile performance optimizations */
+      * { -webkit-tap-highlight-color: transparent; }
+      img { content-visibility: auto; }
+      .animate-pulse { will-change: opacity; }
+      /* Reduce paint complexity */
+      .rounded-xl { border-radius: 0.75rem; contain: layout style paint; }
+      .shadow-lg { contain: layout style paint; }
+      /* Prevent layout shifts */
+      .idea-card { min-height: 200px; }
+      .comment-section { min-height: 100px; }
     </style>
     <title>How Do You Use AI? - Creative AI Use Cases & ChatGPT Ideas | AI Tools Community</title>
     <meta name="description" content="Discover hundreds of creative ways to use AI and ChatGPT. Share your AI use cases, learn practical AI applications, and explore how others use artificial intelligence for work, business, and daily life." />

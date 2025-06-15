@@ -2,7 +2,7 @@ import { ChevronUp, ChevronDown, Flag, ExternalLink, Copy, Link2, Image, FileTex
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState, memo, lazy, Suspense } from "react";
+import { useState, memo, lazy, Suspense, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Idea } from "@shared/schema";
 
@@ -71,14 +71,24 @@ const formatTimeAgo = (date: Date) => {
 export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false, isSharedLink = false, isRecentlySubmitted = false }: IdeaCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
-  const maxLength = 150; // Character limit for truncation
-  const useCase = idea.useCase || idea.description || idea.title || "";
-  const shouldTruncate = useCase.length > maxLength;
-  const displayText = shouldTruncate && !isExpanded 
-    ? useCase.substring(0, maxLength) + "..." 
-    : useCase;
+  
+  // Memoize expensive calculations for better performance
+  const { useCase, shouldTruncate, displayText } = useMemo(() => {
+    const maxLength = 150;
+    const text = idea.useCase || idea.description || idea.title || "";
+    const truncate = text.length > maxLength;
+    const display = truncate && !isExpanded 
+      ? text.substring(0, maxLength) + "..." 
+      : text;
+    
+    return {
+      useCase: text,
+      shouldTruncate: truncate,
+      displayText: display
+    };
+  }, [idea.useCase, idea.description, idea.title, isExpanded]);
 
-  const handleShareIdea = async () => {
+  const handleShareIdea = useCallback(async () => {
     const shareUrl = `${window.location.origin}/?idea=${idea.id}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -99,7 +109,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
         description: "Share this link to let others see this specific AI use case",
       });
     }
-  };
+  }, [idea.id, toast]);
 
   return (
     <Card className={`border hover:shadow-lg transition-all ${

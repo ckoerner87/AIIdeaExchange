@@ -48,15 +48,24 @@ export default function Home() {
   const [interactionCount, setInteractionCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check screen size for mobile optimization
+  // Check screen size for mobile optimization with debouncing
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
     };
     
+    let timeoutId: NodeJS.Timeout;
+    const debouncedResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkScreenSize, 100);
+    };
+    
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
+    window.addEventListener('resize', debouncedResize, { passive: true });
+    return () => {
+      window.removeEventListener('resize', debouncedResize);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // Check paywall status
