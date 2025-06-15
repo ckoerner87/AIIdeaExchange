@@ -434,22 +434,25 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       }
       return response.json();
     },
-    onSuccess: async (data: { voteCount: number }) => {
+    onSuccess: async (data: any) => {
+      const newVoteCount = data.voteCount || data.votes || 0;
+      const commentId = voteCommentMutation.variables?.commentId;
+      
       // Update the specific comment's vote count in the cache
       queryClient.setQueryData(["/api/ideas", ideaId, "comments"], (oldData: any) => {
         if (!oldData) return oldData;
         
         return oldData.map((comment: any) => {
-          if (comment.id === voteCommentMutation.variables?.commentId) {
-            return { ...comment, votes: data.voteCount };
+          if (comment.id === commentId) {
+            return { ...comment, votes: newVoteCount };
           }
           // Also update in replies
           if (comment.replies) {
             return {
               ...comment,
               replies: comment.replies.map((reply: any) => 
-                reply.id === voteCommentMutation.variables?.commentId 
-                  ? { ...reply, votes: data.voteCount }
+                reply.id === commentId 
+                  ? { ...reply, votes: newVoteCount }
                   : reply
               )
             };
@@ -458,8 +461,13 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
         });
       });
       
-      // Invalidate to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      // Force immediate refetch to ensure accuracy
+      await queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      
+      toast({
+        title: "Vote recorded",
+        description: "Your vote has been recorded successfully",
+      });
     },
     onError: (error) => {
       const errorMessage = error.message.includes("429") 
