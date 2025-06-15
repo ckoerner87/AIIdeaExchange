@@ -18,7 +18,7 @@ import SubscriptionForm from "@/components/subscription-form";
 import UnlockMessage from "@/components/unlock-message";
 import InlineSubscribe from "@/components/inline-subscribe";
 import { UserDropdown } from "@/components/user-dropdown";
-import ContactForm from "@/components/contact-form";
+
 
 export default function Home() {
   const { toast } = useToast();
@@ -498,7 +498,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
         {(!paywallEnabled || hasSubmitted) && (
           <div>
             {/* Page Title */}
-            <div className="mb-8">
+            <div className="mb-4">
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 text-center">
                 {paywallEnabled ? "AI Use Case Ideas" : "AI + Ideas = Life Changing. Start here 👇"}
               </h1>
@@ -748,9 +748,14 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
         </div>
 
-        {/* Contact Form Section */}
-        <div className="mt-12">
-          <ContactForm />
+        {/* Feature Request Section */}
+        <div className="mt-12 text-center">
+          <a
+            href="mailto:chris@cofounders.com?subject=Feature Request - AI Ideas Exchange"
+            className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            💡 Request a Feature
+          </a>
         </div>
 
         {/* SEO Content Section - Moved to bottom for cleaner UX while preserving SEO */}
