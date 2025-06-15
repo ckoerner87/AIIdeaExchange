@@ -261,7 +261,7 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
   const queryClient = useQueryClient();
   
   // Get session ID from storage
-  const sessionId = localStorage.getItem('sessionId');
+  const sessionId = localStorage.getItem('ai-ideas-session');
 
   // No pending comment logic needed for anonymous comments
 
@@ -476,7 +476,7 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
 
   const handleVote = (commentId: number, voteType: 'up' | 'down') => {
     // Get session ID dynamically from the correct localStorage key
-    const currentSessionId = localStorage.getItem('sessionId') || sessionId;
+    const currentSessionId = localStorage.getItem('ai-ideas-session') || sessionId;
     
     if (!currentSessionId) {
       toast({
@@ -507,7 +507,7 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
 
   const createReplyMutation = useMutation({
     mutationFn: async ({ parentId, content }: { parentId: number; content: string }) => {
-      const currentSessionId = localStorage.getItem('sessionId') || sessionId;
+      const currentSessionId = localStorage.getItem('ai-ideas-session') || sessionId;
       const response = await fetch(`/api/comments/${parentId}/replies`, {
         method: "POST",
         headers: { 
