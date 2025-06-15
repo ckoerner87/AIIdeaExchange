@@ -106,6 +106,7 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
+- June 15, 2025: Improved user experience - show 15 ideas on initial load with 20 more on pagination, replaced GIF sections with contact form sending to chris@cofounders.com, removed feature request section
 - June 15, 2025: Implemented aggressive mobile PageSpeed optimizations to improve score from 71 - reduced initial page load to 8 ideas, eliminated render-blocking resources, optimized critical CSS, improved image loading with dimensions, reduced JavaScript bundle size, enhanced server compression, and minimized DOM complexity
 - June 15, 2025: Enhanced duplicate vote handling to silently ignore attempts instead of showing error messages
 - June 15, 2025: Fixed comment voting UI with optimistic updates for instant feedback

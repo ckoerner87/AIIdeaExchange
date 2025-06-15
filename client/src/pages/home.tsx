@@ -18,6 +18,7 @@ import SubscriptionForm from "@/components/subscription-form";
 import UnlockMessage from "@/components/unlock-message";
 import InlineSubscribe from "@/components/inline-subscribe";
 import { UserDropdown } from "@/components/user-dropdown";
+import ContactForm from "@/components/contact-form";
 
 export default function Home() {
   const { toast } = useToast();
@@ -38,7 +39,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
-  const [visibleIdeasCount, setVisibleIdeasCount] = useState(8);
+  const [visibleIdeasCount, setVisibleIdeasCount] = useState(15);
   const [newlySubmittedIdeaId, setNewlySubmittedIdeaId] = useState<number | null>(null);
   const [isSharedLink, setIsSharedLink] = useState(false);
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
@@ -718,12 +719,12 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 {ideas.length > visibleIdeasCount && (
                   <div className="text-center pt-8">
                     <Button
-                      onClick={() => setVisibleIdeasCount(prev => prev + 8)}
+                      onClick={() => setVisibleIdeasCount(prev => prev + 20)}
                       variant="outline"
                       className="px-4 md:px-8 py-3 text-sm md:text-lg whitespace-nowrap"
                     >
-                      <span className="hidden sm:inline">Show 8 More Ideas ({ideas.length - visibleIdeasCount} remaining)</span>
-                      <span className="sm:hidden">Show 8 More ({ideas.length - visibleIdeasCount})</span>
+                      <span className="hidden sm:inline">Show 20 More Ideas ({ideas.length - visibleIdeasCount} remaining)</span>
+                      <span className="sm:hidden">Show 20 More ({ideas.length - visibleIdeasCount})</span>
                     </Button>
                   </div>
                 )}
@@ -747,33 +748,9 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
           <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
         </div>
 
-        {/* GIF Section */}
-        <div className="mt-8 text-center">
-          <div className="flex justify-center gap-6 flex-wrap">
-            <img 
-              src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHdpa3piajBreXl0NnBheGV6ZmNoZHl5cnV0NGhsc3F1YWx4N3ZwNCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/fZoKDBwdbILBjhtXZD/giphy.gif"
-              alt="AI Animation Left"
-              className="rounded-lg shadow-md max-w-sm w-full"
-            />
-            <img 
-              src="https://media.giphy.com/media/SbGMR2CbpUxzCxBL9j/giphy.gif?cid=ecf05e47zlpbxusjvpvzr0yjl5cq0c40uyrebycxspdnupa6&ep=v1_gifs_search&rid=giphy.gif&ct=g"
-              alt="AI Animation Right"
-              className="rounded-lg shadow-md max-w-sm w-full"
-            />
-          </div>
-        </div>
-
-        {/* Feature Request Section */}
-        <div className="mt-12 text-center">
-          <a 
-            href="mailto:chris@cofounders.com?subject=Feature Request - How Do You Use AI?" 
-            className="inline-block bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-xl font-bold text-xl hover:shadow-lg transition-all transform hover:scale-105"
-          >
-            💡 Got Ideas? Send Feature Requests
-          </a>
-          <p className="text-slate-600 mt-3 text-sm">
-            Help us improve the platform by sharing your suggestions
-          </p>
+        {/* Contact Form Section */}
+        <div className="mt-12">
+          <ContactForm />
         </div>
 
         {/* SEO Content Section - Moved to bottom for cleaner UX while preserving SEO */}

@@ -312,6 +312,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contact form endpoint
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const { name, email, message } = req.body;
+      
+      if (!name || !email || !message) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+
+      // Send email using SendGrid
+      try {
+        const { sendEmail } = await import('./sendgrid');
+        if (process.env.SENDGRID_API_KEY) {
+          const emailSent = await sendEmail(process.env.SENDGRID_API_KEY, {
+            to: 'chris@cofounders.com',
+            from: 'noreply@howdoyouuseai.com',
+            subject: `Contact Form: Message from ${name}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #333;">New Contact Form Message</h2>
+                <p><strong>From:</strong> ${name} (${email})</p>
+                <p><strong>Message:</strong></p>
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                  ${message.replace(/\n/g, '<br>')}
+                </div>
+                <p style="color: #666; font-size: 14px;">
+                  Reply directly to this email to respond to ${name}.
+                </p>
+              </div>
+            `,
+            text: `New Contact Form Message\n\nFrom: ${name} (${email})\n\nMessage:\n${message}`
+          });
+          
+          if (!emailSent) {
+            console.error('Failed to send contact email');
+          }
+        }
+      } catch (emailError) {
+        console.error('Contact email error:', emailError);
+        // Don't fail the request if email fails
+      }
+
+      res.json({ message: "Message sent successfully" });
+    } catch (error) {
+      console.error('Contact form error:', error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
   // Update session activity
   app.post("/api/session/activity", async (req, res) => {
     try {
