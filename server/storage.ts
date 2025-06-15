@@ -81,6 +81,11 @@ export interface IStorage {
   getRecentCommentVotesBySession(sessionId: string, timeWindowMs: number): Promise<CommentVote[]>;
   getRecentCommentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<CommentVote[]>;
   updateCommentUsername(commentId: number, sessionId: string, username: string): Promise<void>;
+  
+  // User-specific queries for dashboard
+  getIdeasByUserId(userId: string): Promise<Idea[]>;
+  getCommentsByUserId(userId: string): Promise<(Comment & { ideaTitle: string })[]>;
+  getUserStats(userId: string): Promise<{ totalIdeas: number; totalUpvotes: number; totalComments: number; averageScore: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -619,6 +624,72 @@ export class DatabaseStorage implements IStorage {
       ON CONFLICT (comment_id, session_id)
       DO UPDATE SET username = ${username}
     `);
+  }
+
+  // User-specific queries for dashboard
+  async getIdeasByUserId(userId: string): Promise<Idea[]> {
+    return await db
+      .select()
+      .from(ideas)
+      .where(eq(ideas.userId, userId))
+      .orderBy(desc(ideas.createdAt));
+  }
+
+  async getCommentsByUserId(userId: string): Promise<(Comment & { ideaTitle: string })[]> {
+    const result = await db
+      .select({
+        id: comments.id,
+        content: comments.content,
+        votes: comments.votes,
+        createdAt: comments.createdAt,
+        updatedAt: comments.updatedAt,
+        ideaId: comments.ideaId,
+        userId: comments.userId,
+        parentId: comments.parentId,
+        sessionId: comments.sessionId,
+        anonymousUsername: comments.anonymousUsername,
+        ideaTitle: ideas.useCase
+      })
+      .from(comments)
+      .leftJoin(ideas, eq(comments.ideaId, ideas.id))
+      .where(eq(comments.userId, parseInt(userId)))
+      .orderBy(desc(comments.createdAt));
+
+    return result as (Comment & { ideaTitle: string })[];
+  }
+
+  async getUserStats(userId: string): Promise<{ totalIdeas: number; totalUpvotes: number; totalComments: number; averageScore: number }> {
+    // Get user's ideas count and total upvotes
+    const ideasResult = await db
+      .select({
+        count: sql<number>`count(*)`,
+        totalUpvotes: sql<number>`sum(${ideas.votes})`
+      })
+      .from(ideas)
+      .where(eq(ideas.userId, userId));
+
+    // Get user's comments count
+    const commentsResult = await db
+      .select({
+        count: sql<number>`count(*)`
+      })
+      .from(comments)
+      .where(eq(comments.userId, parseInt(userId)));
+
+    // Get average AI grade for user's ideas
+    const averageResult = await db
+      .select({
+        average: sql<number>`avg(${ideas.aiGrade})`
+      })
+      .from(ideas)
+      .where(and(eq(ideas.userId, userId), sql`${ideas.aiGrade} IS NOT NULL`));
+
+    return {
+      totalIdeas: ideasResult[0]?.count || 0,
+      totalUpvotes: ideasResult[0]?.totalUpvotes || 0,
+      totalComments: commentsResult[0]?.count || 0,
+      averageScore: Math.round((averageResult[0]?.average || 0) * 10) / 10
+    };
   }
 }
 
