@@ -9,6 +9,7 @@ import Admin from "@/pages/admin";
 import AdminComments from "@/pages/admin-comments";
 import AuthPage from "@/pages/auth-page";
 import UserDashboard from "@/pages/user-dashboard";
+import NotificationPreferences from "@/pages/notification-preferences";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { initGA } from "./lib/analytics";
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/dashboard" component={UserDashboard} />
+      <Route path="/notifications" component={NotificationPreferences} />
       <Route path="/admin" component={Admin} />
       <Route path="/admin/comments" component={AdminComments} />
       <Route component={NotFound} />

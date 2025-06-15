@@ -848,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User-specific endpoints for dashboard
   app.get("/api/user/ideas", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const userIdeas = await storage.getIdeasByUserId(userId);
       res.json(userIdeas);
     } catch (error) {
@@ -859,7 +859,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/user/comments", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const userComments = await storage.getCommentsByUserId(userId);
       res.json(userComments);
     } catch (error) {
@@ -870,7 +870,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/user/stats", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const stats = await storage.getUserStats(userId);
       res.json(stats);
     } catch (error) {

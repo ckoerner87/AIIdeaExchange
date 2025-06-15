@@ -434,9 +434,12 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Invalidate and refetch comments to update vote counts
       queryClient.invalidateQueries({ queryKey: ["/api/ideas", ideaId, "comments"] });
+      
+      // Force immediate refetch to update vote counts
+      await refetch();
     },
     onError: (error) => {
       toast({

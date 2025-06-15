@@ -68,7 +68,7 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  // TODO: Open notification preferences
+                  window.location.href = '/notifications';
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
               >
