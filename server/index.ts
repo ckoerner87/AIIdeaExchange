@@ -19,13 +19,15 @@ app.use(compression({
 
 // Performance and cache headers
 app.use((req, res, next) => {
-  // Cache static assets for 1 year
+  // Cache static assets for 1 year with compression
   if (req.url.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('Vary', 'Accept-Encoding');
   }
-  // Cache API responses for 5 minutes
+  // Cache API responses for 2 minutes (shorter for faster updates)
   else if (req.url.startsWith('/api/')) {
-    res.setHeader('Cache-Control', 'public, max-age=300');
+    res.setHeader('Cache-Control', 'public, max-age=120');
+    res.setHeader('Vary', 'Accept-Encoding');
   }
   // Don't cache HTML pages
   else {

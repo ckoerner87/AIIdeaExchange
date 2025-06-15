@@ -38,7 +38,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sharedIdeaAccess, setSharedIdeaAccess] = useState(false);
   const [highlightedIdeaId, setHighlightedIdeaId] = useState<number | null>(null);
-  const [visibleIdeasCount, setVisibleIdeasCount] = useState(20);
+  const [visibleIdeasCount, setVisibleIdeasCount] = useState(8);
   const [newlySubmittedIdeaId, setNewlySubmittedIdeaId] = useState<number | null>(null);
   const [isSharedLink, setIsSharedLink] = useState(false);
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
@@ -718,12 +718,12 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 {ideas.length > visibleIdeasCount && (
                   <div className="text-center pt-8">
                     <Button
-                      onClick={() => setVisibleIdeasCount(prev => prev + 20)}
+                      onClick={() => setVisibleIdeasCount(prev => prev + 8)}
                       variant="outline"
                       className="px-4 md:px-8 py-3 text-sm md:text-lg whitespace-nowrap"
                     >
-                      <span className="hidden sm:inline">Show 20 More Ideas ({ideas.length - visibleIdeasCount} remaining)</span>
-                      <span className="sm:hidden">Show 20 More ({ideas.length - visibleIdeasCount})</span>
+                      <span className="hidden sm:inline">Show 8 More Ideas ({ideas.length - visibleIdeasCount} remaining)</span>
+                      <span className="sm:hidden">Show 8 More ({ideas.length - visibleIdeasCount})</span>
                     </Button>
                   </div>
                 )}
