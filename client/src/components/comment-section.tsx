@@ -442,9 +442,13 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
       await refetch();
     },
     onError: (error) => {
+      const errorMessage = error.message.includes("429") 
+        ? "Please wait before voting again" 
+        : "Failed to record vote";
+      
       toast({
         title: "Error",
-        description: "Failed to record vote",
+        description: errorMessage,
         variant: "destructive",
       });
     },
