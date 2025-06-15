@@ -202,6 +202,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('Failed to auto-subscribe user:', error);
       }
 
+      // Send welcome email notification
+      try {
+        const { sendEmail } = await import('./sendgrid');
+        if (process.env.SENDGRID_API_KEY) {
+          const emailSent = await sendEmail(process.env.SENDGRID_API_KEY, {
+            to: email,
+            from: 'noreply@howdoyouuseai.com',
+            subject: 'Welcome to How Do You Use AI - Account Created!',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #333;">Welcome to How Do You Use AI!</h2>
+                <p>Hi ${username},</p>
+                <p>Your account has been successfully created. You can now:</p>
+                <ul>
+                  <li>Submit your own AI use cases</li>
+                  <li>Vote on community ideas</li>
+                  <li>Comment and engage with others</li>
+                  <li>Access exclusive features as they're released</li>
+                </ul>
+                <p>Start exploring amazing AI use cases from our community!</p>
+                <p style="margin-top: 30px;">
+                  <a href="https://howdoyouuseai.com" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Visit How Do You Use AI</a>
+                </p>
+                <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                  If you didn't create this account, please ignore this email.
+                </p>
+              </div>
+            `,
+            text: `Welcome to How Do You Use AI! Your account "${username}" has been successfully created. Start exploring amazing AI use cases from our community at https://howdoyouuseai.com`
+          });
+          
+          if (!emailSent) {
+            console.error('Failed to send welcome email to:', email);
+          }
+        }
+      } catch (error) {
+        console.error('Welcome email error:', error);
+      }
+
       res.json({ 
         success: true, 
         user: { 
@@ -550,6 +589,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const ideaId = parseInt(req.params.id);
       let userId = null;
+      const sessionId = req.headers['x-session-id'];
       
       // Check if user is authenticated
       if (req.isAuthenticated() && req.user?.claims?.sub) {
@@ -559,7 +599,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = insertCommentSchema.safeParse({
         ...req.body,
         ideaId,
-        userId
+        userId,
+        sessionId: !userId ? sessionId : null // Only store sessionId for anonymous comments
       });
       
       if (!result.success) {

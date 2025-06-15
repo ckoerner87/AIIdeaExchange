@@ -442,6 +442,16 @@ export class DatabaseStorage implements IStorage {
     return result?.count || 0;
   }
 
+  async updateCommentUsername(commentId: number, sessionId: string, username: string): Promise<void> {
+    await db
+      .update(comments)
+      .set({ anonymousUsername: username })
+      .where(and(
+        eq(comments.id, commentId),
+        eq(comments.sessionId, sessionId)
+      ));
+  }
+
   async getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]> {
     const result = await db
       .select({

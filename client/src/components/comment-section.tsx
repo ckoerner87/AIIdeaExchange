@@ -67,18 +67,29 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
     return 'U';
   };
 
-  const getDisplayName = (user: UserType | null) => {
-    if (!user) return "Chris's New Friend";
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+  const getDisplayName = (comment: any) => {
+    // For anonymous comments, use the anonymousUsername if available
+    if (!comment.user && comment.anonymousUsername) {
+      return comment.anonymousUsername;
     }
-    if (user.firstName) {
-      return user.firstName;
+    
+    // For authenticated users
+    if (comment.user) {
+      const user = comment.user;
+      if (user.firstName && user.lastName) {
+        return `${user.firstName} ${user.lastName}`;
+      }
+      if (user.firstName) {
+        return user.firstName;
+      }
+      if (user.username) {
+        return user.username;
+      }
+      return user.email?.split('@')[0] || "Anonymous";
     }
-    if (user.username) {
-      return user.username;
-    }
-    return user.email?.split('@')[0] || "Chris's New Friend";
+    
+    // Default for anonymous without username
+    return "Anonymous";
   };
 
   return (
@@ -113,13 +124,13 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
           {comment.user?.profileImageUrl && (
             <AvatarImage 
               src={comment.user.profileImageUrl} 
-              alt={`${getDisplayName(comment.user)}'s avatar`}
+              alt={`${getDisplayName(comment)}'s avatar`}
               loading="lazy"
               decoding="async"
             />
           )}
           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-medium">
-            {getInitials(comment.user)}
+            {comment.anonymousUsername ? comment.anonymousUsername.charAt(0).toUpperCase() : getInitials(comment.user)}
           </AvatarFallback>
         </Avatar>
       </Suspense>
@@ -127,7 +138,7 @@ const CommentItem = memo(({ comment, onDelete, currentUserId, onVote, sessionId,
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="font-medium text-sm text-gray-900 truncate">
-            {getDisplayName(comment.user)}
+            {getDisplayName(comment)}
           </span>
           <span className="text-xs text-gray-500 flex-shrink-0">
             {formatTimeAgo(new Date(comment.createdAt))}
