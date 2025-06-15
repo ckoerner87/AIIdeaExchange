@@ -138,22 +138,16 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
         )}
         <div className="flex items-start space-x-4">
           <div className="flex flex-col items-center space-y-1">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
               onClick={() => onVote(idea.id, 'up')}
               disabled={isVoting}
               aria-label={`Upvote idea: ${idea.useCase?.substring(0, 50) || idea.title || 'this idea'}...`}
             >
               <ChevronUp className="text-slate-600 hover:text-blue-600 h-5 w-5" />
-            </Button>
-            <div className="px-2 text-center">
-              <span className="text-sm font-semibold text-slate-700 block">{idea.votes}</span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
+            </button>
+            <span className="text-sm font-semibold text-slate-700 px-2">{idea.votes}</span>
+            <button
               className={`p-1 rounded-lg transition-colors ${
                 idea.votes >= 100 
                   ? "hover:bg-slate-100" 
@@ -173,7 +167,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                   ? "text-slate-600 hover:text-red-600" 
                   : "text-slate-300"
               }`} />
-            </Button>
+            </button>
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-3 mb-3">
@@ -320,18 +314,13 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                 {idea.tools && <span>Tools: {idea.tools}</span>}
                 <span>{formatTimeAgo(idea.submittedAt)}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleShareIdea}
-                  className="flex items-center space-x-1 text-slate-400 hover:text-slate-600"
-                >
-                  <Copy className="h-3 w-3" />
-                  <span>Share</span>
-                </Button>
-
-              </div>
+              <button
+                onClick={handleShareIdea}
+                className="flex items-center space-x-1 text-slate-400 hover:text-slate-600 text-sm px-2 py-1 rounded"
+              >
+                <Copy className="h-3 w-3" />
+                <span>Share</span>
+              </button>
             </div>
             
             {/* Comment Section */}
