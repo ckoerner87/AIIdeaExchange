@@ -851,10 +851,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid vote type" });
       }
 
-      // Check if user already voted on this specific comment
+      // Check if user already voted on this specific comment - silently ignore if duplicate
       const existingVote = await storage.getCommentVote(commentId, sessionId);
       if (existingVote) {
-        return res.status(400).json({ message: "You have already voted on this comment" });
+        const currentComment = await storage.getCommentById(commentId);
+        return res.json({ 
+          message: "Vote already recorded", 
+          voteCount: currentComment?.votes || 0 
+        });
       }
 
       // Global rate limiting: 2 seconds between any comment votes

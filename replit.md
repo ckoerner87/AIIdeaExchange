@@ -106,6 +106,8 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
+- June 15, 2025: Implemented comprehensive mobile PageSpeed optimizations - lazy loading components, reduced JavaScript execution time, image optimization, CSS containment, and performance monitoring
+- June 15, 2025: Enhanced duplicate vote handling to silently ignore attempts instead of showing error messages
 - June 15, 2025: Fixed comment voting UI with optimistic updates for instant feedback
 - June 15, 2025: Enhanced accessibility for PageSpeed - added aria-labels, improved contrast, fixed heading hierarchy
 - June 15, 2025: Added CSV logging system for user registration data capture
