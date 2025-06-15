@@ -845,6 +845,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User-specific endpoints for dashboard
+  app.get("/api/user/ideas", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userIdeas = await storage.getIdeasByUserId(userId);
+      res.json(userIdeas);
+    } catch (error) {
+      console.error('Get user ideas error:', error);
+      res.status(500).json({ message: "Failed to get user ideas" });
+    }
+  });
+
+  app.get("/api/user/comments", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userComments = await storage.getCommentsByUserId(userId);
+      res.json(userComments);
+    } catch (error) {
+      console.error('Get user comments error:', error);
+      res.status(500).json({ message: "Failed to get user comments" });
+    }
+  });
+
+  app.get("/api/user/stats", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const stats = await storage.getUserStats(userId);
+      res.json(stats);
+    } catch (error) {
+      console.error('Get user stats error:', error);
+      res.status(500).json({ message: "Failed to get user stats" });
+    }
+  });
+
   // Subscribe to weekly digest
   app.post("/api/subscribe", async (req, res) => {
     try {

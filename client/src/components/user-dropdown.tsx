@@ -57,23 +57,12 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  window.location.href = '/admin';
+                  window.location.href = '/dashboard';
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
               >
-                <Settings className="w-4 h-4 mr-3" />
-                Admin Dashboard
-              </button>
-
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  // TODO: Navigate to post history
-                }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
-              >
-                <MessageCircle className="w-4 h-4 mr-3" />
-                Post & Reply History
+                <User className="w-4 h-4 mr-3" />
+                My Dashboard
               </button>
 
               <button
