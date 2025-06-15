@@ -399,6 +399,8 @@ export class DatabaseStorage implements IStorage {
         ideaId: comments.ideaId,
         userId: comments.userId,
         parentId: comments.parentId,
+        sessionId: comments.sessionId,
+        anonymousUsername: comments.anonymousUsername,
         content: comments.content,
         votes: comments.votes,
         createdAt: comments.createdAt,

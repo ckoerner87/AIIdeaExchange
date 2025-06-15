@@ -74,6 +74,8 @@ export const comments = pgTable("comments", {
   ideaId: integer("idea_id").notNull(),
   userId: integer("user_id"), // Allow null for anonymous comments
   parentId: integer("parent_id"), // For nested comments
+  sessionId: text("session_id"), // For anonymous comments
+  anonymousUsername: text("anonymous_username"), // For anonymous comments
   content: text("content").notNull(),
   votes: integer("votes").default(1),
   createdAt: timestamp("created_at").notNull().defaultNow(),
