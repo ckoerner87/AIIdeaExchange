@@ -245,8 +245,9 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                     loading="lazy"
                     decoding="async"
                     fetchPriority="low"
-                    width="600"
-                    height="400"
+                    width={600}
+                    height={400}
+                    style={{ aspectRatio: '3/2', objectFit: 'cover' }}
                   />
                 )}
               </div>

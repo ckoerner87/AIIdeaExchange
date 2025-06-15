@@ -10,10 +10,11 @@
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     <link rel="dns-prefetch" href="//fonts.gstatic.com" />
     
-    <!-- Critical CSS inline -->
+    <!-- Critical CSS inline - minimal for fastest LCP -->
     <style>
-      html { font-family: system-ui, -apple-system, sans-serif; }
-      body { margin: 0; background: #f8fafc; font-display: swap; -webkit-font-smoothing: antialiased; }
+      html { font-family: system-ui, -apple-system, sans-serif; font-display: swap; }
+      body { margin: 0; background: #f8fafc; -webkit-font-smoothing: antialiased; }
+      /* Minimal loading state */
       .loading-spinner { 
         border: 2px solid #f3f3f3; 
         border-top: 2px solid #3498db; 
@@ -22,26 +23,12 @@
         height: 20px; 
         animation: spin 1s linear infinite; 
         margin: 20px auto;
-        will-change: transform;
       }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      /* Critical above-the-fold styles */
+      /* Critical header only */
       .header-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
       .main-container { max-width: 64rem; margin: 0 auto; padding: 1rem; }
-      .text-white { color: white; }
-      .text-center { text-align: center; }
-      .mb-4 { margin-bottom: 1rem; }
-      .mb-8 { margin-bottom: 2rem; }
-      /* Mobile performance optimizations */
-      * { -webkit-tap-highlight-color: transparent; }
-      img { content-visibility: auto; }
-      .animate-pulse { will-change: opacity; }
-      /* Reduce paint complexity */
-      .rounded-xl { border-radius: 0.75rem; contain: layout style paint; }
-      .shadow-lg { contain: layout style paint; }
-      /* Prevent layout shifts */
-      .idea-card { min-height: 200px; }
-      .comment-section { min-height: 100px; }
+      /* Defer non-critical styles */
     </style>
     <title>How Do You Use AI? - Creative AI Use Cases & ChatGPT Ideas | AI Tools Community</title>
     <meta name="description" content="Discover hundreds of creative ways to use AI and ChatGPT. Share your AI use cases, learn practical AI applications, and explore how others use artificial intelligence for work, business, and daily life." />
@@ -84,9 +71,35 @@
     
     <!-- Mobile performance optimizations -->
     <link rel="preload" as="style" href="/src/index.css" />
+    <link rel="preload" as="script" href="/src/main.tsx" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    
+    <!-- Eliminate render-blocking resources -->
+    <style>
+      /* Critical above-the-fold CSS - inline to prevent render blocking */
+      .critical-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #f8fafc;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
     
     <!-- Security Headers to prevent phishing detection -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'none';" />

@@ -182,54 +182,23 @@ img.critical {
   animation: slow-bounce 3s infinite;
 }
 
-/* Mobile performance optimizations */
+/* Critical mobile optimizations only */
 @media screen and (max-width: 768px) {
-  /* Disable smooth scrolling on mobile for better performance */
-  * {
-    scroll-behavior: auto !important;
-  }
-  
-  /* Optimize rendering layers */
-  .idea-card,
-  .comment-section {
-    contain: layout style paint;
-    will-change: transform;
-    transform: translateZ(0);
-  }
-  
-  /* Improve tap targets for mobile */
-  button,
-  .cursor-pointer {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  /* Reduce animation complexity on mobile */
-  .animate-pulse {
-    animation-duration: 2s;
-    will-change: opacity;
-  }
-  
-  /* Optimize image rendering */
-  img {
+  /* Essential performance fixes */
+  * { scroll-behavior: auto !important; }
+  img { 
     image-rendering: optimizeSpeed;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    content-visibility: auto;
   }
+  button { min-height: 44px; min-width: 44px; }
   
-  /* Reduce repaints */
-  .rounded-xl,
-  .shadow-lg {
-    contain: layout style paint;
-  }
+  /* Reduce repaints for key elements */
+  .animate-pulse { animation-duration: 2s; }
 }
 
-/* Reduce motion for better performance */
+/* Disable animations for better performance */
 @media (prefers-reduced-motion: reduce) {
-  .animate-pulse,
-  .animate-spin,
-  .fade-in,
-  .transition-all {
+  * { 
     animation: none !important;
     transition: none !important;
   }

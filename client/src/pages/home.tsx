@@ -7,15 +7,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
-// Lazy load components for better performance
-const IdeaSubmissionForm = lazy(() => import("@/components/idea-submission-form"));
-const IdeaCard = lazy(() => import("@/components/idea-card"));
-const SubscriptionForm = lazy(() => import("@/components/subscription-form"));
-const UnlockMessage = lazy(() => import("@/components/unlock-message"));
-const GiftCardPopup = lazy(() => import("@/components/gift-card-popup"));
-const InlineSubscribe = lazy(() => import("@/components/inline-subscribe"));
-const UserDropdown = lazy(() => import("@/components/user-dropdown").then(module => ({ default: module.UserDropdown })));
+// Lazy load heavy components only
 const AccountCreationPopup = lazy(() => import("@/components/account-creation-popup"));
+const GiftCardPopup = lazy(() => import("@/components/gift-card-popup"));
+
+// Import lightweight components directly to reduce chunk splitting overhead
+import IdeaSubmissionForm from "@/components/idea-submission-form";
+import IdeaCard from "@/components/idea-card";
+import SubscriptionForm from "@/components/subscription-form";
+import UnlockMessage from "@/components/unlock-message";
+import InlineSubscribe from "@/components/inline-subscribe";
+import { UserDropdown } from "@/components/user-dropdown";
 
 export default function Home() {
   const { toast } = useToast();
@@ -487,9 +489,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 </div>
               </div>
             </div>
-            <Suspense fallback={<div className="bg-white rounded-xl border p-6 animate-pulse"><div className="h-32 bg-gray-200 rounded"></div></div>}>
-              <IdeaSubmissionForm sessionId={sessionData?.sessionId || sessionId} onSubmitted={handleIdeaSubmitted} />
-            </Suspense>
+            <IdeaSubmissionForm sessionId={sessionData?.sessionId || sessionId} onSubmitted={handleIdeaSubmitted} />
           </div>
         )}
 
@@ -692,39 +692,21 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                   .slice(0, visibleIdeasCount)
                   .map((idea: any, index: number) => {
                     const elements = [
-                      <Suspense key={idea.id} fallback={
-                        <div className="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
-                          <div className="flex items-start space-x-4">
-                            <div className="w-12 h-20 bg-slate-200 rounded"></div>
-                            <div className="flex-1 space-y-3">
-                              <div className="h-6 bg-slate-200 rounded w-3/4"></div>
-                              <div className="h-4 bg-slate-200 rounded w-full"></div>
-                              <div className="h-4 bg-slate-200 rounded w-5/6"></div>
-                            </div>
-                          </div>
-                        </div>
-                      }>
-                        <IdeaCard 
-                          idea={idea} 
-                          onVote={handleVote}
-                          isVoting={voteMutation.isPending}
-                          isHighlighted={highlightedIdeaId === idea.id || newlySubmittedIdeaId === idea.id}
-                          isRecentlySubmitted={idea.isRecentlySubmitted}
-                          isSharedLink={isSharedLink && highlightedIdeaId === idea.id}
-                        />
-                      </Suspense>
+                      <IdeaCard 
+                        key={idea.id}
+                        idea={idea} 
+                        onVote={handleVote}
+                        isVoting={voteMutation.isPending}
+                        isHighlighted={highlightedIdeaId === idea.id || newlySubmittedIdeaId === idea.id}
+                        isRecentlySubmitted={idea.isRecentlySubmitted}
+                        isSharedLink={isSharedLink && highlightedIdeaId === idea.id}
+                      />
                     ];
                     
                     // Add subscription component after 3rd, 11th, and 18th ideas
                     if (index + 1 === 3 || index + 1 === 11 || index + 1 === 18) {
                       elements.push(
-                        <Suspense key={`subscribe-${selectedCategory}-${selectedTool}-${sortBy}-${index}`} fallback={
-                          <div className="bg-white rounded-xl border p-4 animate-pulse">
-                            <div className="h-20 bg-slate-200 rounded"></div>
-                          </div>
-                        }>
-                          <InlineSubscribe />
-                        </Suspense>
+                        <InlineSubscribe key={`subscribe-${index}`} />
                       );
                     }
                     
