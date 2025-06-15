@@ -504,6 +504,11 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
         queryClient.setQueryData(["/api/ideas", ideaId, "comments"], context.previousData);
       }
       
+      // Don't show error for duplicate votes - just silently ignore
+      if (error.message.includes("already voted")) {
+        return;
+      }
+      
       const errorMessage = error.message.includes("429") 
         ? "Please wait before voting again" 
         : "Failed to record vote";
