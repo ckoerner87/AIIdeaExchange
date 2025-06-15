@@ -55,6 +55,7 @@ This is a full-stack web application built to collect and showcase creative AI u
   - Google Sheets for backup email storage
 - **Analytics**: Google Analytics 4 integration
 - **AI Services**: OpenAI API for content grading
+- **Data Export**: CSV logging system for user registrations with admin download endpoint
 
 ## Data Flow
 

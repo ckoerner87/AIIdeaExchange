@@ -194,6 +194,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordHash,
       });
 
+      // Log user registration to CSV
+      try {
+        const { csvLogger } = await import('./csv-logger');
+        await csvLogger.logUserRegistration({
+          username,
+          email,
+          timestamp: new Date().toISOString(),
+          ipAddress: getClientIP(req),
+        });
+      } catch (error) {
+        console.error('Failed to log user registration to CSV:', error);
+      }
+
       // Auto-subscribe to email list
       try {
         await storage.createSubscription({ email });
@@ -266,6 +279,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       res.status(500).json({ message: "Authentication failed" });
+    }
+  });
+
+  // Download user registrations CSV (admin only)
+  app.get("/api/admin/download-users-csv", async (req, res) => {
+    try {
+      const clientIP = getClientIP(req);
+      if (!isAdminIP(clientIP)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { csvLogger } = await import('./csv-logger');
+      const csvPath = csvLogger.getCSVPath();
+      
+      // Check if file exists
+      const fs = await import('fs');
+      if (!fs.existsSync(csvPath)) {
+        return res.status(404).json({ message: "No user registration data found" });
+      }
+
+      // Set headers for file download
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="user_registrations.csv"');
+      
+      // Stream the file
+      const fileStream = fs.createReadStream(csvPath);
+      fileStream.pipe(res);
+    } catch (error) {
+      console.error('CSV download error:', error);
+      res.status(500).json({ message: "Failed to download CSV" });
     }
   });
 
