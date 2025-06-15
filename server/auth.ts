@@ -57,12 +57,27 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        console.log('Attempting login for username:', username);
         const user = await storage.getUserByUsername(username);
-        if (!user || !(await comparePasswords(password, user.passwordHash))) {
+        console.log('User found:', user ? 'Yes' : 'No');
+        
+        if (!user) {
+          console.log('No user found with username:', username);
           return done(null, false);
         }
+        
+        const passwordMatch = await comparePasswords(password, user.passwordHash);
+        console.log('Password match:', passwordMatch);
+        
+        if (!passwordMatch) {
+          console.log('Password does not match for user:', username);
+          return done(null, false);
+        }
+        
+        console.log('Login successful for user:', username);
         return done(null, user);
       } catch (error) {
+        console.error('LocalStrategy error:', error);
         return done(error);
       }
     }),
@@ -115,15 +130,30 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    const user = req.user as User;
-    res.status(200).json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    });
+  app.post("/api/login", (req, res, next) => {
+    passport.authenticate("local", (err: any, user: any, info: any) => {
+      if (err) {
+        console.error('Login error:', err);
+        return res.status(500).json({ message: "Login failed" });
+      }
+      if (!user) {
+        console.log('Login failed for user:', req.body.username, 'Info:', info);
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error('Session login error:', loginErr);
+          return res.status(500).json({ message: "Login failed" });
+        }
+        res.status(200).json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        });
+      });
+    })(req, res, next);
   });
 
   app.post("/api/logout", (req, res, next) => {
