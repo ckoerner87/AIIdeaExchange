@@ -808,16 +808,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid vote type" });
       }
 
-      // Rate limiting: 2 seconds between comment votes
-      const recentCommentVotes = await storage.getRecentCommentVotesBySession(sessionId, 2000); // 2 seconds
+      // Rate limiting: 1 second between votes on the SAME comment
+      const recentCommentVotes = await storage.getRecentCommentVotesBySessionAndComment(sessionId, commentId, 1000); // 1 second
       if (recentCommentVotes.length > 0) {
-        return res.status(429).json({ message: "Please wait before voting again" });
+        return res.status(429).json({ message: "Please wait before voting on this comment again" });
       }
 
-      // IP-based rate limiting for comment votes
-      const recentCommentVotesByIP = await storage.getRecentCommentVotesByIp(clientIP, 2000);
+      // IP-based rate limiting for the SAME comment
+      const recentCommentVotesByIP = await storage.getRecentCommentVotesByIpAndComment(clientIP, commentId, 1000);
       if (recentCommentVotesByIP.length > 0) {
-        return res.status(429).json({ message: "Please wait before voting again" });
+        return res.status(429).json({ message: "Please wait before voting on this comment again" });
       }
 
       await storage.voteOnComment(commentId, sessionId, clientIP, voteType);

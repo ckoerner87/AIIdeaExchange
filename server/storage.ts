@@ -592,6 +592,18 @@ export class DatabaseStorage implements IStorage {
       ));
   }
 
+  async getRecentCommentVotesBySessionAndComment(sessionId: string, commentId: number, timeWindowMs: number): Promise<CommentVote[]> {
+    const cutoffTime = new Date(Date.now() - timeWindowMs);
+    return await db
+      .select()
+      .from(commentVotes)
+      .where(and(
+        eq(commentVotes.sessionId, sessionId),
+        eq(commentVotes.commentId, commentId),
+        sql`${commentVotes.createdAt} > ${cutoffTime}`
+      ));
+  }
+
   async getRecentCommentVotesByIp(ipAddress: string, timeWindowMs: number): Promise<CommentVote[]> {
     const cutoffTime = new Date(Date.now() - timeWindowMs);
     return await db
@@ -599,6 +611,18 @@ export class DatabaseStorage implements IStorage {
       .from(commentVotes)
       .where(and(
         eq(commentVotes.ipAddress, ipAddress),
+        sql`${commentVotes.createdAt} > ${cutoffTime}`
+      ));
+  }
+
+  async getRecentCommentVotesByIpAndComment(ipAddress: string, commentId: number, timeWindowMs: number): Promise<CommentVote[]> {
+    const cutoffTime = new Date(Date.now() - timeWindowMs);
+    return await db
+      .select()
+      .from(commentVotes)
+      .where(and(
+        eq(commentVotes.ipAddress, ipAddress),
+        eq(commentVotes.commentId, commentId),
         sql`${commentVotes.createdAt} > ${cutoffTime}`
       ));
   }
