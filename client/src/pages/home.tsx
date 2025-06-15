@@ -542,7 +542,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
             )}
 
             {/* Search and Filter Controls - Sticky */}
-            <div className="sticky top-0 sm:top-20 z-50 bg-slate-50 pb-2 md:pb-4 mb-4 md:mb-6 space-y-2 md:space-y-4 shadow-md border-b border-slate-200">
+            <div className="sticky top-0 z-50 bg-slate-50 pb-2 md:pb-4 mb-4 md:mb-6 space-y-2 md:space-y-4 shadow-md border-b border-slate-200">
               {/* Search Bar */}
               <div className="relative w-full">
                 <div className="flex items-center bg-white border-2 border-purple-200 hover:border-purple-400 focus-within:border-purple-500 transition-all rounded-lg">
@@ -726,7 +726,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
         {/* Subscription Section */}
         <div id="subscription-section" className="mt-12">
-          <SubscriptionForm subscriberCount={statsData?.totalSubscribers || 0} />
+          <SubscriptionForm subscriberCount={(stats as any)?.totalSubscribers || 0} />
         </div>
 
         {/* Feature Request Section */}
