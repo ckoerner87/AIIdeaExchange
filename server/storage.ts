@@ -517,34 +517,13 @@ export class DatabaseStorage implements IStorage {
 
   // Comment voting methods
   async voteOnComment(commentId: number, sessionId: string, ipAddress: string, voteType: 'up' | 'down'): Promise<void> {
-    // Check if user already voted on this comment
-    const existingVote = await db
-      .select()
-      .from(commentVotes)
-      .where(and(
-        eq(commentVotes.commentId, commentId),
-        eq(commentVotes.sessionId, sessionId)
-      ))
-      .limit(1);
-
-    if (existingVote.length > 0) {
-      // Update existing vote
-      await db
-        .update(commentVotes)
-        .set({ voteType, createdAt: new Date() })
-        .where(and(
-          eq(commentVotes.commentId, commentId),
-          eq(commentVotes.sessionId, sessionId)
-        ));
-    } else {
-      // Create new vote
-      await db.insert(commentVotes).values({
-        commentId,
-        sessionId,
-        ipAddress,
-        voteType,
-      });
-    }
+    // Only create new vote - duplicates should be prevented at the route level
+    await db.insert(commentVotes).values({
+      commentId,
+      sessionId,
+      ipAddress,
+      voteType,
+    });
 
     // Recalculate and update comment vote count
     const voteCount = await db

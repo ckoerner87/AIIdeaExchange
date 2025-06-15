@@ -186,7 +186,7 @@ export default function IdeaCard({ idea, onVote, isVoting, isHighlighted = false
                   className={`text-xs rounded-full ${categoryColors[idea.category] || categoryColors.other}`}
                   variant="secondary"
                 >
-                  {idea.category.charAt(0).toUpperCase() + idea.category.slice(1)}
+                  {formatCategoryName(idea.category)}
                 </Badge>
               )}
             </div>
