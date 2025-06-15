@@ -20,6 +20,7 @@ export default function ContactForm() {
         title: "Missing fields",
         description: "Please fill in all fields",
         variant: "destructive",
+        duration: 2000,
       });
       return;
     }
@@ -43,6 +44,7 @@ export default function ContactForm() {
         toast({
           title: "Message sent!",
           description: "Thanks for reaching out. We'll get back to you soon.",
+          duration: 2000,
         });
         setName("");
         setEmail("");
@@ -55,6 +57,7 @@ export default function ContactForm() {
         title: "Error",
         description: "Failed to send message. Please try again.",
         variant: "destructive",
+        duration: 2000,
       });
     } finally {
       setIsSubmitting(false);
