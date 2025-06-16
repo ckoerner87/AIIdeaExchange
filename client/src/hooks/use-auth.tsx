@@ -103,17 +103,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], null);
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/user"], null);
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Completely remove user data from cache
+      queryClient.removeQueries({ queryKey: ["/api/user"] });
       queryClient.clear();
       toast({
         title: "Logged out",
         description: "You've been successfully logged out.",
       });
       // Force page reload to ensure clean state
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      window.location.reload();
     },
     onError: (error: Error) => {
       toast({
