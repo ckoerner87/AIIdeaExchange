@@ -47,9 +47,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refetch,
   } = useQuery<User | undefined, Error>({
     queryKey: ["/api/user"],
-    queryFn: getQueryFn({ on401: "returnNull" }),
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/user', { credentials: 'include' });
+        if (response.status === 401) {
+          return null;
+        }
+        if (!response.ok) {
+          throw new Error(`${response.status}: ${response.statusText}`);
+        }
+        return await response.json();
+      } catch (error) {
+        console.log('Auth query error:', error);
+        return null;
+      }
+    },
     retry: false,
-    staleTime: 0, // Override global staleTime for user query
+    staleTime: 0,
+    cacheTime: 0, // Don't cache at all
   });
 
   const loginMutation = useMutation({
@@ -98,36 +113,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      // Clear client-side cookies first
-      document.cookie = 'connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = 'connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + window.location.hostname + ';';
-      
       await fetch('/api/logout', { 
         method: 'POST', 
         credentials: 'include' 
       });
     },
     onSuccess: () => {
-      // Clear all possible variations of the session cookie
-      const cookieNames = ['connect.sid', 'session', 'sessionid'];
-      const domains = [window.location.hostname, '.' + window.location.hostname];
-      const paths = ['/', '/api'];
-      
-      cookieNames.forEach(name => {
-        domains.forEach(domain => {
-          paths.forEach(path => {
-            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain};`;
-            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path};`;
-          });
-        });
+      // Trigger refetch of user data which should now return null
+      refetch();
+      toast({
+        title: "Logged out",
+        description: "You've been successfully logged out.",
       });
-      
-      // Clear React Query cache
-      queryClient.clear();
-      queryClient.removeQueries();
-      
-      // Force hard reload
-      window.location.replace('/');
     },
   });
 
