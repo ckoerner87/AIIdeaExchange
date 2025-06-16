@@ -106,6 +106,7 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
+- June 16, 2025: Fixed critical authentication persistence issue - corrected database schema mismatch where users table ID was defined as serial but stored as text, updated password comparison to handle both bcrypt and scrypt hashes, enhanced session configuration with proper cookie settings, and resolved user deserialization failures that prevented staying logged in after authentication
 - June 16, 2025: Implemented comprehensive PageSpeed optimizations - deferred non-critical CSS with media="print" technique, added aria-labels to filter components, fixed text contrast issues by updating gray colors, corrected heading hierarchy starting with h1, optimized images with loading="lazy" and explicit dimensions, enabled production minification targeting modern browsers, added self-hosted font optimization with font-display:swap, and implemented accessibility improvements for screen readers
 - June 16, 2025: Fixed authentication system where logged-in users' comments appeared as anonymous - updated database schema with userId fields, enhanced storage methods for both traditional and OAuth authentication, improved user deserialization error handling, and completed dashboard integration for proper user attribution
 - June 15, 2025: Fixed white space issue above filters on desktop after scrolling by removing unnecessary top offset

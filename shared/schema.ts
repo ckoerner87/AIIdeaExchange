@@ -58,7 +58,7 @@ export const sessions = pgTable("sessions", {
 
 // Users table for authentication
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: text("id").primaryKey(),
   username: text("username").unique().notNull(),
   email: text("email").unique().notNull(),
   passwordHash: text("password_hash").notNull(),
