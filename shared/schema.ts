@@ -10,7 +10,8 @@ export const ideas = pgTable("ideas", {
   category: text("category").default("other"),
   tools: text("tools"),
   linkUrl: text("link_url"),
-  sessionId: text("session_id").notNull(), // Track who submitted this idea
+  sessionId: text("session_id"), // Track anonymous submissions
+  userId: text("user_id"), // Track authenticated user submissions
   votes: integer("votes").notNull().default(1),
   aiGrade: text("ai_grade"), // Store as decimal string like "7.3"
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
@@ -72,7 +73,7 @@ export const users = pgTable("users", {
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   ideaId: integer("idea_id").notNull(),
-  userId: integer("user_id"), // Allow null for anonymous comments
+  userId: text("user_id"), // Allow null for anonymous comments
   parentId: integer("parent_id"), // For nested comments
   sessionId: text("session_id"), // For anonymous comments
   anonymousUsername: text("anonymous_username"), // For anonymous comments

@@ -411,7 +411,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/ideas", async (req, res) => {
     try {
       const sessionId = req.headers['x-session-id'] as string;
-      if (!sessionId) {
+      let userId = null;
+      
+      // Check if user is authenticated (supports both traditional auth and Replit OAuth)
+      if (req.isAuthenticated() && req.user) {
+        // Traditional auth: user has id property directly
+        if (req.user.id) {
+          userId = req.user.id.toString();
+        }
+        // Replit OAuth: user has claims.sub property
+        else if (req.user.claims?.sub) {
+          userId = req.user.claims.sub;
+        }
+      }
+      
+      // Require sessionId for anonymous users
+      if (!userId && !sessionId) {
         return res.status(401).json({ message: "Session ID required" });
       }
 
@@ -431,10 +446,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: contentValidation.reason || "Invalid content" });
       }
 
-      // Add sessionId to the idea data
-      const ideaData = { ...result.data, sessionId };
+      // Add sessionId and userId to the idea data
+      const ideaData = { 
+        ...result.data, 
+        sessionId: !userId ? sessionId : null, // Only store sessionId for anonymous ideas
+        userId 
+      };
       const idea = await storage.createIdea(ideaData);
-      await storage.updateUserSessionSubmitted(sessionId);
+      
+      // Update session for anonymous users
+      if (!userId && sessionId) {
+        await storage.updateUserSessionSubmitted(sessionId);
+      }
       
       // If this is a test submission, auto-delete it after 10 seconds
       if (contentValidation.isTestSubmission) {
@@ -683,9 +706,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let userId = null;
       const sessionId = req.headers['x-session-id'];
       
-      // Check if user is authenticated
-      if (req.isAuthenticated() && req.user?.claims?.sub) {
-        userId = req.user.claims.sub;
+      // Check if user is authenticated (supports both traditional auth and Replit OAuth)
+      if (req.isAuthenticated() && req.user) {
+        // Traditional auth: user has id property directly
+        if (req.user.id) {
+          userId = req.user.id.toString();
+        }
+        // Replit OAuth: user has claims.sub property
+        else if (req.user.claims?.sub) {
+          userId = req.user.claims.sub;
+        }
       }
       
       const result = insertCommentSchema.safeParse({
