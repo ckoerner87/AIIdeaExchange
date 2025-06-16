@@ -209,7 +209,7 @@ export function setupAuth(app: Express) {
         
         // Clear the session cookie
         res.clearCookie('connect.sid');
-        res.redirect('/');
+        res.status(200).json({ message: "Logged out successfully" });
       });
     });
   });

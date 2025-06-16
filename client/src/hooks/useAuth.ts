@@ -10,10 +10,20 @@ export function useAuth() {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      // Clear React Query cache first
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Set user query data to null immediately
+      queryClient.setQueryData(["/api/user"], null);
+      // Clear all cached data
       queryClient.clear();
-      // Navigate to logout endpoint
-      window.location.href = '/api/logout';
     },
   });
 
