@@ -198,17 +198,18 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
             <Label htmlFor="username">Username</Label>
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
+              <input
                 ref={usernameRef}
                 id="username"
                 type="text"
                 placeholder="Choose a username"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="pl-10"
+                className="flex h-10 w-full rounded-md border border-input bg-background pl-10 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 autoComplete="username"
                 autoFocus
                 tabIndex={1}
+                style={{ pointerEvents: 'auto', userSelect: 'auto', cursor: 'text' }}
                 required
               />
             </div>
@@ -218,13 +219,16 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
+              <input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="pl-10"
+                className="flex h-10 w-full rounded-md border border-input bg-background pl-10 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                autoComplete="email"
+                tabIndex={2}
+                style={{ pointerEvents: 'auto', userSelect: 'auto', cursor: 'text' }}
                 required
               />
             </div>
