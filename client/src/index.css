@@ -60,6 +60,27 @@ button, [role="button"] {
   min-width: 44px;
 }
 
+/* Ensure dialog inputs can receive focus and accept typing */
+[data-radix-dialog-content] input,
+[data-radix-dialog-content] textarea,
+[data-radix-dialog-content] select {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -ms-user-select: auto !important;
+}
+
+/* Ensure dialog content allows interactions */
+[data-radix-dialog-content] {
+  pointer-events: auto !important;
+}
+
+/* Fix dialog overlay to allow content interaction */
+[data-radix-dialog-overlay] {
+  pointer-events: auto;
+}
+
 /* Ensure proper button contrast */
 button:focus-visible {
   outline: 2px solid #3b82f6;

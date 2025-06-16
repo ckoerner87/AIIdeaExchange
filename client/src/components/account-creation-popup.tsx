@@ -109,7 +109,8 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
     createAccountMutation.mutate({
       username: formData.username,
       email: formData.email,
-      password: formData.password
+      password: formData.password,
+      confirmPassword: formData.confirmPassword
     });
   };
 
