@@ -17,7 +17,8 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    confirmPassword: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
