@@ -361,8 +361,19 @@ export default function Home() {
                   <div className="flex items-center space-x-3">
                     <UserDropdown 
                       user={user} 
-                      onLogout={() => {
-                        window.location.href = '/api/logout';
+                      onLogout={async () => {
+                        try {
+                          await fetch('/api/logout', { 
+                            method: 'POST',
+                            credentials: 'include'
+                          });
+                          // Force a full page reload to clear all state and redirect to homepage
+                          window.location.href = '/';
+                        } catch (error) {
+                          console.error('Logout error:', error);
+                          // Even if logout fails, redirect to homepage
+                          window.location.href = '/';
+                        }
                       }}
                     />
                   </div>
