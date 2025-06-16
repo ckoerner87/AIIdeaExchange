@@ -116,7 +116,7 @@ export function setupAuth(app: Express) {
   passport.serializeUser((user, done) => done(null, user.id));
   passport.deserializeUser(async (id: number, done) => {
     try {
-      const user = await storage.getUser(id);
+      const user = await storage.getUser(id.toString());
       done(null, user);
     } catch (error) {
       done(error);

@@ -98,6 +98,7 @@ export const insertIdeaSchema = createInsertSchema(ideas).omit({
   votes: true,
   submittedAt: true,
   sessionId: true, // Handled separately in the API
+  userId: true, // Handled separately in the API
 }).extend({
   useCase: z.string().min(100, "Please write at least 100 characters to describe your use case"),
   linkUrl: z.string().optional().refine((url) => {

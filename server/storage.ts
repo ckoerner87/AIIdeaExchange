@@ -423,12 +423,21 @@ export class DatabaseStorage implements IStorage {
         },
       })
       .from(comments)
-      .leftJoin(users, eq(comments.userId, users.id))
+      .leftJoin(users, eq(comments.userId, sql`${users.id}::text`))
       .where(eq(comments.ideaId, ideaId))
       .orderBy(asc(comments.createdAt));
 
     return result.map(row => ({
-      ...row,
+      id: row.id,
+      ideaId: row.ideaId,
+      userId: row.userId,
+      parentId: row.parentId,
+      sessionId: row.sessionId,
+      anonymousUsername: row.anonymousUsername,
+      content: row.content,
+      votes: row.votes || 1,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
       user: row.user?.id ? row.user : null,
     }));
   }
@@ -635,7 +644,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(ideas)
       .where(eq(ideas.userId, userId))
-      .orderBy(desc(ideas.createdAt));
+      .orderBy(desc(ideas.submittedAt));
   }
 
   async getCommentsByUserId(userId: string): Promise<(Comment & { ideaTitle: string })[]> {
