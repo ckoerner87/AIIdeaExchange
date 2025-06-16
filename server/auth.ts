@@ -60,22 +60,20 @@ export function setupAuth(app: Express) {
   
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || 'default-dev-secret-change-in-production',
-    resave: true, // Force session to be saved even when unmodified
+    resave: false,
     saveUninitialized: false,
     store: new PostgresSessionStore({
       conString: process.env.DATABASE_URL,
       createTableIfMissing: true,
       ttl: sessionTtl,
+      tableName: 'session'
     }),
     cookie: {
       httpOnly: true,
-      secure: false, // Set to true in production with HTTPS
+      secure: false,
       maxAge: sessionTtl,
-      sameSite: 'lax', // Allow cross-site requests for authentication
-      path: '/', // Ensure cookie is available across all paths
+      sameSite: 'lax',
     },
-    name: 'connect.sid', // Standard session name
-    rolling: true, // Extend session on each request
   };
 
   app.set("trust proxy", 1);
@@ -118,13 +116,20 @@ export function setupAuth(app: Express) {
     }),
   );
 
-  passport.serializeUser((user, done) => done(null, (user as any).id));
+  passport.serializeUser((user, done) => {
+    console.log('Serializing user:', (user as any).id);
+    done(null, (user as any).id);
+  });
+  
   passport.deserializeUser(async (id: string, done) => {
     try {
+      console.log('Deserializing user ID:', id);
       const user = await storage.getUser(id);
       if (!user) {
+        console.log('User not found during deserialization:', id);
         return done(null, false);
       }
+      console.log('User successfully deserialized:', user.username);
       done(null, user);
     } catch (error) {
       console.error('Error deserializing user:', error);
