@@ -42,7 +42,7 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
       </Button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-y-auto">
+        <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
           <div className="py-1">
             {/* User Info */}
             <div className="px-4 py-2 border-b border-gray-100">

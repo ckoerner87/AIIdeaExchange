@@ -106,6 +106,7 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
+- June 16, 2025: Fixed user dropdown logout button visibility - improved dropdown positioning and z-index to ensure all menu items including logout button are properly displayed, verified logout functionality works correctly
 - June 16, 2025: Fixed admin deletion functionality - resolved authentication token mismatch preventing idea and comment deletion, updated all admin delete routes to accept Bearer tokens instead of requiring specific hardcoded values, verified successful deletion operations for both single and bulk operations
 - June 16, 2025: Fixed critical authentication persistence issue - corrected database schema mismatch where users table ID was defined as serial but stored as text, updated password comparison to handle both bcrypt and scrypt hashes, enhanced session configuration with proper cookie settings, and resolved user deserialization failures that prevented staying logged in after authentication
 - June 16, 2025: Implemented comprehensive PageSpeed optimizations - deferred non-critical CSS with media="print" technique, added aria-labels to filter components, fixed text contrast issues by updating gray colors, corrected heading hierarchy starting with h1, optimized images with loading="lazy" and explicit dimensions, enabled production minification targeting modern browsers, added self-hosted font optimization with font-display:swap, and implemented accessibility improvements for screen readers
