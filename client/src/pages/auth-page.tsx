@@ -1,37 +1,12 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
+import { useState, FormEvent } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Lightbulb, Users, TrendingUp, MessageCircle } from "lucide-react";
-
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
-});
-
-const registerSchema = z.object({
-  username: z.string()
-    .min(3, "Username must be at least 3 characters")
-    .max(20, "Username must be less than 20 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores, and hyphens"),
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginData = z.infer<typeof loginSchema>;
-type RegisterData = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -43,51 +18,35 @@ export default function AuthPage() {
     return null;
   }
 
-  const loginForm = useForm<LoginData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
-  });
-
-  const registerForm = useForm<RegisterData>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
-
-  const handleLogin = async (data: LoginData) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get('username') as string;
+    const password = formData.get('password') as string;
+
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
-        toast({
-          title: "Welcome back!",
-          description: "You've been successfully logged in.",
-        });
-        window.location.href = '/';
+        window.location.href = "/";
       } else {
-        const error = await response.json();
+        const error = await response.text();
         toast({
           title: "Login failed",
-          description: error.message || "Please check your credentials and try again.",
+          description: error,
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
         title: "Login failed",
-        description: "Something went wrong. Please try again.",
+        description: "Network error occurred",
         variant: "destructive",
       });
     } finally {
@@ -95,37 +54,36 @@ export default function AuthPage() {
     }
   };
 
-  const handleRegister = async (data: RegisterData) => {
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get('username') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: data.username,
-          email: data.email,
-          password: data.password,
-        }),
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (response.ok) {
-        toast({
-          title: "Account created!",
-          description: "Welcome to AI Idea Exchange! You're now logged in.",
-        });
-        window.location.href = '/';
+        window.location.href = "/";
       } else {
-        const error = await response.json();
+        const error = await response.text();
         toast({
           title: "Registration failed",
-          description: error.message || "Please try again.",
+          description: error,
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
         title: "Registration failed",
-        description: "Something went wrong. Please try again.",
+        description: "Network error occurred",
         variant: "destructive",
       });
     } finally {
@@ -134,170 +92,201 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex">
-      {/* Left side - Auth form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Left side - Form */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900">
               {isLogin ? "Welcome back" : "Join the community"}
-            </CardTitle>
-            <p className="text-gray-600">
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
               {isLogin 
-                ? "Sign in to your account to continue sharing AI ideas"
+                ? "Sign in to your account to continue" 
                 : "Create an account to start sharing and discovering AI use cases"
               }
             </p>
-          </CardHeader>
-          <CardContent>
+          </div>
+
+          <div className="bg-white shadow-lg rounded-lg p-8">
             {isLogin ? (
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Username</label>
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                    Username
+                  </label>
                   <input
+                    id="username"
                     name="username"
                     type="text"
                     required
-                    className="w-full p-3 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter your username"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Password</label>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
                   <div className="relative">
                     <input
+                      id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
                       required
-                      className="w-full p-3 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none pr-10"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                       placeholder="Enter your password"
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400" />
+                      )}
+                    </button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                >
                   {isLoading ? "Signing in..." : "Sign in"}
-                </Button>
+                </button>
               </form>
             ) : (
-              <form onSubmit={handleRegister} className="space-y-4">
+              <form onSubmit={handleRegister} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Username</label>
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                    Username
+                  </label>
                   <input
+                    id="username"
                     name="username"
                     type="text"
                     required
-                    className="w-full p-3 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Choose a username"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
                   <input
+                    id="email"
                     name="email"
                     type="email"
                     required
-                    className="w-full p-3 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter your email"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Password</label>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
                   <div className="relative">
                     <input
+                      id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
                       required
-                      className="w-full p-3 border border-gray-300 rounded-md focus:border-blue-500 focus:outline-none pr-10"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                       placeholder="Create a password"
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-400" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-400" />
+                      )}
+                    </button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                >
                   {isLoading ? "Creating account..." : "Create account"}
-                </Button>
+                </button>
               </form>
             )}
-            
+
             <div className="mt-6 text-center">
-              <Button
-                variant="link"
+              <button
+                type="button"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-sm"
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
               >
                 {isLogin 
                   ? "Don't have an account? Sign up" 
                   : "Already have an account? Sign in"
                 }
-              </Button>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      {/* Right side - Hero section */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-purple-700 text-white p-12 flex-col justify-center">
-        <div className="max-w-lg">
-          <h1 className="text-4xl font-bold mb-6">AI Idea Exchange</h1>
-          <p className="text-xl mb-8 opacity-90">
-            Discover, share, and explore real-world AI use cases from a community of innovators
-          </p>
+      {/* Right side - Hero */}
+      <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-12">
+        <div className="max-w-md text-center">
+          <div className="mb-8">
+            <div className="flex justify-center space-x-4 mb-6">
+              <div className="bg-white rounded-full p-3 shadow-lg">
+                <Lightbulb className="h-8 w-8 text-yellow-500" />
+              </div>
+              <div className="bg-white rounded-full p-3 shadow-lg">
+                <Users className="h-8 w-8 text-blue-500" />
+              </div>
+              <div className="bg-white rounded-full p-3 shadow-lg">
+                <TrendingUp className="h-8 w-8 text-green-500" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Discover Amazing AI Use Cases
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Join thousands of innovators sharing real-world applications of AI. 
+              From automation to creative projects, explore how others are using AI to solve problems.
+            </p>
+          </div>
           
-          <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 p-3 rounded-lg">
-                <Lightbulb className="h-6 w-6" />
-              </div>
+          <div className="space-y-4 text-left">
+            <div className="flex items-start space-x-3">
+              <MessageCircle className="h-5 w-5 text-blue-500 mt-0.5" />
               <div>
-                <h3 className="font-semibold">Share Your Ideas</h3>
-                <p className="opacity-80">Submit your creative AI use cases and implementations</p>
+                <p className="font-medium text-gray-900">Share Your Ideas</p>
+                <p className="text-sm text-gray-600">Submit your AI use cases and get feedback from the community</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 p-3 rounded-lg">
-                <TrendingUp className="h-6 w-6" />
-              </div>
+            <div className="flex items-start space-x-3">
+              <TrendingUp className="h-5 w-5 text-green-500 mt-0.5" />
               <div>
-                <h3 className="font-semibold">Vote & Discover</h3>
-                <p className="opacity-80">Upvote the best ideas and find trending AI solutions</p>
+                <p className="font-medium text-gray-900">Vote & Discover</p>
+                <p className="text-sm text-gray-600">Upvote the best ideas and discover trending AI applications</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 p-3 rounded-lg">
-                <MessageCircle className="h-6 w-6" />
-              </div>
+            <div className="flex items-start space-x-3">
+              <Users className="h-5 w-5 text-purple-500 mt-0.5" />
               <div>
-                <h3 className="font-semibold">Join Discussions</h3>
-                <p className="opacity-80">Comment and collaborate with other AI enthusiasts</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 p-3 rounded-lg">
-                <Users className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Build Your Profile</h3>
-                <p className="opacity-80">Track your submissions, votes, and community contributions</p>
+                <p className="font-medium text-gray-900">Connect</p>
+                <p className="text-sm text-gray-600">Join discussions and connect with fellow AI enthusiasts</p>
               </div>
             </div>
           </div>
