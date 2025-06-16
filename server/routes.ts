@@ -88,8 +88,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({ username, email, passwordHash });
       
       // Auto-login the user by creating a session
-      req.session.userId = user.id;
-      req.session.isAuthenticated = true;
+      (req.session as any).userId = user.id;
+      (req.session as any).isAuthenticated = true;
       
       res.status(201).json({ 
         message: "Account created successfully",

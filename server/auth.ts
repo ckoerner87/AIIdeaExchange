@@ -195,7 +195,7 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const user = req.user as User;
+    const user = req.user as SelectUser;
     res.json({
       id: user.id,
       username: user.username,
