@@ -29,6 +29,10 @@ export function useAuth() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       // Clear all other cached data
       queryClient.clear();
+      // Force a page reload to ensure clean state
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     },
     onError: () => {
       // If logout fails, refetch user data
