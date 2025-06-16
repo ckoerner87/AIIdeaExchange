@@ -367,12 +367,15 @@ export default function Home() {
                             method: 'POST',
                             credentials: 'include'
                           });
-                          // Force a full page reload to clear all state and redirect to homepage
-                          window.location.href = '/';
+                          // Invalidate React Query cache to clear user data
+                          queryClient.clear();
+                          // Force a full page reload to clear all state
+                          window.location.reload();
                         } catch (error) {
                           console.error('Logout error:', error);
-                          // Even if logout fails, redirect to homepage
-                          window.location.href = '/';
+                          // Even if logout fails, clear cache and reload
+                          queryClient.clear();
+                          window.location.reload();
                         }
                       }}
                     />

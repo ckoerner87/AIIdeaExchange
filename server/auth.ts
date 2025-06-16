@@ -199,14 +199,36 @@ export function setupAuth(app: Express) {
   app.post("/api/logout", (req, res, next) => {
     req.logout((err) => {
       if (err) return next(err);
-      res.redirect('/');
+      
+      // Destroy the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
+          return next(err);
+        }
+        
+        // Clear the session cookie
+        res.clearCookie('connect.sid');
+        res.redirect('/');
+      });
     });
   });
 
   app.get("/api/logout", (req, res, next) => {
     req.logout((err) => {
       if (err) return next(err);
-      res.redirect('/');
+      
+      // Destroy the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Session destruction error:', err);
+          return next(err);
+        }
+        
+        // Clear the session cookie
+        res.clearCookie('connect.sid');
+        res.redirect('/');
+      });
     });
   });
 
