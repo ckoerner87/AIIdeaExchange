@@ -8,13 +8,20 @@ import { formatDistanceToNow } from "date-fns";
 
 interface UserIdea {
   id: number;
-  useCase: string;
+  title: string;
   description: string;
+  useCase: string;
   category: string;
-  upvotes: number;
-  commentCount: number;
-  createdAt: string;
-  status: string;
+  tools: string;
+  linkUrl: string | null;
+  sessionId: string | null;
+  userId: string;
+  votes: number;
+  aiGrade: string | null;
+  submittedAt: string;
+  postType: string;
+  mediaUrl: string | null;
+  mediaType: string | null;
 }
 
 interface UserComment {
@@ -29,17 +36,22 @@ interface UserComment {
 export default function UserDashboard() {
   const { user, isLoading: authLoading } = useAuth();
 
-  const { data: userIdeas = [], isLoading: ideasLoading } = useQuery({
+  const { data: userIdeas = [], isLoading: ideasLoading } = useQuery<UserIdea[]>({
     queryKey: ["/api/user/ideas"],
     enabled: !!user,
   });
 
-  const { data: userComments = [], isLoading: commentsLoading } = useQuery({
+  const { data: userComments = [], isLoading: commentsLoading } = useQuery<UserComment[]>({
     queryKey: ["/api/user/comments"],
     enabled: !!user,
   });
 
-  const { data: userStats } = useQuery({
+  const { data: userStats = { totalIdeas: 0, totalUpvotes: 0, totalComments: 0, averageScore: 0 } } = useQuery<{
+    totalIdeas: number;
+    totalUpvotes: number;
+    totalComments: number;
+    averageScore: number;
+  }>({
     queryKey: ["/api/user/stats"],
     enabled: !!user,
   });
@@ -169,18 +181,18 @@ export default function UserDashboard() {
                             </span>
                             <div className="flex items-center">
                               <Calendar className="h-4 w-4 mr-1" />
-                              {formatDistanceToNow(new Date(idea.createdAt))} ago
+                              {idea.submittedAt ? formatDistanceToNow(new Date(idea.submittedAt)) + ' ago' : 'Recently'}
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center space-x-4 ml-4">
                           <div className="flex items-center text-green-600">
                             <ThumbsUp className="h-4 w-4 mr-1" />
-                            <span className="font-medium">{idea.upvotes}</span>
+                            <span className="font-medium">{idea.votes}</span>
                           </div>
                           <div className="flex items-center text-blue-600">
                             <MessageCircle className="h-4 w-4 mr-1" />
-                            <span className="font-medium">{idea.commentCount}</span>
+                            <span className="font-medium">0</span>
                           </div>
                         </div>
                       </div>
