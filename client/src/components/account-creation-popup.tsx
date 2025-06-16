@@ -189,49 +189,74 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md dialog-content">
         <DialogHeader>
-          <DialogTitle className="text-center">Create Your Account</DialogTitle>
+          <DialogTitle className="text-center">Join the community</DialogTitle>
+          <p className="text-center text-sm text-gray-600">Create an account to start sharing and discovering AI use cases</p>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" style={{ pointerEvents: 'auto' }}>
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <input
-                ref={usernameRef}
-                id="username"
-                type="text"
-                placeholder="Choose a username"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-input bg-background pl-10 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                autoComplete="username"
-                autoFocus
-                tabIndex={1}
-                style={{ pointerEvents: 'auto', userSelect: 'auto', cursor: 'text' }}
-                required
-              />
-            </div>
+            <label htmlFor="username" className="text-sm font-medium">Username</label>
+            <input
+              ref={usernameRef}
+              id="username"
+              name="username"
+              type="text"
+              placeholder="Choose a username"
+              value={formData.username}
+              onChange={(e) => {
+                console.log('Username input changed:', e.target.value);
+                setFormData({ ...formData, username: e.target.value });
+              }}
+              onInput={(e) => {
+                console.log('Username input event:', e.currentTarget.value);
+              }}
+              onKeyDown={(e) => {
+                console.log('Username keydown:', e.key);
+              }}
+              className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="off"
+              autoFocus
+              tabIndex={1}
+              style={{ 
+                pointerEvents: 'auto' as const, 
+                userSelect: 'auto' as const, 
+                cursor: 'text',
+                zIndex: 9999
+              }}
+              required
+            />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-input bg-background pl-10 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                autoComplete="email"
-                tabIndex={2}
-                style={{ pointerEvents: 'auto', userSelect: 'auto', cursor: 'text' }}
-                required
-              />
-            </div>
+            <label htmlFor="email" className="text-sm font-medium">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={(e) => {
+                console.log('Email input changed:', e.target.value);
+                setFormData({ ...formData, email: e.target.value });
+              }}
+              onInput={(e) => {
+                console.log('Email input event:', e.currentTarget.value);
+              }}
+              onKeyDown={(e) => {
+                console.log('Email keydown:', e.key);
+              }}
+              className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="off"
+              tabIndex={2}
+              style={{ 
+                pointerEvents: 'auto' as const, 
+                userSelect: 'auto' as const, 
+                cursor: 'text',
+                zIndex: 9999
+              }}
+              required
+            />
           </div>
           
           <div className="space-y-2">
