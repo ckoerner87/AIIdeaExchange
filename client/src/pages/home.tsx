@@ -5,7 +5,7 @@ import { Lightbulb, Bell, ChevronDown, ChevronUp, Search, X } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 
 // Lazy load heavy components only
 const SimpleSignupPopup = lazy(() => import("@/components/simple-signup-popup"));

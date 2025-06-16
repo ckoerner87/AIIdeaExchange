@@ -98,13 +98,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async () => {
       await apiRequest("POST", "/api/logout");
     },
+    onMutate: () => {
+      // Optimistically set user to null immediately
+      queryClient.setQueryData(["/api/user"], null);
+    },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       queryClient.clear();
       toast({
         title: "Logged out",
         description: "You've been successfully logged out.",
       });
+      // Force page reload to ensure clean state
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     },
     onError: (error: Error) => {
       toast({
@@ -112,6 +121,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: error.message,
         variant: "destructive",
       });
+      // If logout fails, refetch user data
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     },
   });
 
