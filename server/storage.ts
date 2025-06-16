@@ -94,6 +94,7 @@ export class DatabaseStorage implements IStorage {
     // Ensure category defaults to "other" if not provided
     const ideaData = {
       sessionId: insertIdea.sessionId,
+      userId: insertIdea.userId, // Include userId for authenticated users
       title: insertIdea.title,
       description: insertIdea.description,
       useCase: insertIdea.useCase,
@@ -101,7 +102,10 @@ export class DatabaseStorage implements IStorage {
       tools: insertIdea.tools || null,
       linkUrl: insertIdea.linkUrl || null,
       aiGrade: insertIdea.aiGrade || null,
-      votes: 1
+      votes: 1,
+      postType: insertIdea.postType || "text",
+      mediaUrl: insertIdea.mediaUrl || null,
+      mediaType: insertIdea.mediaType || null
     };
     
     const [idea] = await db
@@ -678,13 +682,13 @@ export class DatabaseStorage implements IStorage {
       .from(comments)
       .where(eq(comments.userId, userId));
 
-    // Get average AI grade for user's ideas
+    // Get average AI grade for user's ideas (cast text to numeric)
     const averageResult = await db
       .select({
-        average: sql<number>`avg(${ideas.aiGrade})`
+        average: sql<number>`avg(CAST(${ideas.aiGrade} AS NUMERIC))`
       })
       .from(ideas)
-      .where(and(eq(ideas.userId, userId), sql`${ideas.aiGrade} IS NOT NULL`));
+      .where(and(eq(ideas.userId, userId), sql`${ideas.aiGrade} IS NOT NULL AND ${ideas.aiGrade} != ''`));
 
     return {
       totalIdeas: ideasResult[0]?.count || 0,
