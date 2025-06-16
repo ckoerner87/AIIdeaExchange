@@ -60,7 +60,7 @@ export function setupAuth(app: Express) {
   
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || 'default-dev-secret-change-in-production',
-    resave: false,
+    resave: true, // Force session to be saved even when unmodified
     saveUninitialized: false,
     store: new PostgresSessionStore({
       conString: process.env.DATABASE_URL,
@@ -72,8 +72,10 @@ export function setupAuth(app: Express) {
       secure: false, // Set to true in production with HTTPS
       maxAge: sessionTtl,
       sameSite: 'lax', // Allow cross-site requests for authentication
+      path: '/', // Ensure cookie is available across all paths
     },
     name: 'connect.sid', // Standard session name
+    rolling: true, // Extend session on each request
   };
 
   app.set("trust proxy", 1);
