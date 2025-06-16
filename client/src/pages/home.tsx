@@ -302,7 +302,7 @@ export default function Home() {
       
       // Show account creation popup after 3 interactions
       if (newCount >= 3) {
-        setShowAccountCreationPopup(true);
+        window.location.href = '/auth';
         setInteractionCount(0); // Reset counter
       }
     }
@@ -827,13 +827,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
         />
       </Suspense>
 
-      {/* Account Creation Popup */}
-      <Suspense fallback={null}>
-        <AccountCreationPopup
-          isOpen={showAccountCreationPopup}
-          onClose={() => setShowAccountCreationPopup(false)}
-        />
-      </Suspense>
+
     </div>
   );
 }
