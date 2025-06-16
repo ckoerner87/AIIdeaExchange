@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
 // Lazy load heavy components only
-const AccountCreationPopup = lazy(() => import("@/components/account-creation-popup"));
+const SimpleSignupPopup = lazy(() => import("@/components/simple-signup-popup"));
 const GiftCardPopup = lazy(() => import("@/components/gift-card-popup"));
 
 // Import lightweight components directly to reduce chunk splitting overhead
