@@ -44,10 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     data: user,
     error,
     isLoading,
+    refetch,
   } = useQuery<User | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
     retry: false,
+    staleTime: 0, // Override global staleTime for user query
   });
 
   const loginMutation = useMutation({
@@ -106,12 +108,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Completely remove user data from cache
       queryClient.removeQueries({ queryKey: ["/api/user"] });
       queryClient.clear();
+      // Force refetch to get updated auth state
+      refetch();
       toast({
         title: "Logged out",
         description: "You've been successfully logged out.",
       });
       // Force page reload to ensure clean state
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     },
     onError: (error: Error) => {
       toast({
