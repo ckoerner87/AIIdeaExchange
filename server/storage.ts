@@ -456,15 +456,7 @@ export class DatabaseStorage implements IStorage {
     return result?.count || 0;
   }
 
-  async updateCommentUsername(commentId: number, sessionId: string, username: string): Promise<void> {
-    await db
-      .update(comments)
-      .set({ anonymousUsername: username })
-      .where(and(
-        eq(comments.id, commentId),
-        eq(comments.sessionId, sessionId)
-      ));
-  }
+
 
   async getAllComments(): Promise<(Comment & { user: User | null; idea: { useCase: string } })[]> {
     const result = await db
@@ -498,7 +490,16 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(comments.createdAt));
 
     return result.map(row => ({
-      ...row,
+      id: row.id,
+      content: row.content,
+      votes: row.votes,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      ideaId: row.ideaId,
+      parentId: row.parentId,
+      anonymousUsername: row.anonymousUsername,
+      sessionId: row.sessionId,
+      userId: row.userId,
       user: row.user?.id ? row.user : null,
       idea: { useCase: row.idea?.useCase || "" },
     }));
@@ -616,26 +617,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateCommentUsername(commentId: number, sessionId: string, username: string): Promise<void> {
-    // Add a username field to comments table if it doesn't exist and update the comment
-    // For now, we'll store it in a separate table to track anonymous comment usernames
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS comment_usernames (
-        id SERIAL PRIMARY KEY,
-        comment_id INTEGER NOT NULL,
-        session_id TEXT NOT NULL,
-        username TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW(),
-        UNIQUE(comment_id, session_id)
-      )
-    `);
-    
-    // Insert or update the username for this comment
-    await db.execute(sql`
-      INSERT INTO comment_usernames (comment_id, session_id, username)
-      VALUES (${commentId}, ${sessionId}, ${username})
-      ON CONFLICT (comment_id, session_id)
-      DO UPDATE SET username = ${username}
-    `);
+    await db
+      .update(comments)
+      .set({ anonymousUsername: username })
+      .where(and(
+        eq(comments.id, commentId),
+        eq(comments.sessionId, sessionId)
+      ));
   }
 
   // User-specific queries for dashboard
