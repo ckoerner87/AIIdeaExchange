@@ -654,7 +654,7 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
                     <div className="flex-1 mr-4">
                       <p className="text-sm text-blue-700">
                         Wanna know when people reply? <button 
-                          onClick={() => window.location.href = '/auth'}
+                          onClick={() => setShowSignupPopup(true)}
                           className="text-blue-700 underline hover:text-blue-800 font-medium"
                         >
                           Create a free account real fast here
@@ -724,7 +724,13 @@ export default function CommentSection({ ideaId, className = "", commentCount: p
         </div>
       )}
       
-
+      {/* Account Creation Popup */}
+      <Suspense fallback={null}>
+        <AccountCreationPopup 
+          isOpen={showSignupPopup} 
+          onClose={() => setShowSignupPopup(false)} 
+        />
+      </Suspense>
 
       {/* Username Collection Popup */}
       <Suspense fallback={null}>

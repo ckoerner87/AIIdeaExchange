@@ -302,7 +302,7 @@ export default function Home() {
       
       // Show account creation popup after 3 interactions
       if (newCount >= 3) {
-        window.location.href = '/auth';
+        setShowAccountCreationPopup(true);
         setInteractionCount(0); // Reset counter
       }
     }

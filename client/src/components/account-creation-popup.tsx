@@ -208,57 +208,38 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
             <label htmlFor="username">Username</label>
             <input
               ref={usernameRef}
-              id="username"
               type="text"
+              name="username"
+              className="border p-2 w-full"
               placeholder="Choose a username"
-              value={formData.username}
-              onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-              style={{
-                width: '100%',
-                height: '40px',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '16px',
-                backgroundColor: '#fff',
-                color: '#000',
-                pointerEvents: 'auto',
-                userSelect: 'text',
-                WebkitUserSelect: 'text',
-                MozUserSelect: 'text',
-                msUserSelect: 'text'
+              onChange={(e) => {
+                console.log('Username changed:', e.target.value);
+                setFormData(prev => ({ ...prev, username: e.target.value }));
               }}
-              autoComplete="off"
-              autoFocus
-              required
+              onKeyDown={(e) => {
+                console.log('Username keydown:', e.key);
+              }}
+              onFocus={() => console.log('Username focused')}
+              onBlur={() => console.log('Username blurred')}
             />
           </div>
           
           <div>
             <label htmlFor="email">Email</label>
             <input
-              id="email"
               type="email"
+              name="email"
+              className="border p-2 w-full"
               placeholder="Enter your email"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              style={{
-                width: '100%',
-                height: '40px',
-                padding: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '16px',
-                backgroundColor: '#fff',
-                color: '#000',
-                pointerEvents: 'auto',
-                userSelect: 'text',
-                WebkitUserSelect: 'text',
-                MozUserSelect: 'text',
-                msUserSelect: 'text'
+              onChange={(e) => {
+                console.log('Email changed:', e.target.value);
+                setFormData(prev => ({ ...prev, email: e.target.value }));
               }}
-              autoComplete="off"
-              required
+              onKeyDown={(e) => {
+                console.log('Email keydown:', e.key);
+              }}
+              onFocus={() => console.log('Email focused')}
+              onBlur={() => console.log('Email blurred')}
             />
           </div>
           
