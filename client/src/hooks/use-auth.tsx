@@ -45,9 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error,
     isLoading,
     refetch,
-  } = useQuery<User | undefined, Error>({
+  } = useQuery({
     queryKey: ["/api/user"],
-    queryFn: async () => {
+    queryFn: async (): Promise<User | null> => {
       try {
         const response = await fetch('/api/user', { credentials: 'include' });
         if (response.status === 401) {
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     retry: false,
     staleTime: 0,
-    cacheTime: 0, // Don't cache at all
+    gcTime: 0, // React Query v5 uses gcTime instead of cacheTime
   });
 
   const loginMutation = useMutation({
@@ -115,12 +115,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async () => {
       await fetch('/api/logout', { 
         method: 'POST', 
-        credentials: 'include' 
+        credentials: 'include'  // Keep this!
       });
     },
     onSuccess: () => {
+      // Clear localStorage auth tokens
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("authToken");
+      
+      // Clear React Query cache and force auth state update
+      queryClient.clear();
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
       // Trigger refetch of user data which should now return null
       refetch();
+      
       toast({
         title: "Logged out",
         description: "You've been successfully logged out.",
