@@ -204,66 +204,60 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
           <p className="text-sm text-gray-600 mt-2">Create an account to start sharing and discovering AI use cases</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium">Username</label>
+          <div>
+            <label htmlFor="username">Username</label>
             <input
               ref={usernameRef}
               id="username"
-              name="username"
               type="text"
               placeholder="Choose a username"
               value={formData.username}
-              onChange={(e) => {
-                console.log('Username input changed:', e.target.value);
-                setFormData({ ...formData, username: e.target.value });
+              onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+              style={{
+                width: '100%',
+                height: '40px',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '16px',
+                backgroundColor: '#fff',
+                color: '#000',
+                pointerEvents: 'auto',
+                userSelect: 'text',
+                WebkitUserSelect: 'text',
+                MozUserSelect: 'text',
+                msUserSelect: 'text'
               }}
-              onInput={(e) => {
-                console.log('Username input event:', e.currentTarget.value);
-              }}
-              onKeyDown={(e) => {
-                console.log('Username keydown:', e.key);
-              }}
-              className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoComplete="off"
               autoFocus
-              tabIndex={1}
-              style={{ 
-                pointerEvents: 'auto' as const, 
-                userSelect: 'auto' as const, 
-                cursor: 'text',
-                zIndex: 9999
-              }}
               required
             />
           </div>
           
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">Email</label>
+          <div>
+            <label htmlFor="email">Email</label>
             <input
               id="email"
-              name="email"
               type="email"
               placeholder="Enter your email"
               value={formData.email}
-              onChange={(e) => {
-                console.log('Email input changed:', e.target.value);
-                setFormData({ ...formData, email: e.target.value });
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              style={{
+                width: '100%',
+                height: '40px',
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '16px',
+                backgroundColor: '#fff',
+                color: '#000',
+                pointerEvents: 'auto',
+                userSelect: 'text',
+                WebkitUserSelect: 'text',
+                MozUserSelect: 'text',
+                msUserSelect: 'text'
               }}
-              onInput={(e) => {
-                console.log('Email input event:', e.currentTarget.value);
-              }}
-              onKeyDown={(e) => {
-                console.log('Email keydown:', e.key);
-              }}
-              className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoComplete="off"
-              tabIndex={2}
-              style={{ 
-                pointerEvents: 'auto' as const, 
-                userSelect: 'auto' as const, 
-                cursor: 'text',
-                zIndex: 9999
-              }}
               required
             />
           </div>
