@@ -449,7 +449,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add sessionId and userId to the idea data
       const ideaData = { 
         ...result.data, 
-        sessionId: !userId ? sessionId : null, // Only store sessionId for anonymous ideas
+        sessionId: !userId ? (sessionId || null) : null, // Only store sessionId for anonymous ideas
         userId 
       };
       const idea = await storage.createIdea(ideaData);
