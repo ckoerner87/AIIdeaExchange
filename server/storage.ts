@@ -342,8 +342,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User operations
-  async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, parseInt(id)));
     return user;
   }
 
@@ -655,7 +655,7 @@ export class DatabaseStorage implements IStorage {
       })
       .from(comments)
       .leftJoin(ideas, eq(comments.ideaId, ideas.id))
-      .where(eq(comments.userId, parseInt(userId)))
+      .where(eq(comments.userId, userId))
       .orderBy(desc(comments.createdAt));
 
     return result as (Comment & { ideaTitle: string })[];
@@ -677,7 +677,7 @@ export class DatabaseStorage implements IStorage {
         count: sql<number>`count(*)`
       })
       .from(comments)
-      .where(eq(comments.userId, parseInt(userId)));
+      .where(eq(comments.userId, userId));
 
     // Get average AI grade for user's ideas
     const averageResult = await db
