@@ -98,35 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
-    },
-    onMutate: () => {
-      // Optimistically set user to null immediately
-      queryClient.setQueryData(["/api/user"], null);
-    },
-    onSuccess: () => {
-      // Completely remove user data from cache
-      queryClient.removeQueries({ queryKey: ["/api/user"] });
-      queryClient.clear();
-      // Force refetch to get updated auth state
-      refetch();
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out.",
-      });
-      // Force page reload to ensure clean state
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Logout failed",
-        description: error.message,
-        variant: "destructive",
-      });
-      // If logout fails, refetch user data
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Direct navigation to GET logout endpoint that handles redirect
+      window.location.href = '/api/logout';
     },
   });
 
