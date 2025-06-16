@@ -362,9 +362,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: { username: string; email: string; passwordHash: string }): Promise<User> {
+    const userId = Math.random().toString(36).substr(2, 9);
     const [user] = await db
       .insert(users)
       .values({
+        id: userId,
         username: userData.username,
         email: userData.email,
         passwordHash: userData.passwordHash,

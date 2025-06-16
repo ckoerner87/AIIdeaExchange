@@ -106,6 +106,7 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
+- June 16, 2025: RESOLVED INPUT BLOCKING - Fixed critical account creation issue by replacing React Hook Form with simple uncontrolled HTML inputs using FormData, eliminated controlled state that was preventing text/email input interaction while allowing password fields to work normally, updated database user creation to generate proper IDs preventing null constraint violations during registration
 - June 16, 2025: CRITICAL ISSUE - Account creation popup form has persistent input blocking issue where username and email fields cannot accept text input, only password fields work. Multiple attempted fixes including: removing Radix Dialog, using native HTML inputs, eliminating CSS classes, adding aggressive CSS overrides, replacing with custom modal - none resolved the issue. Password fields work normally indicating targeted interference with text/email input types specifically
 - June 16, 2025: Fixed user logout functionality - added GET logout route alongside existing POST route to handle browser navigation, implemented proper redirect to homepage after logout to eliminate 404 errors, verified smooth logout flow that returns users to homepage in unauthenticated state
 - June 16, 2025: Fixed user dropdown logout button visibility - improved dropdown positioning and z-index to ensure all menu items including logout button are properly displayed
