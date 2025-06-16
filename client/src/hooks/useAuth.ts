@@ -19,11 +19,20 @@ export function useAuth() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      // Set user query data to null immediately
+    onMutate: () => {
+      // Optimistically set user to null immediately
       queryClient.setQueryData(["/api/user"], null);
-      // Clear all cached data
+    },
+    onSuccess: () => {
+      // Ensure user data is null and invalidate the query
+      queryClient.setQueryData(["/api/user"], null);
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Clear all other cached data
       queryClient.clear();
+    },
+    onError: () => {
+      // If logout fails, refetch user data
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     },
   });
 
