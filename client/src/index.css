@@ -63,16 +63,35 @@ button, [role="button"] {
 /* Ensure dialog inputs can receive focus and accept typing */
 [data-radix-dialog-content] input,
 [data-radix-dialog-content] textarea,
-[data-radix-dialog-content] select {
+[data-radix-dialog-content] select,
+.dialog-content input,
+.dialog-content textarea,
+.dialog-content select {
   pointer-events: auto !important;
   user-select: auto !important;
   -webkit-user-select: auto !important;
   -moz-user-select: auto !important;
   -ms-user-select: auto !important;
+  -webkit-touch-callout: auto !important;
+  -webkit-user-drag: auto !important;
+  -khtml-user-select: auto !important;
+  cursor: text !important;
+}
+
+/* Force input focus ability */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  cursor: text !important;
 }
 
 /* Ensure dialog content allows interactions */
-[data-radix-dialog-content] {
+[data-radix-dialog-content],
+.dialog-content {
   pointer-events: auto !important;
 }
 

@@ -25,13 +25,27 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
   const [forgotEmail, setForgotEmail] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const usernameRef = useRef<HTMLInputElement>(null);
+
+  // Focus first input when dialog opens
+  useEffect(() => {
+    if (isOpen && usernameRef.current) {
+      setTimeout(() => {
+        usernameRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
 
   const createAccountMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          password: data.password
+        }),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -185,6 +199,7 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
+                ref={usernameRef}
                 id="username"
                 type="text"
                 placeholder="Choose a username"
