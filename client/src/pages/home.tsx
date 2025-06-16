@@ -571,7 +571,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
               <div className="grid grid-cols-3 gap-2 md:gap-4">
                 {/* Category Filter */}
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-full bg-white border border-blue-200 hover:border-blue-400 focus:border-blue-500 py-2 md:py-3 text-xs md:text-sm">
+                  <SelectTrigger className="w-full bg-white border border-blue-200 hover:border-blue-400 focus:border-blue-500 py-2 md:py-3 text-xs md:text-sm" aria-label="Filter by Category">
                     <SelectValue placeholder={isMobile ? "Category" : "🎯 Filter by Category"} />
                   </SelectTrigger>
                     <SelectContent>
@@ -592,7 +592,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
                 
                 {/* Tool Filter */}
                 <Select value={selectedTool} onValueChange={setSelectedTool}>
-                  <SelectTrigger className="w-full bg-white border border-green-200 hover:border-green-400 focus:border-green-500 py-2 md:py-3 text-xs md:text-sm">
+                  <SelectTrigger className="w-full bg-white border border-green-200 hover:border-green-400 focus:border-green-500 py-2 md:py-3 text-xs md:text-sm" aria-label="Filter by Tool">
                     <SelectValue placeholder={isMobile ? "Tool" : "🛠️ Filter by Tool"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -614,7 +614,7 @@ Prioritize examples that combine creativity + execution. If relevant, include wh
 
                 {/* Sort Dropdown */}
                 <Select value={sortBy} onValueChange={(value: 'votes' | 'recent' | 'comments') => setSortBy(value)}>
-                  <SelectTrigger className="w-full bg-white border border-orange-200 hover:border-orange-400 focus:border-orange-500 py-2 md:py-3 text-xs md:text-sm">
+                  <SelectTrigger className="w-full bg-white border border-orange-200 hover:border-orange-400 focus:border-orange-500 py-2 md:py-3 text-xs md:text-sm" aria-label="Sort by">
                     <SelectValue placeholder={isMobile ? "Sort" : "📊 Sort by"} />
                   </SelectTrigger>
                   <SelectContent>

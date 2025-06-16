@@ -60,6 +60,9 @@
     <meta name="language" content="en" />
     <meta name="theme-color" content="#1e293b" />
     
+    <!-- Defer non-critical CSS -->
+    <link rel="stylesheet" href="/src/index.css" media="print" onload="this.media='all'" />
+    
     <!-- Preload critical resources -->
     <link rel="preload" href="/api/session" as="fetch" crossorigin />
     <link rel="preload" href="/api/stats" as="fetch" crossorigin />
@@ -68,10 +71,6 @@
     <link rel="prefetch" href="/api/ideas" />
     <link rel="dns-prefetch" href="//www.google-analytics.com" />
     <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-    
-    <!-- Mobile performance optimizations -->
-    <link rel="preload" as="style" href="/src/index.css" />
-    <link rel="preload" as="script" href="/src/main.tsx" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />

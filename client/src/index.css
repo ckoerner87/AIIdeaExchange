@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Self-hosted fonts for performance */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('data:font/woff2;charset=utf-8;base64,') format('woff2');
+}
+
 /* Critical performance optimizations */
 * {
   box-sizing: border-box;
