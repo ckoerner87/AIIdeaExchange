@@ -106,6 +106,8 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
+- June 16, 2025: Implemented comprehensive PageSpeed optimizations - deferred non-critical CSS with media="print" technique, added aria-labels to filter components, fixed text contrast issues by updating gray colors, corrected heading hierarchy starting with h1, optimized images with loading="lazy" and explicit dimensions, enabled production minification targeting modern browsers, added self-hosted font optimization with font-display:swap, and implemented accessibility improvements for screen readers
+- June 16, 2025: Fixed authentication system where logged-in users' comments appeared as anonymous - updated database schema with userId fields, enhanced storage methods for both traditional and OAuth authentication, improved user deserialization error handling, and completed dashboard integration for proper user attribution
 - June 15, 2025: Fixed white space issue above filters on desktop after scrolling by removing unnecessary top offset
 - June 15, 2025: Fixed contact form toast notifications to disappear after 2 seconds instead of staying indefinitely
 - June 15, 2025: Improved user experience - show 15 ideas on initial load with 20 more on pagination, replaced GIF sections with contact form sending to chris@cofounders.com, removed feature request section

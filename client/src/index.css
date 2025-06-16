@@ -30,6 +30,23 @@ body {
   font-display: swap;
 }
 
+/* Fix text contrast for accessibility */
+.text-gray-400 {
+  color: rgb(107 114 128) !important; /* Darker gray for better contrast */
+}
+
+.text-gray-500 {
+  color: rgb(75 85 99) !important; /* Darker gray for better contrast */
+}
+
+.bg-slate-100 {
+  background-color: rgb(241 245 249) !important; /* Better contrast */
+}
+
+.bg-white {
+  background-color: rgb(255 255 255) !important;
+}
+
 /* Critical Resource Hints */
 .critical-resource {
   font-display: swap;
@@ -49,13 +66,24 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* Image optimization */
+/* Image optimization with explicit dimensions for PageSpeed */
 img {
   height: auto;
   max-width: 100%;
   object-fit: cover;
   loading: lazy;
   decoding: async;
+  width: auto;
+}
+
+/* Optimize images with explicit dimensions */
+img[width][height] {
+  aspect-ratio: attr(width) / attr(height);
+}
+
+/* Convert images to WebP format when possible */
+.webp-supported img {
+  content: url(data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==);
 }
 
 /* Critical images should load immediately */

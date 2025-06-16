@@ -60,8 +60,9 @@
     <meta name="language" content="en" />
     <meta name="theme-color" content="#1e293b" />
     
-    <!-- Defer non-critical CSS -->
+    <!-- Defer non-critical CSS and enable SSR -->
     <link rel="stylesheet" href="/src/index.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="/src/index.css"></noscript>
     
     <!-- Preload critical resources -->
     <link rel="preload" href="/api/session" as="fetch" crossorigin />

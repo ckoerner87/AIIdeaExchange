@@ -398,12 +398,12 @@ export default function Home() {
         {paywallEnabled && !hasSubmitted && (
           <div className="mb-12">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">
+              <h1 className="text-2xl font-bold text-slate-900 mb-4">
                 {paywallEnabled 
                   ? "Need more AI ideas? We've got hundreds! But share yours first!"
                   : "Share Your AI Use Case!"
                 }
-              </h2>
+              </h1>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-6">
                 {paywallEnabled
                   ? "Wanna see how hundreds of other geniuses are using AI? You've gotta share your own use case first! We don't care if you think it's silly - just share it! We don't need your email, name or your login, just your idea."
