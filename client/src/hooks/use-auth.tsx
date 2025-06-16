@@ -98,14 +98,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
+      // Clear client-side cookies first
+      document.cookie = 'connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      document.cookie = 'connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + window.location.hostname + ';';
+      
       await fetch('/api/logout', { 
         method: 'POST', 
         credentials: 'include' 
       });
     },
     onSuccess: () => {
-      // Force page reload after successful logout
-      window.location.href = '/';
+      // Clear all possible variations of the session cookie
+      const cookieNames = ['connect.sid', 'session', 'sessionid'];
+      const domains = [window.location.hostname, '.' + window.location.hostname];
+      const paths = ['/', '/api'];
+      
+      cookieNames.forEach(name => {
+        domains.forEach(domain => {
+          paths.forEach(path => {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain};`;
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path};`;
+          });
+        });
+      });
+      
+      // Clear React Query cache
+      queryClient.clear();
+      queryClient.removeQueries();
+      
+      // Force hard reload
+      window.location.replace('/');
     },
   });
 
