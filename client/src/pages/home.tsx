@@ -361,22 +361,11 @@ export default function Home() {
                   <div className="flex items-center space-x-3">
                     <UserDropdown 
                       user={user} 
-                      onLogout={async () => {
-                        try {
-                          await fetch('/api/logout', { 
-                            method: 'POST',
-                            credentials: 'include'
-                          });
-                          // Invalidate React Query cache to clear user data
-                          queryClient.clear();
-                          // Force a full page reload to clear all state
-                          window.location.reload();
-                        } catch (error) {
-                          console.error('Logout error:', error);
-                          // Even if logout fails, clear cache and reload
-                          queryClient.clear();
-                          window.location.reload();
-                        }
+                      onLogout={() => {
+                        // Clear React Query cache first
+                        queryClient.clear();
+                        // Navigate directly to logout endpoint which handles redirect
+                        window.location.href = '/api/logout';
                       }}
                     />
                   </div>
