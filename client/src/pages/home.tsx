@@ -22,7 +22,7 @@ import { UserDropdown } from "@/components/user-dropdown";
 
 export default function Home() {
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, logoutMutation } = useAuth();
   const [sessionId, setSessionId] = useState<string>(() => {
     // Initialize from localStorage on mount
     if (typeof window !== 'undefined') {
@@ -362,10 +362,7 @@ export default function Home() {
                     <UserDropdown 
                       user={user} 
                       onLogout={() => {
-                        // Clear React Query cache first
-                        queryClient.clear();
-                        // Navigate directly to logout endpoint which handles redirect
-                        window.location.href = '/api/logout';
+                        logoutMutation.mutate();
                       }}
                     />
                   </div>
