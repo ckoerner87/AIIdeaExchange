@@ -187,14 +187,23 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
     );
   }
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md dialog-content">
-        <DialogHeader>
-          <DialogTitle className="text-center">Join the community</DialogTitle>
-          <p className="text-center text-sm text-gray-600">Create an account to start sharing and discovering AI use cases</p>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4" style={{ pointerEvents: 'auto' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/50" onClick={onClose}></div>
+      <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4 z-60">
+        <button 
+          onClick={onClose}
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+        >
+          ✕
+        </button>
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-semibold">Join the community</h2>
+          <p className="text-sm text-gray-600 mt-2">Create an account to start sharing and discovering AI use cases</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="username" className="text-sm font-medium">Username</label>
             <input
@@ -305,25 +314,25 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
             </div>
           </div>
           
-          <Button
+          <button
             type="submit"
             disabled={createAccountMutation.isPending}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium"
           >
-            {createAccountMutation.isPending ? "Creating Account..." : "Create Account"}
-          </Button>
+            {createAccountMutation.isPending ? "Creating Account..." : "Create account"}
+          </button>
           
           <div className="text-center">
             <button
               type="button"
-              onClick={() => setShowForgotPassword(true)}
+              onClick={() => window.location.href = '/auth'}
               className="text-sm text-blue-600 hover:text-blue-700 underline"
             >
-              Already have an account? Forgot password?
+              Already have an account? Sign in
             </button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
