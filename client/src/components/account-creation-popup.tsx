@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -191,6 +191,9 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 className="pl-10"
+                autoComplete="username"
+                autoFocus
+                tabIndex={1}
                 required
               />
             </div>
