@@ -70,7 +70,9 @@ export function setupAuth(app: Express) {
       httpOnly: true,
       secure: false, // Set to true in production with HTTPS
       maxAge: sessionTtl,
+      sameSite: 'lax', // Allow cross-site requests for authentication
     },
+    name: 'connect.sid', // Standard session name
   };
 
   app.set("trust proxy", 1);
@@ -114,9 +116,9 @@ export function setupAuth(app: Express) {
   );
 
   passport.serializeUser((user, done) => done(null, (user as any).id));
-  passport.deserializeUser(async (id: number, done) => {
+  passport.deserializeUser(async (id: string, done) => {
     try {
-      const user = await storage.getUser(id.toString());
+      const user = await storage.getUser(id);
       if (!user) {
         return done(null, false);
       }
