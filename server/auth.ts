@@ -207,8 +207,13 @@ export function setupAuth(app: Express) {
           return next(err);
         }
         
-        // Clear the session cookie
-        res.clearCookie('connect.sid');
+        // Clear the session cookie with proper options
+        res.clearCookie('connect.sid', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/'
+        });
         res.status(200).json({ message: "Logged out successfully" });
       });
     });

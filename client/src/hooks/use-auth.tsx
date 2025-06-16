@@ -98,8 +98,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      // Direct navigation to GET logout endpoint that handles redirect
-      window.location.href = '/api/logout';
+      await fetch('/api/logout', { 
+        method: 'POST', 
+        credentials: 'include' 
+      });
+    },
+    onSuccess: () => {
+      // Force page reload after successful logout
+      window.location.href = '/';
     },
   });
 
