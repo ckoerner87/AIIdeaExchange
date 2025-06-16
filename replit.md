@@ -106,6 +106,7 @@ Preferred communication style: Simple, everyday language.
 ## Changelog
 
 Changelog:
+- June 16, 2025: Fixed account creation form input fields - added missing Confirm Password field, implemented password matching validation, resolved TypeScript errors preventing proper form state management, verified all input fields now accept text input properly
 - June 16, 2025: Fixed user logout functionality - added GET logout route alongside existing POST route to handle browser navigation, implemented proper redirect to homepage after logout to eliminate 404 errors, verified smooth logout flow that returns users to homepage in unauthenticated state
 - June 16, 2025: Fixed user dropdown logout button visibility - improved dropdown positioning and z-index to ensure all menu items including logout button are properly displayed
 - June 16, 2025: Fixed admin deletion functionality - resolved authentication token mismatch preventing idea and comment deletion, updated all admin delete routes to accept Bearer tokens instead of requiring specific hardcoded values, verified successful deletion operations for both single and bulk operations

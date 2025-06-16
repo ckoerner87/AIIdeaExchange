@@ -45,7 +45,7 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
         description: "Your account has been created successfully. Please sign in.",
       });
       onClose();
-      setFormData({ username: "", email: "", password: "" });
+      setFormData({ username: "", email: "", password: "", confirmPassword: "" });
       // Redirect to login
       window.location.href = "/api/login";
     },
@@ -90,7 +90,7 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim()) {
+    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim() || !formData.confirmPassword.trim()) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -98,7 +98,19 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
       });
       return;
     }
-    createAccountMutation.mutate(formData);
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+    createAccountMutation.mutate({
+      username: formData.username,
+      email: formData.email,
+      password: formData.password
+    });
   };
 
   const handleForgotPassword = (e: React.FormEvent) => {
@@ -209,6 +221,29 @@ export default function AccountCreationPopup({ isOpen, onClose }: AccountCreatio
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="pl-10 pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 className="pl-10 pr-10"
                 required
               />
