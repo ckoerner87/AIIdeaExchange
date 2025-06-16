@@ -416,12 +416,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user is authenticated (supports both traditional auth and Replit OAuth)
       if (req.isAuthenticated() && req.user) {
         // Traditional auth: user has id property directly
-        if (req.user.id) {
-          userId = req.user.id.toString();
+        if ((req.user as any).id) {
+          userId = (req.user as any).id.toString();
         }
         // Replit OAuth: user has claims.sub property
-        else if (req.user.claims?.sub) {
-          userId = req.user.claims.sub;
+        else if ((req.user as any).claims?.sub) {
+          userId = (req.user as any).claims.sub;
         }
       }
       
@@ -709,12 +709,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user is authenticated (supports both traditional auth and Replit OAuth)
       if (req.isAuthenticated() && req.user) {
         // Traditional auth: user has id property directly
-        if (req.user.id) {
-          userId = req.user.id.toString();
+        if ((req.user as any).id) {
+          userId = (req.user as any).id.toString();
         }
         // Replit OAuth: user has claims.sub property
-        else if (req.user.claims?.sub) {
-          userId = req.user.claims.sub;
+        else if ((req.user as any).claims?.sub) {
+          userId = (req.user as any).claims.sub;
         }
       }
       

@@ -90,7 +90,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // Ideas
-  async createIdea(insertIdea: InsertIdea & { sessionId: string }): Promise<Idea> {
+  async createIdea(insertIdea: any): Promise<Idea> {
     // Ensure category defaults to "other" if not provided
     const ideaData = {
       sessionId: insertIdea.sessionId,
