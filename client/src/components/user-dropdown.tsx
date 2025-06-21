@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import { User, LogOut, Settings, MessageCircle, Bell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { User, LogOut, Settings, MessageCircle, Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface UserDropdownProps {
   user: {
@@ -16,6 +17,7 @@ interface UserDropdownProps {
 export function UserDropdown({ user, onLogout }: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -57,7 +59,7 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  window.location.href = '/dashboard';
+                  router.push("/dashboard");
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
               >
@@ -68,7 +70,7 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  window.location.href = '/notifications';
+                  router.push("/notifications");
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
               >

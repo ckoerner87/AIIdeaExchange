@@ -2,7 +2,14 @@ import { useState, FormEvent } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Lightbulb, Users, TrendingUp, MessageCircle } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Lightbulb,
+  Users,
+  TrendingUp,
+  MessageCircle,
+} from "lucide-react";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -21,10 +28,10 @@ export default function AuthPage() {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const formData = new FormData(e.currentTarget);
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
 
     try {
       const response = await fetch("/api/login", {
@@ -57,11 +64,11 @@ export default function AuthPage() {
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const formData = new FormData(e.currentTarget);
-    const username = formData.get('username') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const username = formData.get("username") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     try {
       const response = await fetch("/api/register", {
@@ -101,18 +108,24 @@ export default function AuthPage() {
               {isLogin ? "Welcome back" : "Join the community"}
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              {isLogin 
-                ? "Sign in to your account to continue" 
-                : "Create an account to start sharing and discovering AI use cases"
-              }
+              {isLogin
+                ? "Sign in to your account to continue"
+                : "Create an account to start sharing and discovering AI use cases"}
             </p>
           </div>
 
           <div className="bg-white shadow-lg rounded-lg p-8">
             {isLogin ? (
-              <form onSubmit={handleLogin} className="space-y-6">
+              <form
+                key="login-form"
+                onSubmit={handleLogin}
+                className="space-y-6"
+              >
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Username
                   </label>
                   <input
@@ -126,7 +139,10 @@ export default function AuthPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Password
                   </label>
                   <div className="relative">
@@ -161,9 +177,16 @@ export default function AuthPage() {
                 </button>
               </form>
             ) : (
-              <form onSubmit={handleRegister} className="space-y-6">
+              <form
+                key="signup-form"
+                onSubmit={handleRegister}
+                className="space-y-6"
+              >
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Username
                   </label>
                   <input
@@ -177,7 +200,10 @@ export default function AuthPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Email
                   </label>
                   <input
@@ -191,7 +217,10 @@ export default function AuthPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Password
                   </label>
                   <div className="relative">
@@ -233,10 +262,9 @@ export default function AuthPage() {
                 onClick={() => setIsLogin(!isLogin)}
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"
               >
-                {isLogin 
-                  ? "Don't have an account? Sign up" 
-                  : "Already have an account? Sign in"
-                }
+                {isLogin
+                  ? "Don't have an account? Sign up"
+                  : "Already have an account? Sign in"}
               </button>
             </div>
           </div>
@@ -262,31 +290,38 @@ export default function AuthPage() {
               Discover Amazing AI Use Cases
             </h3>
             <p className="text-gray-600 mb-6">
-              Join thousands of innovators sharing real-world applications of AI. 
-              From automation to creative projects, explore how others are using AI to solve problems.
+              Join thousands of innovators sharing real-world applications of
+              AI. From automation to creative projects, explore how others are
+              using AI to solve problems.
             </p>
           </div>
-          
+
           <div className="space-y-4 text-left">
             <div className="flex items-start space-x-3">
               <MessageCircle className="h-5 w-5 text-blue-500 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900">Share Your Ideas</p>
-                <p className="text-sm text-gray-600">Submit your AI use cases and get feedback from the community</p>
+                <p className="text-sm text-gray-600">
+                  Submit your AI use cases and get feedback from the community
+                </p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <TrendingUp className="h-5 w-5 text-green-500 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900">Vote & Discover</p>
-                <p className="text-sm text-gray-600">Upvote the best ideas and discover trending AI applications</p>
+                <p className="text-sm text-gray-600">
+                  Upvote the best ideas and discover trending AI applications
+                </p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <Users className="h-5 w-5 text-purple-500 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900">Connect</p>
-                <p className="text-sm text-gray-600">Join discussions and connect with fellow AI enthusiasts</p>
+                <p className="text-sm text-gray-600">
+                  Join discussions and connect with fellow AI enthusiasts
+                </p>
               </div>
             </div>
           </div>

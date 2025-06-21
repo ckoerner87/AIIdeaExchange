@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async () => {
       await fetch('/api/logout', { 
         method: 'POST', 
-        credentials: 'include'  // Keep this!
+        credentials: "include",
       });
     },
     onSuccess: () => {
@@ -135,6 +135,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Logged out",
         description: "You've been successfully logged out.",
       });
+    },
+    onError: (error: Error) => {
+      console.error("Logout failed", error);
     },
   });
 

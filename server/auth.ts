@@ -70,9 +70,10 @@ export function setupAuth(app: Express) {
     }),
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       maxAge: sessionTtl,
-      sameSite: 'lax',
+      sameSite: "lax",
+      path: "/",
     },
   };
 
@@ -215,29 +216,6 @@ export function setupAuth(app: Express) {
           path: '/'
         });
         res.status(200).json({ message: "Logged out successfully" });
-      });
-    });
-  });
-
-  app.get("/api/logout", (req, res, next) => {
-    req.logout((err) => {
-      if (err) return next(err);
-      
-      // Destroy the session
-      req.session.destroy((err) => {
-        if (err) {
-          console.error('Session destruction error:', err);
-          return next(err);
-        }
-        
-        // Clear the session cookie with proper options matching session config
-        res.clearCookie('connect.sid', {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          path: '/'
-        });
-        res.redirect('/');
       });
     });
   });
